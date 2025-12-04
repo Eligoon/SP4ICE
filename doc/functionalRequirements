@@ -1,0 +1,40 @@
+ICE Project - Projektorienteret analyse
+
+Project ide
+    Tekstbaseret adventure game inspireret af Dungeons & Dragons.
+
+Funktionelle krav
+   - Brugeren kan oprette en karakter (navn, race, klasse)
+   - Brugeren kan bevæge sig mellem lokationer
+   - Lokationer viser beskrivelse og valgmuligheder for handling
+   - Encounters kan opstå (valg, kamp, NPC-interaktioner
+   - Kampsystem baseret på stats og terningekast
+   - Inventory (samle, bruge og se items)
+   - Health og stats counter (systemet udregninger og opdaterer, bruger kan se dem)
+   - Game over hvis HP = 0
+
+Entities
+   - Character (Spillerens figur, navn, klasse, race)
+   - Stats (Karakterens hp, damage, resistence)
+   - Enemy (Modstandere i encounters)
+   - Traps (fælder der kan give skade)
+   - Location (Steder spilleren kan gå hen)
+   - Event (Noget der sker i en lokation)
+   - Item (Objekter der kan samles op, gemmes og bruges)
+        - ItemTyper (potion, weapon, wearable, key, scroll, book, food)
+   - Inventory (Samling af items)
+   - Dice (Til udfald af events)
+   - Damage (reducerer character eller enemy hp)
+   - NPC (non-playable-character som giver opgaver, info eller samtale)
+
+Domæne Model tekstbeskrivelse
+    Character -> has -> stats
+              -> has -> inventory -> contains -> item
+              -> is in -> location
+    Location -> leads to -> location
+             -> may contain -> encounter with enemy
+                            -> encounter with NPC
+                            -> encounter with items
+                            -> encounter with traps
+    Encounter -> uses -> dice
+              -> has  -> multiple options
