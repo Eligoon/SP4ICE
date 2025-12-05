@@ -27,15 +27,10 @@ Funktionelle krav
 
 
 Entities
-   - Character (Spillerens figur, navn, klasse, race)
-   - Stats (Karakterens hp, damage, resistence)
-   - Enemy (Modstandere i encounters)
-   - Traps (fælder der kan give skade)
-   - Location (Steder spilleren kan gå hen)
-   - Event (Noget der sker i en lokation)
-   - Item (Objekter der kan samles op, gemmes og bruges)
-        - ItemTyper (potion, weapon, wearable, key, scroll, book, food)
-   - Inventory (Samling af items)
-   - Dice (Til udfald af events)
-   - Damage (reducerer character eller enemy hp)
-   - NPC (non-playable-character som giver opgaver, info eller samtale)
+   - Character (name, class, race, stats)
+   - Stats (health, intelligence, strength, dexterity)
+   - NPC (name, race, choice and/or combat, item (interactive object))
+   - Location (NPC, item, story, choice)
+   - Item (weapon, armour, key, healthItem, questItem)
+   - Inventory (Item)
+   - Choice (NPC, story, combat, location, dataSaving, Inventory)
