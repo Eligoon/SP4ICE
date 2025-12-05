@@ -1,0 +1,101 @@
+@startuml
+title Tekstbaseret Rollespil - DomÃ¦nemodel
+
+' =======================
+'        CLASSES
+' =======================
+
+class Game <<Singleton>> {
+    - player: Player
+    - locations: Map<String, Location>
+    - currentLocation: Location
+    --
+    + start(): void
+    + processCommand(input: String): void
+    + move(direction: String): void
+    + getLocation(name: String): Location
+}
+
+class Player {
+    - name: String
+    - health: int
+    - inventory: List<Item>
+    - currentLocation: Location
+    - stats: Stats
+    --
+    + moveTo(location: Location): void
+    + pickUp(item: Item): void
+    + attack(enemy: Enemy): void
+    + isAlive(): boolean
+}
+
+class Stats {
+    - strength: int
+    - agility: int
+    - stamina: int
+}
+
+class Location {
+    - name: String
+    - description: String
+    - items: List<Item>
+    - enemies: List<Enemy>
+    - exits: Map<String, Location>
+    --
+    + addExit(direction: String, location: Location): void
+    + removeEnemy(enemy: Enemy): void
+    + removeItem(item: Item): void
+}
+
+class Item {
+    - name: String
+    - type: ItemType
+    - value: int
+    --
+    + applyTo(player: Player): void
+}
+
+class Enemy {
+    - name: String
+    - health: int
+    - attackPower: int
+    - loot: List<Item>
+    --
+    + attack(player: Player): void
+    + isAlive(): boolean
+}
+
+class Command {
+    - keyWord: String
+    --
+    + execute(game: Game, args: String[]): void
+}
+
+enum ItemType {
+    WEAPON
+    CONSUMABLE
+    KEY
+    QUEST
+}
+
+' =======================
+'     RELATIONSHIPS
+' =======================
+
+Game --> Player : has 1
+Game --> Location : has *
+
+Player --> Item : inventory *
+Player --> Location : at 1
+Player --> Stats : has 1
+
+Location --> Item : contains *
+Location --> Enemy : contains *
+Location --> Location : exits *
+
+Enemy --> Item : drops *
+
+Command --> Game : execute()
+
+@enduml
+... (1 linje linjer tilbage)

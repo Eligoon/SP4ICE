@@ -4,14 +4,27 @@ Project ide
     Tekstbaseret adventure game inspireret af Dungeons & Dragons.
 
 Funktionelle krav
-   - Brugeren kan oprette en karakter (navn, race, klasse)
-   - Brugeren kan bevæge sig mellem lokationer
-   - Lokationer viser beskrivelse og valgmuligheder for handling
-   - Encounters kan opstå (valg, kamp, NPC-interaktioner
-   - Kampsystem baseret på stats og terningekast
-   - Inventory (samle, bruge og se items)
-   - Health og stats counter (systemet udregninger og opdaterer, bruger kan se dem)
-   - Game over hvis HP = 0
+- Game Controller: gemmer og kontrollerer flowet af spillet
+- Location: Location er til for at repræsentere et bestemt område af verdenen.
+            Vores location hjælper med at fortælle historien som vores spiller går igennem,
+            men indeholder også forskellige NPC, choices og/eller items.
+- Inventory: Spillerens inventory er en oversigt over de items som man har i sin taske.
+            Ens inventory er begrænset af et bestemt antal. Har en funtion til at delete items.
+- Creature: Der findes forskellige slags creatures, fx spilleren (dig), nogle andre creatures (NPC)
+            nogle vil snakke med dig, andre slås, og nogle har begge udfald.
+- Story: En narrativ historie der guider dig igennem spillet i form af quests.
+- Choice: De forskellige valg du som spiller, kan tage der ændre historiens gang.
+- Start eller load spil: Du kan starte dit gemte spil på eller starte et nyt hvor
+            du kan lave din karakter, give den et navn, vælge en race og en
+            klasse du ønsker at spiller.
+- DataSaving: Man kan gemme sit spil så man kan fortsætte på et andet tidspunkt.
+- Race: Hvilken race ens karakter er. Hver race har unikke muligheder og oplevelser igennem historien.
+            Hver race har desuden bonus til forskellige stats (health, strength, dexterity, intelligence)
+- Class: Spilleren kan vælge en klasse som påvirker karakterens stats. fx. Warrior giver + strength,
+        Mage giver + intelligence, Ranger giver + dexterity.
+- Item: Ting der findes og bruges i spillet. Kan tilføjes til inventory og bruges når det behøves.
+- Armor/weapon: Giver nogle få + i stats
+
 
 Entities
    - Character (Spillerens figur, navn, klasse, race)
@@ -26,15 +39,3 @@ Entities
    - Dice (Til udfald af events)
    - Damage (reducerer character eller enemy hp)
    - NPC (non-playable-character som giver opgaver, info eller samtale)
-
-Domæne Model tekstbeskrivelse
-    Character -> has -> stats
-              -> has -> inventory -> contains -> item
-              -> is in -> location
-    Location -> leads to -> location
-             -> may contain -> encounter with enemy
-                            -> encounter with NPC
-                            -> encounter with items
-                            -> encounter with traps
-    Encounter -> uses -> dice
-              -> has  -> multiple options
