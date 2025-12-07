@@ -1,0 +1,263 @@
+@startuml
+
+'Game controller'
+class GameController {
+    - currentLocation : Location
+    - player : Player
+    - textUI : TextUI
+    - dataSaving : DataSaving
+    + startGame() : void
+    + loadGame() : void
+    + saveGame() : void
+    + processChoice(choice : Choice) : void
+    + handleCombat(creature : Creature) : void
+    + changeLocation(location : Location) : void
+}
+
+'Text UI '
+class TextUI {
+    + displayText(text : String) : void
+    + displayChoices(choices : List<Choice>) : void
+    + getPlayerInput() : String
+    + displayInventory(inventory : Inventory) : void
+    + displayCombatStatus(player : Player, enemy : Creature) : void
+}
+
+'Saving data '
+class DataSaving {
+    + saveGameState(gameController : GameController) : void
+    + loadGameState() : GameController
+    + deleteSave() : void
+}
+
+'Story'
+class Story {
+    - storySegments : Map<String, String>
+}
+
+'Choice'
+class Choice {
+    - description : String
+    - targetLocation : Location
+    - requirements : List<String>
+    + execute(gameController : GameController) : void
+    + isAvailable(player : Player) : boolean
+    + getDescription() : String
+}
+
+'Stats'
+class Stats {
+    - health : int
+    - strength : int
+    - dexterity : int
+    - intelligence : int
+    + getHealth() : int
+    + setHealth(value : int) : void
+    + getStrength() : int
+    + setStrength(value : int) : void
+    + getDexterity() : int
+    + setDexterity(value : int) : void
+    + getIntelligence() : int
+    + setIntelligence(value : int) : void
+    + applyModifier(stat : String, modifier : int) : void
+}
+
+'Creature'
+abstract class Creature {
+    # name : String
+    # race : Race
+    # stats : Stats
+    + {abstract} interact() : void
+    + fight(target : Creature) : void
+    + move(location : Location) : void
+    + pickUpItem(item : Item) : void
+    + getName() : String
+    + getRace() : Race
+    + getStats() : Stats
+}
+
+'Player'
+class Player {
+    - characterClass : Class
+    - inventory : Inventory
+    - questLog : List<Quest>
+    + interact() : void
+    + useItem(item : Item) : void
+    + equipWeapon(weapon : Weapon) : void
+    + equipArmor(armor : Armor) : void
+    + addQuest(quest : Quest) : void
+    + completeQuest(questId : String) : void
+}
+
+'NPC'
+class NPC {
+    - dialogue : List<String>
+    - questToGive : Quest
+    - itemHeld : Item
+    - isHostile : boolean
+    + interact() : void
+    + CPU_Interaction() : void
+    + CPU_Attack() : void
+    + giveQuest(player : Player) : void
+    + getQuestItem(player : Player) : boolean
+    + giveReward(player : Player) : void
+}
+
+' Race '
+class Race {
+    - raceName : String
+    - healthModifier : int
+    - strengthModifier : int
+    - dexterityModifier : int
+    - intelligenceModifier : int
+    - specialAbility : String
+    + applyRacialBonuses(stats : Stats) : void
+    + getRaceName() : String
+    + getSpecialAbility() : String
+}
+
+'Class'
+class Class {
+    - className : String
+    - baseHealth : int
+    - primaryStat : String
+    - specialSkills : List<String>
+    + applyClassBonuses(stats : Stats) : void
+    + getClassName() : String
+    + getSpecialSkills() : List<String>
+}
+
+'Location'
+class Location {
+    - locationName : String
+    - description : String
+    - creatures : List<Creature>
+    - items : List<Item>
+    - availableChoices : List<Choice>
+    - connectedLocations : Map<String, Location>
+    + enter(player : Player) : void
+    + displayDescription() : String
+    + getAvailableChoices() : List<Choice>
+    + addCreature(creature : Creature) : void
+    + removeCreature(creature : Creature) : void
+    + addItem(item : Item) : void
+    + removeItem(item : Item) : void
+}
+
+'Inventory'
+class Inventory {
+    - items : List<Item>
+    - maxCapacity : int
+    - equippedWeapon : Weapon
+    - equippedArmor : Armor
+    + addItem(item : Item) : boolean
+    + removeItem(item : Item) : void
+    + displayInventory() : void
+    + hasItem(itemName : String) : boolean
+    + getItems() : List<Item>
+}
+
+' Items '
+abstract class Item {
+    # itemName : String
+    # description : String
+    # weight : int
+    + {abstract} use(player : Player) : void
+    + add(inventory : Inventory) : void
+    + remove(inventory : Inventory) : void
+    + getItemName() : String
+    + getDescription() : String
+}
+
+class Health {
+    - healAmount : int
+    + use(player : Player) : void
+    + getHealAmount() : int
+}
+
+class Key {
+    - keyId : String
+    - doorId : String
+    + use(player : Player) : void
+    + unlockDoor(doorId : String) : boolean
+}
+
+class Weapon {
+    - damage : int
+    - damageType : String
+    - range : int
+    + use(player : Player) : void
+    + attack() : int
+    + getDamage() : int
+}
+
+class Armor {
+    - defenseBonus : int
+    - armorType : String
+    + use(player : Player) : void
+    + getDefenseBonus() : int
+}
+
+'quests'
+class Quest {
+    - questId : String
+    - questName : String
+    - description : String
+    - isCompleted : boolean
+    - requiredItem : String
+    - reward : Item
+    + use(player : Player) : void
+    + completeQuest(player : Player) : void
+    + getQuestId() : String
+    + isCompleted() : boolean
+}
+
+' ============ RELATIONSHIPS ============
+
+' Game Controller relationships
+GameController "1" --> "1" Player : manages
+GameController "1" --> "1" Location : currentLocation
+GameController "1" --> "1" TextUI : uses
+GameController "1" --> "1" DataSaving : uses
+GameController "1" --> "*" Choice : processes
+
+' Location relationships
+Location "1" --> "*" Creature : contains
+Location "1" --> "*" Item : contains
+Location "1" --> "*" Choice : offers
+Location "*" --> "*" Location : connectedTo
+Location "1" --> "1" Story : references
+
+' Creature hierarchy
+Creature <|-- Player : extends
+Creature <|-- NPC : extends
+
+' Creature composition
+Creature "1" --> "1" Race : has
+Creature "1" --> "1" Stats : has
+
+' Player composition
+Player "1" --> "1" Class : has
+Player "1" --> "1" Inventory : has
+Player "1" --> "*" Quest : tracks
+
+' NPC composition
+NPC "1" --> "0..1" Quest : canGive
+NPC "1" --> "0..1" Item : holds
+
+' Inventory relationships
+Inventory "1" --> "*" Item : contains
+Inventory "1" --> "0..1" Weapon : equippedWeapon
+Inventory "1" --> "0..1" Armor : equippedArmor
+
+' Item hierarchy
+Item <|-- Health : extends
+Item <|-- Key : extends
+Item <|-- Weapon : extends
+Item <|-- Armor : extends
+Item <|-- Quest : extends
+
+' Choice relationship
+Choice "1" --> "0..1" Location : leadsTo
+
+@enduml

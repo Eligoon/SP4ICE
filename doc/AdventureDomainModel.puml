@@ -1,0 +1,72 @@
+@startuml
+!define ENTITY_COLOR #99ccff
+!define GAME_COLOR #ff9999
+!define WORLD_COLOR #99ff99
+!define SYSTEM_COLOR #ffcc99
+!define DATA_COLOR #cc99ff
+
+package "Core Game" {
+    class "GameState" as GS <<Control>> GAME_COLOR
+    class "Character" as C <<Entity>> ENTITY_COLOR
+    class "Race" as R <<Entity>> ENTITY_COLOR
+    class "Class" as CL <<Entity>> ENTITY_COLOR
+    class "Inventory" as INV <<Entity>> ENTITY_COLOR
+}
+
+package "Items" {
+    abstract "Item" as I <<Entity>>
+    class "Weapon" as W <<Entity>>
+    class "Armor" as AR <<Entity>>
+    class "Potion" as P <<Entity>>
+    class "QuestItem" as QI <<Entity>>
+}
+
+package "World" {
+    class "Location" as L <<Entity>> WORLD_COLOR
+    class "Enemy" as E <<Entity>> WORLD_COLOR
+    class "Choice" as CH <<Entity>> WORLD_COLOR
+}
+
+package "Systems" {
+    class "Combat" as CM <<Control>> SYSTEM_COLOR
+    class "SaveData" as SD <<Entity>> DATA_COLOR
+}
+
+' GameState relationships
+GS --> C : "contains"
+GS --> L : "has current"
+GS --> SD : "can save to"
+
+' Character relationships
+C --> R : "has"
+C --> CL : "has"
+C --> INV : "has"
+C --> CM : "participates in"
+
+' Inventory relationships
+INV --> I : "has 0..*"
+
+' Item inheritance
+I <|-- W : "extends"
+I <|-- AR : "extends"
+I <|-- P : "extends"
+I <|-- QI : "extends"
+
+' Location relationships
+L --> E : "has 0..*"
+L --> I : "has 0..*"
+L --> CH : "offers 1..*"
+L --> L : "connects to 0..*"
+
+' Combat relationships
+CM --> C : "involves"
+CM --> E : "involves"
+
+' Enemy relationships
+E --> CM : "participates in"
+E --> I : "drops"
+
+' SaveData relationships
+SD --> GS : "stores"
+
+@enduml
