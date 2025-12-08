@@ -1,10 +1,12 @@
 package util;
 
 import collectibles.Item;
+import controller.Choice;
 import creatures.Creature;
 import creatures.Player;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class TextUI {
