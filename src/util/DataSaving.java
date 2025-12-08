@@ -15,6 +15,48 @@ public class DataSaving {
         }
     }
 
+    private void createTables() {
+        try (Statement stmt = conn.createStatement()) {
+
+            String sqlGameState = """
+                CREATE TABLE IF NOT EXISTS game_state (
+                    id INTEGER PRIMARY KEY,
+                    current_location TEXT
+                );
+                """;
+            stmt.executeUpdate(sqlGameState);
+
+            String sqlPlayer = """
+                CREATE TABLE IF NOT EXISTS player (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    race TEXT,
+                    class TEXT,
+                    health INTEGER,
+                    strength INTEGER,
+                    dexterity INTEGER,
+                    intelligence INTEGER,
+                    location TEXT
+                );
+                """;
+            stmt.executeUpdate(sqlPlayer);
+
+            String sqlInventory = """
+                CREATE TABLE IF NOT EXISTS inventory (
+                    player_id INTEGER,
+                    item_name TEXT
+                );
+                """;
+            stmt.executeUpdate(sqlInventory);
+
+        } catch (SQLException e) {
+            System.err.println("Error creating tables:");
+            e.printStackTrace();
+        }
+    }
+
+
+
     // Need to truncate the tables that needs a full, reset, such as Player and Inventory
     // Other tables needs to be updated, such as NPC's booleans so they are no longer dead
     /*
@@ -27,16 +69,5 @@ public class DataSaving {
 
 
 
-
-    // Potentially needed need to make columns
-    public void addPlayer(columns) {
-        String sql = "INSERT INTO Player (columns) VALUES ()";
-        try {
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
      */
 }
