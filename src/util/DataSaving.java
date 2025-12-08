@@ -16,27 +16,27 @@ public class DataSaving {
     }
 
     private void createTables() {
-        try (Statement stmt = conn.createStatement()) {
+        try (Statement stmt = connection.createStatement()) {
 
             String sqlGameState = """
                 CREATE TABLE IF NOT EXISTS game_state (
                     id INTEGER PRIMARY KEY,
-                    current_location TEXT
+                    current_location VARCHAR(100)
                 );
                 """;
             stmt.executeUpdate(sqlGameState);
 
             String sqlPlayer = """
                 CREATE TABLE IF NOT EXISTS player (
-                    id INTEGER PRIMARY KEY,
-                    name TEXT,
-                    race TEXT,
-                    class TEXT,
-                    health INTEGER,
-                    strength INTEGER,
-                    dexterity INTEGER,
-                    intelligence INTEGER,
-                    location TEXT
+                     id INTEGER PRIMARY KEY,
+                     name VARCHAR(100),
+                     race VARCHAR(50),
+                     class VARCHAR(50),
+                     health INTEGER,
+                     strength INTEGER,
+                     dexterity INTEGER,
+                     intelligence INTEGER,
+                     location VARCHAR(100)
                 );
                 """;
             stmt.executeUpdate(sqlPlayer);
@@ -44,7 +44,7 @@ public class DataSaving {
             String sqlInventory = """
                 CREATE TABLE IF NOT EXISTS inventory (
                     player_id INTEGER,
-                    item_name TEXT
+                    item_name VARCHAR(100)
                 );
                 """;
             stmt.executeUpdate(sqlInventory);
