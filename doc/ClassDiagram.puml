@@ -29,7 +29,13 @@ class TextUI {
 class DataSaving {
     + connect(String url)
     + saveGameState(gameController : GameController) : void
+    + saveCurrentLocation()
+    + savePlayer()
+    + saveInventory()
     + loadGameState() : GameController
+    + loadLocation()
+    + loadPlayer()
+    + loadInventory()
     + deleteSave() : void
 }
 
