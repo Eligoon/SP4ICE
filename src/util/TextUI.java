@@ -1,5 +1,9 @@
 package util;
 
+import collectibles.Item;
+import creatures.Creature;
+import creatures.Player;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -57,5 +61,27 @@ public class TextUI {
         }else{return promptBinary(msg);
                 }
 
+    }
+
+    public void displayChoices(List<Choice> choices){
+        for(int i = 0; i < choices.size(); i++){
+            displayMsg((i + 1)+". "+ choices.get(i).getDescription());
+        }
+    }
+    public String getPlayerInput(){
+        return sc.nextLine();
+    }
+
+    public void displayInventory(Inventory inventory){
+        displayMsg("=== INVENTORY ===");
+        for (Item item : inventory.getItems()){
+            displayMsg("- "+ item.getName());
+        }
+    }
+
+    public void displayCombatStatus(Player player, Creature enemy){
+        displayMsg("=== COMBAT STATUS ===");
+        displayMsg(player.getName() + " - HP: " + player.getCurrentHP()+ " /"+ player.getMaxHP());
+        displayMsg(enemy.getName() + " - HP: " + enemy.getCurrentHP()+ " /"+ enemy.getMaxHP());
     }
 }
