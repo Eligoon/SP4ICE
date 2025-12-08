@@ -15,6 +15,9 @@ public class DataSaving {
         }
     }
 
+    // Need to truncate the tables that needs a full, reset, such as Player and Inventory
+    // Other tables needs to be updated, such as NPC's booleans so they are no longer dead
+    /*
     public void deleteSave()
     {
         String sql = "TRUNCATE TABLE <Player>";
@@ -35,4 +38,5 @@ public class DataSaving {
             throw new RuntimeException(e);
         }
     }
+     */
 }
