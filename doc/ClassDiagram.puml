@@ -6,9 +6,10 @@ class GameController {
     - player : Player
     - textUI : TextUI
     - dataSaving : DataSaving
-    + startGame() : void
+    + newGame() : void
     + loadGame() : void
     + saveGame() : void
+    + createCharacter() : void
     + processChoice(choice : Choice) : void
     + handleCombat(creature : Creature) : void
     + changeLocation(location : Location) : void
@@ -170,6 +171,12 @@ abstract class Item {
     + getDescription() : String
 }
 
+class Objects {
+    - isActive : boolean
+    - name : String
+    + dealDamage() : void
+
+}
 class Health {
     - healAmount : int
     + use(player : Player) : void
@@ -213,8 +220,6 @@ class Quest {
     + isCompleted() : boolean
 }
 
-' ============ RELATIONSHIPS ============
-
 ' Game Controller relationships
 GameController "1" --> "1" Player : manages
 GameController "1" --> "1" Location : currentLocation
@@ -228,6 +233,10 @@ Location "1" --> "*" Item : contains
 Location "1" --> "*" Choice : offers
 Location "*" --> "*" Location : connectedTo
 Location "1" --> "1" Story : references
+
+' Objects relationships
+Location "0" --> "*" Objects : has
+Key --> Objects : can unlock
 
 ' Creature hierarchy
 Creature <|-- Player : extends
