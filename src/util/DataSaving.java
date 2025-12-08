@@ -15,10 +15,19 @@ public class DataSaving {
         }
     }
 
+    public void deleteSave()
+    {
+        String sql = "TRUNCATE TABLE <Player>";
 
-    // Potentially needed
-    public void addPlayer(String name, int account) {
-        String sql = "INSERT INTO Player (name, account) VALUES ('Gås', 1000000)";
+        Statement stmt = connection.createStatement();
+    }
+
+
+
+
+    // Potentially needed need to make columns
+    public void addPlayer(columns) {
+        String sql = "INSERT INTO Player (columns) VALUES ()";
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
