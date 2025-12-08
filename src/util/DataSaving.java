@@ -55,19 +55,15 @@ public class DataSaving {
         }
     }
 
-
-
-    // Need to truncate the tables that needs a full, reset, such as Player and Inventory
-    // Other tables needs to be updated, such as NPC's booleans so they are no longer dead
-    /*
-    public void deleteSave()
-    {
-        String sql = "TRUNCATE TABLE <Player>";
-
-        Statement stmt = connection.createStatement();
+    public void deleteSave() {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM game_state;");
+            stmt.executeUpdate("DELETE FROM player;");
+            stmt.executeUpdate("DELETE FROM inventory;");
+            System.out.println("Save deleted.");
+        } catch (SQLException e) {
+            System.err.println("Could not delete save:");
+            e.printStackTrace();
+        }
     }
-
-
-
-     */
 }
