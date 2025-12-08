@@ -14,4 +14,16 @@ public class DataSaving {
             System.err.println(e.getMessage());
         }
     }
+
+
+    // Potentially needed
+    public void addPlayer(String name, int account) {
+        String sql = "INSERT INTO Player (name, account) VALUES ('Gås', 1000000)";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
