@@ -95,6 +95,7 @@ class NPC {
     - questToGive : Quest
     - itemHeld : Item
     - isHostile : boolean
+    - isDead : boolean
     + interact() : void
     + CPU_Interaction() : void
     + CPU_Attack() : void
