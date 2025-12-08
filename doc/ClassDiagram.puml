@@ -6,6 +6,7 @@ class GameController {
     - player : Player
     - textUI : TextUI
     - dataSaving : DataSaving
+    - String url
     + newGame() : void
     + loadGame() : void
     + saveGame() : void
