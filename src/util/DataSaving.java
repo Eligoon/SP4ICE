@@ -51,6 +51,8 @@ public class DataSaving {
                 """;
             stmt.executeUpdate(sqlInventory);
 
+            System.out.println("Tables created");
+
         } catch (SQLException e) {
             System.err.println("Error creating tables:");
             e.printStackTrace();
