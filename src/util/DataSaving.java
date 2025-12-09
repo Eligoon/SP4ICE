@@ -82,6 +82,7 @@ public class DataSaving {
     // SaveInventory
 
     // SaveNPCs the ? can be replaced once we have concrete NPCs
+    // False is 0 true is 1 for booleans
     public void saveNPCs(Location location) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
@@ -114,6 +115,53 @@ public class DataSaving {
     // LoadInventory
 
     // LoadNPCs
+    public void loadNPCs(Map<String, Location> allLocations) {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state")) {
+
+            while (rs.next()) {
+
+                String npcName = rs.getString("npc_name");
+                String locName = rs.getString("location_name");
+                boolean isDead = rs.getBoolean("is_dead");
+                boolean isHostile = rs.getBoolean("is_hostile");
+
+                Location location = allLocations.get(locName);
+                if (location == null) {
+                    System.err.println("WARNING: Location '" + locName
+                            + "' not found while loading NPC '"
+                            + npcName + "'.");
+                    continue;
+                }
+
+                boolean npcFound = false;
+
+                for (Creature c : location.getCreatures()) {
+                    if (c instanceof NPC npc && npc.getName().equals(npcName)) {
+                        npcFound = true;
+                        npc.isDead = isDead;
+                        npc.isHostile = isHostile;
+
+                        if (npc.isDead) {
+                            location.removeCreature(npc);
+                        }
+                    }
+                }
+
+                if (!npcFound) {
+                    System.err.println("WARNING: NPC " + npcName
+                            + " not found in location " + locName
+                            + " during load.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load NPC states from database.");
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     // Delete rows in the tables to prepare for a new game
     public void deleteSave() {
