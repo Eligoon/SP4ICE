@@ -77,7 +77,7 @@ public class DataSaving {
 
     // SaveCurrentLocation
 
-
+    // the ? will be replaced once we have a concrete player by the getter methods
     // Saves the player's information including:
     // - Name
     // - Race and Class
@@ -107,7 +107,7 @@ public class DataSaving {
 
     // SaveInventory
 
-    // SaveNPCs the ? can be replaced once we have concrete NPCs
+    // the ? will be replaced once we have a concrete NPCs by the getter methods
     // False is 0 true is 1 for booleans
     public void saveNPCs(Location location) {
         try (PreparedStatement stmt = connection.prepareStatement(
