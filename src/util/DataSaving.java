@@ -77,7 +77,33 @@ public class DataSaving {
 
     // SaveCurrentLocation
 
-    // SavePlayer
+
+    // Saves the player's information including:
+    // - Name
+    // - Race and Class
+    // - Stats (health, strength, dexterity, intelligence)
+    // - Current location
+    public void savePlayer(Player player, Location location) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "REPLACE INTO player (id, name, race, class, health, strength, dexterity, intelligence, location) " +
+                        "VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)"))
+        {
+            stmt.setString(1, player.getName());
+            stmt.setString(2, player.getRace().getRaceName());
+            stmt.setString(3, player.getCharacterClass().getClassName());
+            stmt.setInt(4, player.getStats().getHealth());
+            stmt.setInt(5, player.getStats().getStrength());
+            stmt.setInt(6, player.getStats().getDexterity());
+            stmt.setInt(7, player.getStats().getIntelligence());
+            stmt.setString(8, location.getLocationName());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save player.");
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     // SaveInventory
 
