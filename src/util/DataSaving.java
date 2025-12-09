@@ -175,7 +175,18 @@ public class DataSaving {
 
     // LoadGameState
 
-    // LoadLocation
+    // Loads a location object by name from a map of all locations.
+    // Returns null if the location is not found.
+        public Location loadLocation(String locationName, Map<String, Location> allLocations) {
+            Location loc = allLocations.get(locationName);
+
+            if (loc == null) {
+                System.err.println("ERROR: Location '" + locationName + "' not found during load.");
+            }
+
+            return loc;
+        }
+
 
     // LoadPlayer
 
