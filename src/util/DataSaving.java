@@ -75,9 +75,24 @@ public class DataSaving {
 
     // SaveGameState
 
-    // SaveCurrentLocation
+    // the ? will be replaced once we have a concrete location by the getter methods (part of preparedstatement)
+    // Saves only the player's current location.
+    // Useful when the location changes without saving the full game?
+        public void saveCurrentLocation(Location location) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
+            )) {
+                stmt.setString(1, location.getLocationName());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save current location.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
-    // the ? will be replaced once we have a concrete player by the getter methods
+
+    // the ? will be replaced once we have a concrete player by the getter methods (part of preparedstatement)
     // Saves the player's information including:
     // - Name
     // - Race and Class
@@ -107,7 +122,7 @@ public class DataSaving {
 
     // SaveInventory
 
-    // the ? will be replaced once we have a concrete NPCs by the getter methods
+    // the ? will be replaced once we have a concrete NPCs by the getter methods (part of preparedstatement)
     // False is 0 true is 1 for booleans
     public void saveNPCs(Location location) {
         try (PreparedStatement stmt = connection.prepareStatement(
