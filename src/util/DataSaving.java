@@ -253,7 +253,7 @@ public class DataSaving {
         }
 
 
-    // LoadInventory
+    // LoadInventory //TODO
 
     // LoadNPCs
     public void loadNPCs(Map<String, Location> allLocations) {
