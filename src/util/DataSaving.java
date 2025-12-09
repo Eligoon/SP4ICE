@@ -72,6 +72,8 @@ public class DataSaving {
 
     // TRUNCATE is not supported in SQLite
 
+    // SAVING PART OF THE SAVING OF DATA
+
     // Saves the overall game state, currently only the player's current location.
     // This allows the game to resume from the same location on load.
         public void saveGameState(GameController gameController) {
@@ -185,14 +187,17 @@ public class DataSaving {
         }
     }
 
+    // LOADING PART OF THE SAVING OF DATA
 
     // Loads the saved game state.
     // Returns the name of the player's last saved location.
         public String loadGameState() {
             try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT current_location FROM game_state WHERE id = 1")) {
+                 ResultSet rs = stmt.executeQuery("SELECT current_location FROM game_state WHERE id = 1"))
+            {
 
-                if (rs.next()) {
+                if (rs.next())
+                {
                     return rs.getString("current_location");
                 }
             } catch (SQLException e) {
@@ -217,7 +222,36 @@ public class DataSaving {
         }
 
 
-    // LoadPlayer
+    // Loads the player's basic information and stats from the database.
+    // Returns a Player object, or null if no saved player exists.
+        public Player loadPlayer() {
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
+            {
+
+                if (rs.next()) {
+                    Player player = new Player(
+                            rs.getString("name"),
+                            rs.getString("race"),
+                            rs.getString("class")
+                    );
+
+                    player.getStats().setHealth(rs.getInt("health"));
+                    player.getStats().setStrength(rs.getInt("strength"));
+                    player.getStats().setDexterity(rs.getInt("dexterity"));
+                    player.getStats().setIntelligence(rs.getInt("intelligence"));
+
+                    return player;
+                }
+
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to load player.");
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
 
     // LoadInventory
 
