@@ -81,6 +81,8 @@ public class DataSaving {
 
     // SaveInventory
 
+    // SaveNPCs
+
     // LoadGameState
 
     // LoadLocation
@@ -88,6 +90,8 @@ public class DataSaving {
     // LoadPlayer
 
     // LoadInventory
+
+    // LoadNPCs
 
     // Delete rows in the tables to prepare for a new game
     public void deleteSave() {
