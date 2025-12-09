@@ -70,7 +70,6 @@ public class DataSaving {
         }
     }
 
-    // Note to self, look into INSERT and REPLACE
     // TRUNCATE is not supported in SQLite
 
     // Saves the overall game state, currently only the player's current location.
@@ -187,7 +186,23 @@ public class DataSaving {
     }
 
 
-    // LoadGameState
+    // Loads the saved game state.
+    // Returns the name of the player's last saved location.
+        public String loadGameState() {
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT current_location FROM game_state WHERE id = 1")) {
+
+                if (rs.next()) {
+                    return rs.getString("current_location");
+                }
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to load game state.");
+                e.printStackTrace();
+            }
+
+            return null; // No save found
+        }
+
 
     // Loads a location object by name from a map of all locations.
     // Returns null if the location is not found.
