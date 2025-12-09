@@ -1,6 +1,8 @@
 package util;
 import java.sql.*;
 
+// TRUNCATE is not supported in SQLite
+
 public class DataSaving {
     // Connection to database
     Connection connection;
@@ -70,7 +72,10 @@ public class DataSaving {
         }
     }
 
-    // TRUNCATE is not supported in SQLite
+    /** Explaining comment block of save and load
+     *
+
+     */
 
     // SAVING PART OF THE SAVING OF DATA
 
