@@ -81,7 +81,29 @@ public class DataSaving {
 
     // SaveInventory
 
-    // SaveNPCs
+    // SaveNPCs the ? can be replaced once we have concrete NPCs
+    public void saveNPCs(Location location) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
+        {
+            for (Creature c : location.getCreatures()) {
+
+                if (c instanceof NPC npc) {
+                    stmt.setString(1, npc.getName());
+                    stmt.setString(2, location.getLocationName());
+                    stmt.setBoolean(3, npc.isDead);
+                    stmt.setBoolean(4, npc.isHostile);
+                    stmt.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save NPCs for location: " + location.getLocationName());
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     // LoadGameState
 
