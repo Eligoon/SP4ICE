@@ -80,8 +80,8 @@ public class DataSaving {
     // Useful when the location changes without saving the full game?
         public void saveCurrentLocation(Location location) {
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
-            )) {
+                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"))
+            {
                 stmt.setString(1, location.getLocationName());
                 stmt.executeUpdate();
             } catch (SQLException e) {
@@ -120,7 +120,33 @@ public class DataSaving {
     }
 
 
-    // SaveInventory
+    // the ? will be replaced once we have a concrete inventory by the getter methods (part of preparedstatement)
+    // Saves all items currently in the player's inventory.
+    // Each item is stored in a separate row.
+    // Before saving, the table is cleared to avoid duplicates.
+        public void saveInventory(Player player) {
+            try (Statement clear = connection.createStatement()) {
+                clear.executeUpdate("DELETE FROM inventory;");
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to clear inventory before saving.");
+                e.printStackTrace();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO inventory (player_id, item_name) VALUES (1, ?)"))
+            {
+                for (Item item : player.getInventory().getItems()) {
+                    stmt.setString(1, item.getItemName());
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save inventory.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
 
     // the ? will be replaced once we have a concrete NPCs by the getter methods (part of preparedstatement)
     // False is 0 true is 1 for booleans
@@ -158,9 +184,11 @@ public class DataSaving {
     // LoadNPCs
     public void loadNPCs(Map<String, Location> allLocations) {
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state")) {
+             ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state"))
+        {
 
-            while (rs.next()) {
+            while (rs.next())
+            {
 
                 String npcName = rs.getString("npc_name");
                 String locName = rs.getString("location_name");
@@ -206,7 +234,8 @@ public class DataSaving {
 
     // Delete rows in the tables to prepare for a new game
     public void deleteSave() {
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt = connection.createStatement())
+        {
             stmt.executeUpdate("DELETE FROM game_state;");
             stmt.executeUpdate("DELETE FROM player;");
             stmt.executeUpdate("DELETE FROM inventory;");
