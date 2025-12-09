@@ -318,7 +318,7 @@ public class DataSaving {
             stmt.executeUpdate("DELETE FROM game_state;");
             stmt.executeUpdate("DELETE FROM player;");
             stmt.executeUpdate("DELETE FROM inventory;");
-            stmt.executeUpdate("DELETE FROM npc_state");
+            stmt.executeUpdate("DELETE FROM npc_state;");
             System.out.println("Save deleted.");
         } catch (SQLException e) {
             System.err.println("Could not delete save:");
