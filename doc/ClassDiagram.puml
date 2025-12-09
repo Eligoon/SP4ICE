@@ -32,10 +32,12 @@ class DataSaving {
     + saveCurrentLocation()
     + savePlayer()
     + saveInventory()
+    + saveNPCs()
     + loadGameState() : GameController
     + loadLocation()
     + loadPlayer()
     + loadInventory()
+    + loadNPCs()
     + deleteSave() : void
 }
 
