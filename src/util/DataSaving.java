@@ -73,7 +73,21 @@ public class DataSaving {
     // Note to self, look into INSERT and REPLACE
     // TRUNCATE is not supported in SQLite
 
-    // SaveGameState
+    // Saves the overall game state, currently only the player's current location.
+    // This allows the game to resume from the same location on load.
+        public void saveGameState(GameController gameController) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
+            )) {
+                stmt.setString(1, gameController.currentLocation.getLocationName());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save game state.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
 
     // the ? will be replaced once we have a concrete location by the getter methods (part of preparedstatement)
     // Saves only the player's current location.
@@ -181,7 +195,7 @@ public class DataSaving {
             Location loc = allLocations.get(locationName);
 
             if (loc == null) {
-                System.err.println("ERROR: Location '" + locationName + "' not found during load.");
+                System.err.println("ERROR: Location " + locationName + " not found during load.");
             }
 
             return loc;
