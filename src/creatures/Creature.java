@@ -26,9 +26,6 @@ public class Creature {
     public void fight (Creature target) { //Handles combat with another creature
          //TODO
     }
-    public void move (Location location) { // Moves the creature to another location
-         //TODO
-    }
 
     public void pickUpItem (Item item) { // Adds a item to the creatures inventory (for Player)
         //TODO

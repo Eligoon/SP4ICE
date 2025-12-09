@@ -70,7 +70,6 @@ abstract class Creature {
     # stats : Stats
     + {abstract} interact() : void
     + fight(target : Creature) : void
-    + move(location : Location) : void
     + pickUpItem(item : Item) : void
     + getName() : String
     + getRace() : Race
@@ -83,6 +82,7 @@ class Player {
     - inventory : Inventory
     - questLog : List<Quest>
     + interact() : void
+    + move(location : Location) : void
     + useItem(item : Item) : void
     + equipWeapon(weapon : Weapon) : void
     + equipArmor(armor : Armor) : void
