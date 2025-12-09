@@ -51,6 +51,17 @@ public class DataSaving {
                 """;
             stmt.executeUpdate(sqlInventory);
 
+            String sqlNPCState = """
+                CREATE TABLE IF NOT EXISTS npc_state (
+                    npc_name       VARCHAR(100) PRIMARY KEY,
+                    location_name  VARCHAR(100),
+                    is_dead        BOOLEAN,
+                    is_hostile     BOOLEAN
+                );
+                """;
+            stmt.executeUpdate(sqlNPCState);
+
+
             System.out.println("Tables created");
 
         } catch (SQLException e) {
