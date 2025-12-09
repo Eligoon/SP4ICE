@@ -17,7 +17,7 @@ public class DataSaving {
         }
     }
 
-    // Creating tables for gameState, player and inventory if they do not already exist.
+    // Creating tables for gameState, player, inventory and NPC if they do not already exist.
     // Should only run the very first time the game is run.
     private void createTables() {
         try (Statement stmt = connection.createStatement()) {
