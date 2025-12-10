@@ -1,5 +1,7 @@
 package util;
 import java.sql.*;
+import java.util.Map;
+
 import collectibles.Item;
 import controller.GameController;
 import world.Location;
@@ -78,9 +80,48 @@ public class DataSaving {
         }
     }
 
-    /** Explaining comment block of save and load
+    /**
+     * Game Save/Load
      *
-
+     * This class handles saving and loading the game state, player information,
+     * inventory, and NPC states to and from a database. It provides methods to
+     * persist the game's progress and resume it later.
+     *
+     * SAVE SEQUENCE:
+     * 1. savePlayer(player, location)
+     *      - Save the full player data, including stats and current location.
+     * 2. saveInventory(player)
+     *      - Save all items in the player's inventory.
+     * 3. saveNPCs(location)
+     *      - Save the state of all NPCs in the current location.
+     * 4. saveGameState(gameController)
+     *      - Save the overall game state (currently only location).
+     * 5. saveCurrentLocation(location)
+     *      - Update the location independently when only location changes.
+     *
+     * LOAD SEQUENCE:
+     * 1. loadGameState()
+     *      - Get the last saved location of the player.
+     * 2. loadLocation(locationName, allLocations)
+     *      - Convert the location name into a Location object.
+     * 3. loadPlayer()
+     *      - Load the player's stats and information.
+     * 4. loadInventory(player)
+     *      - Load all items into the player's inventory.
+     * 5. loadNPCs(allLocations)
+     *      - Load NPCs into all locations, updating their status (dead/hostile).
+     *
+     * OTHER FUNCTIONALITY:
+     * - deleteSave()
+     *      - Clears all saved data from the database tables.
+     *      - Prepares the game for a fresh start.
+     *
+     * NOTES:
+     * - Prepared statements are used to prevent SQL injection. (SQL injection is an attack targeting the database of a program by inserting/injecting SQL code into an SQL call. The attack exploits a vulnerability in the handling of user input and database calls.)
+     * - Boolean values are stored as 0 (false) and 1 (true) in the database.
+     * - Inventory saving uses batch inserts for efficiency.
+     * - Loading NPCs assumes all NPCs are preloaded in their respective locations.
+     * - ItemRegistry is used to create new item instances when loading inventory.
      */
 
     // SAVING PART OF THE SAVING OF DATA
@@ -264,7 +305,34 @@ public class DataSaving {
         }
 
 
-    // LoadInventory //TODO
+    // Loads all items in the player's inventory from the database
+    // Uses the ItemRegistry to create item instances by name
+    public void loadInventory(Player player)
+    {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT item_name FROM inventory WHERE player_id = 1"))
+        {
+            // Clear current inventory first
+            player.getInventory().clear();
+
+            while (rs.next())
+            {
+                String itemName = rs.getString("item_name");
+                Item item = ItemRegistry.create(itemName);
+
+                if (item != null) {
+                    player.getInventory().addItem(item);
+                } else {
+                    System.err.println("WARNING: Item '" + itemName + "' could not be loaded into inventory.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load inventory for player.");
+            e.printStackTrace();
+        }
+    }
+
 
     // LoadNPCs
     public void loadNPCs(Map<String, Location> allLocations) {
