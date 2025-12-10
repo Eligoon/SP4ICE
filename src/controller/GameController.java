@@ -1,45 +1,41 @@
-package controller;
-import world.Location;
+    package controller;
+    import world.Location;
 
-import util.DataSaving;
+    import util.DataSaving;
+    import world.Story;
 
-public class GameController {
-    private Location currentLocation;
+    public class GameController {
+        private Location currentLocation;
+        private Story emeraldTear;
 
-    public void initializeGame(){
-        Location theClearing = new Location(
-                "The Clearing",
-                "A glistening flower stands dancing in the gentle breeze in the middle of the clearing. It is taller than you are,\n" +
-                        "and strangely glowing below the dew that coats it. This is the sense of danger you felt.\n" +
-                        "Roots fly up towards you, attempting to grab and strangle you! "
-        );
-    Location huntingCabin = new Location(
-        "The Hunting Cabin",
-            "Through the barricaded window opening of the cabin," +
-                    "you can see crates. They may contain something useful. " +
-                    "The door is locked. While the building looks abanandoned, " +
-                    "the lock is not damaged or old enough that you can just break " +
-                    "it. You will need a key to enter."
-    );
+        public GameController(){
+            emeraldTear = new Story();
+        }
 
-        // Set starting location to be current location
-        currentLocation = theClearing;
+        public void initializeGame(){
+            // Displays the welcome message
+            emeraldTear.displayWelcomeMessage();
 
-        // Connect locations together
-        theClearing.addConnectedLocation("north", huntingCabin);
+            // Loads story, with locations and connects all locations together
+            emeraldTear.loadStory();
+
+            // Set starting location to be current location
+            currentLocation = emeraldTear.getLocation("The Clearing");
+
+
+        }
+
+
+
+
+       private DataSaving db = new DataSaving();
+       private String url = "jdbc:sqlite:identifier.sqlite";
+
+
+        // db.connect cannot exist without being in a method, just put it in here for now.
+        // Needs to be present in everything containing data, so new game, load game, save game etc.
+        public void newGame() {
+            db.connect(url);
+        }
+
     }
-
-
-
-
-   private DataSaving db = new DataSaving();
-   private String url = "jdbc:sqlite:identifier.sqlite";
-
-
-    // db.connect cannot exist without being in a method, just put it in here for now.
-    // Needs to be present in everything containing data, so new game, load game, save game etc.
-    public void newGame() {
-        db.connect(url);
-    }
-
-}
