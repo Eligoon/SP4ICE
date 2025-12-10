@@ -40,7 +40,7 @@ public class TextUI {
     public int promptNumeric(String msg){
         displayMsg(msg);                        //Give the Player a question
         String input = sc.nextLine();           // Give the player a place to place their answer!
-        int numInput = Integer.parseInt(input); //Convert the answer to a Number!
+        int numInput = Integer.parseInt(input); // Convert the answer to a Number!
 
         return numInput;
     }
