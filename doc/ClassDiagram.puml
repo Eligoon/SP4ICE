@@ -269,6 +269,7 @@ Creature "1" --> "1" Stats : has
 Player "1" --> "1" Class : has
 Player "1" --> "1" Inventory : has
 Player "1" --> "*" Quest : tracks
+Player --> Choice : can make
 
 ' NPC composition
 NPC "1" --> "0..1" Quest : canGive
