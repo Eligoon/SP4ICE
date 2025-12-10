@@ -76,11 +76,6 @@ public class Inventory {
     public void equipArmor(Armor armor) {
         this.equippedArmor = armor;
     }
-}
-
-
-
-
 
 
 }
