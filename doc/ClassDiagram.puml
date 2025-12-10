@@ -156,6 +156,12 @@ class Location {
     + removeItem(item : Item) : void
 }
 
+'helper class to create items'
+class ItemRegistry {
+    - Map<String, Item>
+    + static Item create()
+}
+
 'Inventory'
 class Inventory {
     - items : List<Item>
@@ -174,6 +180,9 @@ abstract class Item {
     # itemName : String
     # description : String
     # weight : int
+    + Item(itemName, description, weight)
+    # Item(Item other)
+    + abstract Item copy()
     + {abstract} use(player : Player) : void
     + add(inventory : Inventory) : void
     + remove(inventory : Inventory) : void
@@ -269,6 +278,10 @@ NPC "1" --> "0..1" Item : holds
 Inventory "1" --> "*" Item : contains
 Inventory "1" --> "0..1" Weapon : equippedWeapon
 Inventory "1" --> "0..1" Armor : equippedArmor
+
+' ItemRegistry relationship
+DataSaving --> ItemRegistry : uses
+ItemRegistry --> Item : creates
 
 ' Item hierarchy
 Item <|-- Health : extends
