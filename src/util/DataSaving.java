@@ -1,9 +1,19 @@
 package util;
 import java.sql.*;
+import java.util.Map;
+
+import collectibles.Item;
+import controller.GameController;
+import world.Location;
+import creatures.Player;
+import creatures.NPC;
+import creatures.Creature;
+
+// TRUNCATE is not supported in SQLite
 
 public class DataSaving {
     // Connection to database
-    Connection connection;
+    private Connection connection;
 
     // Method to establish connection to our database
     public void connect(String url) {
@@ -15,7 +25,7 @@ public class DataSaving {
         }
     }
 
-    // Creating tables for gameState, player and inventory if they do not already exist.
+    // Creating tables for gameState, player, inventory and NPC if they do not already exist.
     // Should only run the very first time the game is run.
     private void createTables() {
         try (Statement stmt = connection.createStatement()) {
@@ -51,6 +61,17 @@ public class DataSaving {
                 """;
             stmt.executeUpdate(sqlInventory);
 
+            String sqlNPCState = """
+                CREATE TABLE IF NOT EXISTS npc_state (
+                    npc_name VARCHAR(100) PRIMARY KEY,
+                    location_name VARCHAR(100),
+                    is_dead BOOLEAN,
+                    is_hostile BOOLEAN
+                );
+                """;
+            stmt.executeUpdate(sqlNPCState);
+
+
             System.out.println("Tables created");
 
         } catch (SQLException e) {
@@ -59,31 +80,321 @@ public class DataSaving {
         }
     }
 
-    // Note to self, look into INSERT and REPLACE
-    // TRUNCATE is not supported in SQLite
 
-    // SaveGameState
+    /**
+     * Game Save/Load
+     *
+     * This class handles saving and loading the game state, player information,
+     * inventory, and NPC states to and from a database. It provides methods to
+     * persist the game's progress and resume it later.
+     *
+     * SAVE SEQUENCE:
+     * 1. savePlayer(player, location)
+     *      - Save the full player data, including stats and current location.
+     * 2. saveInventory(player)
+     *      - Save all items in the player's inventory.
+     * 3. saveNPCs(location)
+     *      - Save the state of all NPCs in the current location.
+     * 4. saveGameState(gameController)
+     *      - Save the overall game state (currently only location).
+     * 5. saveCurrentLocation(location)
+     *      - Update the location independently when only location changes.
+     *
+     * LOAD SEQUENCE:
+     * 1. loadGameState()
+     *      - Get the last saved location of the player.
+     * 2. loadLocation(locationName, allLocations)
+     *      - Convert the location name into a Location object.
+     * 3. loadPlayer()
+     *      - Load the player's stats and information.
+     * 4. loadInventory(player)
+     *      - Load all items into the player's inventory.
+     * 5. loadNPCs(allLocations)
+     *      - Load NPCs into all locations, updating their status (dead/hostile).
+     *
+     * OTHER FUNCTIONALITY:
+     * - deleteSave()
+     *      - Clears all saved data from the database tables.
+     *      - Prepares the game for a fresh start.
+     *
+     * NOTES:
+     * - Prepared statements are used to prevent SQL injection. (SQL injection is an attack targeting the database of a program by inserting/injecting SQL code into an SQL call. The attack exploits a vulnerability in the handling of user input and database calls.)
+     * - Boolean values are stored as 0 (false) and 1 (true) in the database.
+     * - Inventory saving uses batch inserts for efficiency.
+     * - Loading NPCs assumes all NPCs are preloaded in their respective locations.
+     * - ItemRegistry is used to create new item instances when loading inventory.
+     */
 
-    // SaveCurrentLocation
 
-    // SavePlayer
+    // SAVING PART OF THE SAVING OF DATA
 
-    // SaveInventory
+    // Saves the overall game state, currently only the player's current location.
+    // This allows the game to resume from the same location on load.
+        public void saveGameState(GameController gameController) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
+            )) {
+                stmt.setString(1, gameController.currentLocation.getLocationName());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save game state.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
-    // LoadGameState
 
-    // LoadLocation
+    // the ? will be replaced once we have a concrete location by the getter methods (part of preparedstatement)
+    // Saves only the player's current location.
+    // Useful when the location changes without saving the full game?
+        public void saveCurrentLocation(Location location) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"))
+            {
+                stmt.setString(1, location.getLocationName());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save current location.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
-    // LoadPlayer
 
-    // LoadInventory
+    // the ? will be replaced once we have a concrete player by the getter methods (part of preparedstatement)
+    // Saves the player's information including:
+    // - Name
+    // - Race and Class
+    // - Stats (health, strength, dexterity, intelligence)
+    // - Current location
+    public void savePlayer(Player player, Location location) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "REPLACE INTO player (id, name, race, class, health, strength, dexterity, intelligence, location) " +
+                        "VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)"))
+        {
+            stmt.setString(1, player.getName());
+            stmt.setString(2, player.getRace().getRaceName());
+            stmt.setString(3, player.getCharacterClass().getClassName());
+            stmt.setInt(4, player.getStats().getHealth());
+            stmt.setInt(5, player.getStats().getStrength());
+            stmt.setInt(6, player.getStats().getDexterity());
+            stmt.setInt(7, player.getStats().getIntelligence());
+            stmt.setString(8, location.getLocationName());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save player.");
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    // the ? will be replaced once we have a concrete inventory by the getter methods (part of preparedstatement)
+    // Saves all items currently in the player's inventory.
+    // Each item is stored in a separate row.
+    // Before saving, the table is cleared to avoid duplicates.
+        public void saveInventory(Player player) {
+            try (Statement clear = connection.createStatement()) {
+                clear.executeUpdate("DELETE FROM inventory;");
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to clear inventory before saving.");
+                e.printStackTrace();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO inventory (player_id, item_name) VALUES (1, ?)"))
+            {
+                for (Item item : player.getInventory().getItems()) {
+                    stmt.setString(1, item.getItemName());
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to save inventory.");
+                System.err.println("Reason: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+
+    // the ? will be replaced once we have a concrete NPCs by the getter methods (part of preparedstatement)
+    // False is 0 true is 1 for booleans
+    public void saveNPCs(Location location) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
+        {
+            for (Creature c : location.getCreatures()) {
+
+                if (c instanceof NPC npc) {
+                    stmt.setString(1, npc.getName());
+                    stmt.setString(2, location.getLocationName());
+                    stmt.setBoolean(3, npc.isDead);
+                    stmt.setBoolean(4, npc.isHostile);
+                    stmt.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save NPCs for location: " + location.getLocationName());
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // LOADING PART OF THE SAVING OF DATA
+
+    // Loads the saved game state.
+    // Returns the name of the player's last saved location.
+        public String loadGameState() {
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT current_location FROM game_state WHERE id = 1"))
+            {
+
+                if (rs.next())
+                {
+                    return rs.getString("current_location");
+                }
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to load game state.");
+                e.printStackTrace();
+            }
+
+            return null; // No save found
+        }
+
+
+    // Loads a location object by name from a map of all locations.
+    // Returns null if the location is not found.
+        public Location loadLocation(String locationName, Map<String, Location> allLocations) {
+            Location loc = allLocations.get(locationName);
+
+            if (loc == null) {
+                System.err.println("ERROR: Location " + locationName + " not found during load.");
+            }
+
+            return loc;
+        }
+
+
+    // Loads the player's basic information and stats from the database.
+    // Returns a Player object, or null if no saved player exists.
+        public Player loadPlayer() {
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
+            {
+
+                if (rs.next()) {
+                    Player player = new Player(
+                            rs.getString("name"),
+                            rs.getString("race"),
+                            rs.getString("class")
+                    );
+
+                    player.getStats().setHealth(rs.getInt("health"));
+                    player.getStats().setStrength(rs.getInt("strength"));
+                    player.getStats().setDexterity(rs.getInt("dexterity"));
+                    player.getStats().setIntelligence(rs.getInt("intelligence"));
+
+                    return player;
+                }
+
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to load player.");
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+
+    // Loads all items in the player's inventory from the database
+    // Uses the ItemRegistry to create item instances by name
+    public void loadInventory(Player player)
+    {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT item_name FROM inventory WHERE player_id = 1"))
+        {
+            // Clear current inventory first
+            player.getInventory().clear();
+
+            while (rs.next())
+            {
+                String itemName = rs.getString("item_name");
+                Item item = ItemRegistry.create(itemName);
+
+                if (item != null) {
+                    player.getInventory().addItem(item);
+                } else {
+                    System.err.println("WARNING: Item '" + itemName + "' could not be loaded into inventory.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load inventory for player.");
+            e.printStackTrace();
+        }
+    }
+
+
+    // LoadNPCs
+    public void loadNPCs(Map<String, Location> allLocations) {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state"))
+        {
+
+            while (rs.next())
+            {
+
+                String npcName = rs.getString("npc_name");
+                String locName = rs.getString("location_name");
+                boolean isDead = rs.getBoolean("is_dead");
+                boolean isHostile = rs.getBoolean("is_hostile");
+
+                Location location = allLocations.get(locName);
+                if (location == null) {
+                    System.err.println("WARNING: Location '" + locName
+                            + "' not found while loading NPC '"
+                            + npcName + "'.");
+                    continue;
+                }
+
+                boolean npcFound = false;
+
+                for (Creature c : location.getCreatures()) {
+                    if (c instanceof NPC npc && npc.getName().equals(npcName)) {
+                        npcFound = true;
+                        npc.isDead = isDead;
+                        npc.isHostile = isHostile;
+
+                        if (npc.isDead) {
+                            location.removeCreature(npc);
+                        }
+                    }
+                }
+
+                if (!npcFound) {
+                    System.err.println("WARNING: NPC " + npcName
+                            + " not found in location " + locName
+                            + " during load.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load NPC states from database.");
+            System.err.println("Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     // Delete rows in the tables to prepare for a new game
     public void deleteSave() {
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt = connection.createStatement())
+        {
             stmt.executeUpdate("DELETE FROM game_state;");
             stmt.executeUpdate("DELETE FROM player;");
             stmt.executeUpdate("DELETE FROM inventory;");
+            stmt.executeUpdate("DELETE FROM npc_state;");
             System.out.println("Save deleted.");
         } catch (SQLException e) {
             System.err.println("Could not delete save:");
