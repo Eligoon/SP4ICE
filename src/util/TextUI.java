@@ -4,6 +4,7 @@ import collectibles.Item;
 import controller.Choice;
 import creatures.Creature;
 import creatures.Player;
+import creatures.attributes.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
