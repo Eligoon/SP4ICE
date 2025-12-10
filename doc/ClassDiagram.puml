@@ -92,7 +92,6 @@ class Player {
     - inventory : Inventory
     - questLog : List<Quest>
     + interact() : void
-    + move(location : Location) : void
     + useItem(item : Item) : void
     + equipWeapon(weapon : Weapon) : void
     + equipArmor(armor : Armor) : void
