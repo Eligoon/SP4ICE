@@ -1,5 +1,11 @@
 package util;
 import java.sql.*;
+import collectibles.Item;
+import controller.GameController;
+import world.Location;
+import creatures.Player;
+import creatures.NPC;
+import creatures.Creature;
 
 // TRUNCATE is not supported in SQLite
 
