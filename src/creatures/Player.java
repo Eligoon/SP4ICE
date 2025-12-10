@@ -39,9 +39,7 @@ public class Player extends Creature {
     public void interact() { //Interaction placeholder
         //TODO
     }
-    public void move (Location location) { // Moves the creature to another location
-        //TODO
-    }
+
     public void useItem(Item item) { //called when the player uses an item
         //TODO
     }
