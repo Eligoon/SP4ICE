@@ -29,6 +29,26 @@ public class GameController {
         theClearing.addConnectedLocation("north", huntingCabin);
     }
 
+    // move: Handles movement from the players current location to another connected location.
+    public void move(String direction) {
+        //Look up if there  is a connected lacation in the given direction
+        Location newLocation = currentLocation.getConnectedLocation(direction);
+        //if the direction does not lead anywhere (null) block movement
+        if (newLocation == null) {
+            System.out.println("You can't go that way.");
+            return; //stop the method here
+        }
+        //update the current location to the new valid location.
+        currentLocation = newLocation;
+
+        // Feedback to the player showing movement and new location name
+        System.out.println("You move " + direction + "...");
+        System.out.println("You are now at: " + currentLocation.getLocationName());
+
+        //Print the location's description so the player (Description is located in location.java)
+        System.out.println(currentLocation.getDescription());
+    }
+
 
 
 
