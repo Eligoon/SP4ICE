@@ -50,17 +50,54 @@ class Story {
 class Choice {
     - description : String
     - targetLocation : Location
-    - requirements : List<String>
+    - enemy : Creature
+    - type : ChoiceType
+    +  Choice(String description, Location targetLocation)
+    +  Choice(String description, Creature enemy)
     + execute(gameController : GameController) : void
+    + addRequirement(rec : Requirement) : void
     + isAvailable(player : Player) : boolean
     + getDescription() : String
+    + getType() : ChoiceType
+    + getTargetLocation() : Location
+    + getEnemy() : Creature
+    + getRequirements() : List<Requirement>
+}
+
+' Classes for requirements used in choices
+
+class ClassRequirement {
+
+}
+
+class ItemRequirement {
+
+}
+
+class NpcDeadRequirement {
+
+}
+
+class RaceRequirement {
+
+}
+
+class ClassRequirement {
+
+}
+
+' Interface for requirements
+
+interface Requirement {
+ + isMet(player : Player) : boolean
+}
 
 ' Choice types for Choice
 enum ChoiceType {
     MOVE
     COMBAT
     INTERACT
-    USE_OBJECT
+    USEOBJECT
 }
 
 
@@ -301,5 +338,7 @@ Item <|-- Quest : extends
 
 ' Choice relationship
 Choice "1" --> "0..1" Location : leadsTo
+
+
 
 @enduml
