@@ -35,4 +35,43 @@ public class Choice {
         this.type = ChoiceType.COMBAT;
     }
 
+    // Requirement for choices
+
+    // Add a requirement (item, race, class, npc dead, etc.)
+    public void addRequirement(Requirement req) {
+        requirements.add(req);
+    }
+
+    // Check if ALL requirements for this choice are met
+    public boolean isAvailable(Player player) {
+        for (Requirement req : requirements) {
+            if (!req.isMet(player)) {
+                return false;  // A requirement failed means the choice is hidden
+            }
+        }
+        return true;
+    }
+
+
+    // Getters
+
+    public String getDescription() {
+        return description;
+    }
+
+    public ChoiceType getType() {
+        return type;
+    }
+
+    public Location getTargetLocation() {
+        return targetLocation;
+    }
+
+    public Creature getEnemy() {
+        return enemy;
+    }
+
+    public List<Requirement> getRequirements() {
+        return requirements;
+    }
 }
