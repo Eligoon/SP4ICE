@@ -5,10 +5,15 @@ import util.DataSaving;
 import world.Story;
 
 public class GameController {
+    // --- Fields / Attributes ---
+    //Tracks the players current location
     private Location currentLocation;
+    // Text based UI to display messages
     TextUI ui = new TextUI();
+    //Story object containing all locations and text for them
     Story emeraldTear = new Story();
 
+    // ---- Initializing the game ---
     public void initializeGame() {
         // Displays the welcome message
         emeraldTear.displayWelcomeMessage();
@@ -19,6 +24,7 @@ public class GameController {
         // Set starting location to be current location
         currentLocation = emeraldTear.getLocation("The Clearing");
     }
+    // --- Movement logic ---
     // move: Handles movement from the players current location to another connected location.
     public void move(String direction) {
         //Look up if there  is a connected location in the given direction
@@ -39,8 +45,7 @@ public class GameController {
         ui.displayMsg(currentLocation.getDescription());
     }
 
-            // Move location
-
+//--- Database handling --- used for save/load
    private DataSaving db = new DataSaving();
    private String url = "jdbc:sqlite:identifier.sqlite";
 
