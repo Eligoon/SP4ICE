@@ -3,6 +3,7 @@ package world;
 import collectibles.Item;
 import controller.Choices.Choice;
 import creatures.Creature;
+import util.TextUI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class Location {
     private List<Item> items; // Items available at location
     private List<Choice> availableChoices; // Choices to make at location
     private Map<String, Location> connectedLocations; // List of locations to go to from here
-    private ui = new TextUI();
+    private TextUI ui = new TextUI();
 
     // Full constructor
     public Location(String locationName, String description, List<Creature> creatures, List<Item> items, List<Choice> availableChoices, Map<String, Location> connectedLocations) {
@@ -76,23 +77,23 @@ public class Location {
     // Shows creatures, items and which directions to go
     public void displayLocation(){
         if (hasCreatures()){
-            ui.displayText("Creatures here:");
+            ui.displayMsg("Creatures here:");
             for (Creature creature : creatures){
-                ui.displayText(creature.getName());
+                ui.displayMsg(creature.getName());
             }
         }
 
         if (hasItems()){
-            ui.displayText("Items here:");
+            ui.displayMsg("Items here:");
             for (Item item : items){
-                ui.displayText(item.getItemName());
+                ui.displayMsg(item.getItemName());
             }
         }
 
         if (!connectedLocations.isEmpty()){
-            ui.displayText("You can go: ");
+            ui.displayMsg("You can go: ");
             for (String direction : connectedLocations.keySet()){
-                ui.displayText(direction);
+                ui.displayMsg(direction);
             }
         }
 
