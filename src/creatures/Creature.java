@@ -9,10 +9,11 @@ import world.Location;
 * This is a superclass for Player and NPC. */
 public class Creature {
     protected String name; //The creatures display name
+    protected String description; //
     protected Race race; // The creatures tace (Human, Elf, Orc, Dwarf)
-    protected Stats stats; // Thea creatures stats (health, strength, dexteryty and intelligence)
+    protected Stats stats; // Thea creatures stats (health, strength, dexterity and intelligence)
 
-// --- Constructur for creating a Creature ---
+// --- Constructor for creating a Creature ---
     public Creature(String name, Race race, Stats stats) {
 
         this.name = name;

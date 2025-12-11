@@ -49,6 +49,9 @@ public class GameController {
         System.out.println(currentLocation.getDescription());
     }
 
+            // Move location
+
+
 
 
 
