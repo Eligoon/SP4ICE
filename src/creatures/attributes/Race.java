@@ -1,5 +1,7 @@
 package creatures.attributes;
 
+import java.util.List;
+
 public class Race {
     /*' Race '
 class Race {
@@ -64,6 +66,24 @@ class Race {
         stats.setDexterity(stats.getDexterity() + dexterityModifier);
         stats.setIntelligence(stats.getIntelligence() + intelligenceModifier);
     }
+
+    public static List<Race> getAllRaces(){
+        return List.of(createHuman(), createDwarf(), createElf(), createOrc());
+    }
+    /* Example of use in Main:
+    List<Race> races = Race.getAllRaces();
+
+ArrayList<String> raceNames = new ArrayList<>();
+for (Race r : races) {
+    raceNames.add(r.getRaceName());
+}
+
+int choice = promptNumeric("Choose your race!:") - 1;
+Race chosenRace = races.get(choice);
+
+
+     */
+
     public String getRaceName(){
         return raceName;
     }
