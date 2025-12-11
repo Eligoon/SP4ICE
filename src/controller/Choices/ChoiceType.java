@@ -5,6 +5,6 @@ public enum ChoiceType {
     MOVE,       // Go to another location
     COMBAT,     // Start a fight
     INTERACT,   // Use something or talk to something
-    USE_OBJECT, // Use an item
+    USEOBJECT, // Use an item
     // can add more here
 }
