@@ -1,7 +1,7 @@
 package world;
 
 import util.TextUI;
-import world.Location;
+/*import world.Location;*/
 
 public class Objects {
     TextUI ui = new TextUI();
