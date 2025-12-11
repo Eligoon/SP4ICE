@@ -12,8 +12,6 @@ public class ItemRequirement implements Requirement {
 
     @Override
     public boolean isMet(Player player) {
-        return player.getInventory().hasItem(itemName);
+        return player.getInventory().hasItem.equalsIgnorecase(itemName);
     }
-
-
 }

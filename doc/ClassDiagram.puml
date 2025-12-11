@@ -18,7 +18,7 @@ class GameController {
 
 'Text UI '
 class TextUI {
-    + displayText(text : String) : void
+    + displayMsg(text : String) : void
     + displayChoices(choices : List<Choice>) : void
     + getPlayerInput() : String
     + displayInventory(inventory : Inventory) : void
@@ -82,8 +82,10 @@ class RaceRequirement {
 
 }
 
-class ClassRequirement {
-
+class MultiRequirement {
+  - requirements : List<Requirement>
+  - operator : ChoiceType
+  + MultiRequirement(List<Requirement> requirements, ChoiceType operator)
 }
 
 ' Interface for requirements
@@ -98,6 +100,9 @@ enum ChoiceType {
     COMBAT
     INTERACT
     USEOBJECT
+
+    AND
+    OR
 }
 
 
@@ -343,10 +348,13 @@ Choice --> ClassRequirement : uses
 Choice --> ItemRequirement : uses
 Choice --> NpcDeadRequirement : uses
 Choice --> RaceRequirement : uses
+Choice --> MultiRequirement : uses
+MultiRequirement --> ChoiceType : uses
 
 ClassRequirement --|> Requirement
 ItemRequirement --|> Requirement
 NpcDeadRequirement --|> Requirement
 RaceRequirement --|> Requirement
+MultiRequirement --|> Requirement
 
 @enduml

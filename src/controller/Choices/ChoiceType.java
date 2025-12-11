@@ -6,5 +6,8 @@ public enum ChoiceType {
     COMBAT,     // Start a fight
     INTERACT,   // Use something or talk to something
     USEOBJECT, // Use an item
+
+    AND,       // For multiRequirement
+    OR,       // For multiRequirement
     // can add more here
 }

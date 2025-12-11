@@ -59,18 +59,18 @@ public class Choice {
 
         switch (type) {
 
-            case Move:
+            case MOVE:
                 // Move player to another location
                 gc.changeLocation(targetLocation);
                 break;
 
-            case Combat:
+            case COMBAT:
                 // Start a fight
                 gc.handleCombat(enemy);
                 break;
 
-            case Interact:
-            case UseObject:
+            case INTERACT:
+            case USEOBJECT:
 
         }
     }
