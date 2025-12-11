@@ -55,6 +55,7 @@ class Choice {
     + isAvailable(player : Player) : boolean
     + getDescription() : String
 
+' Choice types for Choice
 enum ChoiceType {
     MOVE
     COMBAT
