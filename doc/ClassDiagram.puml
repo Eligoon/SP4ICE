@@ -338,7 +338,15 @@ Item <|-- Quest : extends
 
 ' Choice relationship
 Choice "1" --> "0..1" Location : leadsTo
+Choice --> ChoiceType : uses
+Choice --> ClassRequirement : uses
+Choice --> ItemRequirement : uses
+Choice --> NpcDeadRequirement : uses
+Choice --> RaceRequirement : uses
 
-
+ClassRequirement --|> Requirement
+ItemRequirement --|> Requirement
+NpcDeadRequirement --|> Requirement
+RaceRequirement --|> Requirement
 
 @enduml
