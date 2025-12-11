@@ -54,7 +54,14 @@ class Choice {
     + execute(gameController : GameController) : void
     + isAvailable(player : Player) : boolean
     + getDescription() : String
+
+enum ChoiceType {
+    MOVE
+    COMBAT
+    INTERACT
+    USE_OBJECT
 }
+
 
 'Stats'
 class Stats {
