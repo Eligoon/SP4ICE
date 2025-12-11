@@ -2,6 +2,7 @@ package controller;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
+import world.Objects;
 import world.Story;
 
 public class GameController {
@@ -43,6 +44,15 @@ public class GameController {
 
         //Print the location's description so the player (Description is located in location.java)
         ui.displayMsg(currentLocation.getDescription());
+        // After movement, check for trap
+        Objects object = new Objects();
+        object.checkForTrap(this);
+    }
+
+
+    //--- Getter ---
+    public Location getCurrentLocation(){
+        return currentLocation;
     }
 
 //--- Database handling --- used for save/load
