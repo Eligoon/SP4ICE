@@ -1,7 +1,7 @@
 package util;
 
 import collectibles.Item;
-import controller.Choice;
+import controller.Choices.Choice;
 import creatures.Creature;
 import creatures.Player;
 import creatures.attributes.Inventory;

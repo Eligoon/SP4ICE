@@ -1,4 +1,4 @@
-package controller.requirements;
+package controller.Choices;
 
 import creatures.Player;
 
@@ -8,6 +8,4 @@ public interface Requirement {
     // Returns true if the player passes the requirement
     boolean isMet(Player player);
 
-    // Message shown when requirement is not met (Might need this at some point?)
-    String getFailureMessage();
 }

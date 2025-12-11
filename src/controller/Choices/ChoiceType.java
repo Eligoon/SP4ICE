@@ -1,4 +1,4 @@
-package controller;
+package controller.Choices;
 
 // This is a list of the different types of actions a Choice can be
 public enum ChoiceType {

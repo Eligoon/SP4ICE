@@ -1,4 +1,4 @@
-package controller;
+package controller.Choices;
 
 import world.Location;
 
