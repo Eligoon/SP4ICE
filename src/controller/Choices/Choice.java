@@ -3,7 +3,7 @@ package controller.Choices;
 import creatures.Creature;
 import creatures.Player;
 import world.Location;
-
+import controller.GameController;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +50,29 @@ public class Choice {
             }
         }
         return true;
+    }
+
+    // Execution to gamecontroller
+
+    // Tell GameController what to do when this choice is picked
+    public void execute(GameController gc) {
+
+        switch (type) {
+
+            case Move:
+                // Move player to another location
+                gc.changeLocation(targetLocation);
+                break;
+
+            case Combat:
+                // Start a fight
+                gc.handleCombat(enemy);
+                break;
+
+            case Interact:
+            case UseObject:
+
+        }
     }
 
 
