@@ -1,7 +1,7 @@
 package world;
 
 import collectibles.Item;
-import controller.Choice;
+import controller.Choices.Choice;
 import creatures.Creature;
 import util.TextUI;
 

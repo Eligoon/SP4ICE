@@ -18,7 +18,7 @@ class GameController {
 
 'Text UI '
 class TextUI {
-    + displayText(text : String) : void
+    + displayMsg(text : String) : void
     + displayChoices(choices : List<Choice>) : void
     + getPlayerInput() : String
     + displayInventory(inventory : Inventory) : void
@@ -50,11 +50,61 @@ class Story {
 class Choice {
     - description : String
     - targetLocation : Location
-    - requirements : List<String>
+    - enemy : Creature
+    - type : ChoiceType
+    +  Choice(String description, Location targetLocation)
+    +  Choice(String description, Creature enemy)
     + execute(gameController : GameController) : void
+    + addRequirement(rec : Requirement) : void
     + isAvailable(player : Player) : boolean
     + getDescription() : String
+    + getType() : ChoiceType
+    + getTargetLocation() : Location
+    + getEnemy() : Creature
+    + getRequirements() : List<Requirement>
 }
+
+' Classes for requirements used in choices
+
+class ClassRequirement {
+
+}
+
+class ItemRequirement {
+
+}
+
+class NpcDeadRequirement {
+
+}
+
+class RaceRequirement {
+
+}
+
+class MultiRequirement {
+  - requirements : List<Requirement>
+  - operator : ChoiceType
+  + MultiRequirement(List<Requirement> requirements, ChoiceType operator)
+}
+
+' Interface for requirements
+
+interface Requirement {
+ + isMet(player : Player) : boolean
+}
+
+' Choice types for Choice
+enum ChoiceType {
+    MOVE
+    COMBAT
+    INTERACT
+    USEOBJECT
+
+    AND
+    OR
+}
+
 
 'Stats'
 class Stats {
@@ -268,6 +318,7 @@ Creature "1" --> "1" Stats : has
 Player "1" --> "1" Class : has
 Player "1" --> "1" Inventory : has
 Player "1" --> "*" Quest : tracks
+Player --> Choice : can make
 
 ' NPC composition
 NPC "1" --> "0..1" Quest : canGive
@@ -291,5 +342,18 @@ Item <|-- Quest : extends
 
 ' Choice relationship
 Choice "1" --> "0..1" Location : leadsTo
+Choice --> ChoiceType : uses
+Choice --> ClassRequirement : uses
+Choice --> ItemRequirement : uses
+Choice --> NpcDeadRequirement : uses
+Choice --> RaceRequirement : uses
+Choice --> MultiRequirement : uses
+MultiRequirement --> ChoiceType : uses
+
+ClassRequirement --|> Requirement
+ItemRequirement --|> Requirement
+NpcDeadRequirement --|> Requirement
+RaceRequirement --|> Requirement
+MultiRequirement --|> Requirement
 
 @enduml
