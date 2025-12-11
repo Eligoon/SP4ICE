@@ -74,6 +74,14 @@ public class Location {
         return !items.isEmpty();
     }
 
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     // Shows creatures, items and which directions to go
     public void displayLocation(){
         if (hasCreatures()){

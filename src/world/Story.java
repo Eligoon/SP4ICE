@@ -11,7 +11,7 @@ public class Story {
     // Make map for connecting locations
     private Map<String, Location> locations;
 
-    // Make each Location available individually
+    // Make each Location accessable individually
     private Location theClearing;
     private Location huntingCabin;
     private Location theLake;
