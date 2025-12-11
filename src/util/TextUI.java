@@ -87,4 +87,16 @@ public class TextUI {
         displayMsg(player.getName() + " - HP: " + player.getCurrentHP()+ " /"+ player.getMaxHP());
         displayMsg(enemy.getName() + " - HP: " + enemy.getCurrentHP()+ " /"+ enemy.getMaxHP());
     }
+
+    public List<Choice> getAvailableChoices(List<Choice> all, Player player) {
+        List<Choice> result = new ArrayList<>();
+
+        for (Choice c : all) {
+            if (c.isAvailable(player)) {   // only add choices that meet all requirements
+                result.add(c);
+            }
+        }
+        return result;
+    }
+
 }
