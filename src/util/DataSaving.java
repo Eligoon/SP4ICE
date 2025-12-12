@@ -4,10 +4,13 @@ import java.util.Map;
 
 import collectibles.Item;
 import controller.GameController;
+import creatures.attributes.Race;
+import creatures.attributes.Stats;
 import world.Location;
 import creatures.Player;
 import creatures.NPC;
 import creatures.Creature;
+import creatures.CharacterClass;
 
 // TRUNCATE is not supported in SQLite
 
@@ -278,33 +281,59 @@ public class DataSaving {
 
     // Loads the player's basic information and stats from the database.
     // Returns a Player object, or null if no saved player exists.
-        public Player loadPlayer() {
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
-            {
+    public Player loadPlayer() {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1")) {
 
-                if (rs.next()) {
-                    Player player = new Player(
-                            rs.getString("name"),
-                            rs.getString("race"),
-                            rs.getString("class")
-                    );
+            if (rs.next()) {
 
-                    player.getStats().setCurrentHealth(rs.getInt("health"));
-                    player.getStats().setStrength(rs.getInt("strength"));
-                    player.getStats().setDexterity(rs.getInt("dexterity"));
-                    player.getStats().setIntelligence(rs.getInt("intelligence"));
+                Race race = getRaceFromString(rs.getString("race"));
+                CharacterClass cls = getClassFromString(rs.getString("class"));
 
-                    return player;
-                }
+                Stats stats = new Stats(
+                        rs.getInt("health"),
+                        rs.getInt("strength"),
+                        rs.getInt("dexterity"),
+                        rs.getInt("intelligence")
+                );
 
-            } catch (SQLException e) {
-                System.err.println("ERROR: Failed to load player.");
-                e.printStackTrace();
+                Player player = new Player(
+                        rs.getString("name"),
+                        race,
+                        cls,
+                        stats
+                );
+
+                return player;
             }
 
-            return null;
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load player.");
+            e.printStackTrace();
         }
+
+        return null;
+    }
+
+    // Helper method to convert string to Race object
+    public Race getRaceFromString(String raceName) {
+        return switch (raceName.toLowerCase()) {
+            case "human" -> Race.createHuman();
+            case "dwarf" -> Race.createDwarf();
+            case "elf" -> Race.createElf();
+            case "orc" -> Race.createOrc();
+            default -> Race.createHuman(); // fallback
+        };
+    }
+
+    public CharacterClass getClassFromString(String className) {
+        return switch (className.toLowerCase()) {
+            case "warrior" -> CharacterClass.createWarrior();
+            case "mage"    -> CharacterClass.createMage();
+            case "ranger"  -> CharacterClass.createRanger();
+            default -> CharacterClass.createWarrior(); // fallback
+        };
+    }
 
 
     // Loads all items in the player's inventory from the database
