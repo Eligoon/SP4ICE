@@ -1,4 +1,5 @@
 package controller;
+
 import controller.Choices.Choice;
 import util.TextUI;
 import world.Location;
@@ -17,6 +18,21 @@ public class GameController {
     //Story object containing all locations and text for them
     Story emeraldTear = new Story();
 
+    //--- Database handling --- used for save/load
+    private static DataSaving db = new DataSaving();
+    private static String url = "jdbc:sqlite:identifier.sqlite";
+
+    // Static initializer for database connection
+    // Runs once when the class is loaded
+    static {
+        try {
+            db.connect(url);
+        } catch (Exception e) {
+            System.out.println("Failed to connect to database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     // ---- Initializing the game ---
     public void initializeGame() {
         // Displays the welcome message
@@ -28,10 +44,11 @@ public class GameController {
         // Set starting location to be current location
         currentLocation = emeraldTear.getLocation("The Clearing");
     }
+
     // --- Movement logic ---
     // move: Handles movement from the players current location to another connected location.
     public void move(String direction) {
-        //Look up if there  is a connected location in the given direction
+        //Look up if there is a connected location in the given direction
         Location newLocation = currentLocation.getConnectedLocation(direction);
         //if the direction does not lead anywhere (null) block movement
         if (newLocation == null) {
@@ -52,26 +69,13 @@ public class GameController {
         object.checkForTraps(currentLocation);
     }
 
-
-    //--- Getter ---
-    public Location getCurrentLocation(){
+    //--- Getters ---
+    public Location getCurrentLocation() {
         return currentLocation;
     }
 
     public List<Choice> getLocationChoices() {
         return currentLocation.getAvailableChoices();
-    }
-
-
-    //--- Database handling --- used for save/load
-   private DataSaving db = new DataSaving();
-   private String url = "jdbc:sqlite:identifier.sqlite";
-
-
-    // db.connect cannot exist without being in a method, just put it in here for now.
-    // Needs to be present in everything containing data, so new game, load game, save game etc.
-    public void newGame() {
-        db.connect(url);
     }
 
     /* Example of how choice could be processed
@@ -84,6 +88,4 @@ public class GameController {
     // Mark it as taken so it turns gray next time
     picked.setTaken(true);
      */
-
 }
-
