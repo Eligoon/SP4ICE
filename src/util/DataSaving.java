@@ -228,8 +228,8 @@ public class DataSaving {
                 if (c instanceof NPC npc) {
                     stmt.setString(1, npc.getName());
                     stmt.setString(2, location.getLocationName());
-                    stmt.setBoolean(3, npc.isDead);
-                    stmt.setBoolean(4, npc.isHostile);
+                    stmt.setBoolean(3, npc.isDead());
+                    stmt.setBoolean(4, npc.isHostile());
                     stmt.executeUpdate();
                 }
             }
