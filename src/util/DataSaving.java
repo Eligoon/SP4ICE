@@ -395,7 +395,7 @@ public class DataSaving {
                         npc.isDead = isDead;
                         npc.isHostile = isHostile;
 
-                        if (npc.isDead) {
+                        if (npc.isDead()) {
                             location.removeCreature(npc);
                         }
                     }
