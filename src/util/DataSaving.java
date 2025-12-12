@@ -190,6 +190,7 @@ public class DataSaving {
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to save player.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -205,6 +206,7 @@ public class DataSaving {
             clear.executeUpdate("DELETE FROM inventory WHERE player_id = 1;");
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to clear inventory before saving.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -220,6 +222,7 @@ public class DataSaving {
 
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to save inventory.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -227,7 +230,7 @@ public class DataSaving {
 
 
     // the ? will be replaced once we have a concrete NPCs by the getter methods (part of preparedstatement)
-    // False is 0 true is 1 for booleans
+    // Booleans:  False --> 0 , true --> 1
     public void saveNPCs(Location location) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
@@ -258,13 +261,13 @@ public class DataSaving {
             try (Statement stmt = connection.createStatement();
                  ResultSet rs = stmt.executeQuery("SELECT current_location FROM game_state WHERE id = 1"))
             {
-
                 if (rs.next())
                 {
                     return rs.getString("current_location");
                 }
             } catch (SQLException e) {
                 System.err.println("ERROR: Failed to load game state.");
+                System.err.println("Reason: " + e.getMessage());
                 e.printStackTrace();
             }
 
@@ -315,6 +318,7 @@ public class DataSaving {
 
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to load player.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -367,6 +371,7 @@ public class DataSaving {
 
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to load inventory for player.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -404,7 +409,7 @@ public class DataSaving {
                         npc.setDead(isDead);
                         npc.setHostile(isHostile);
 
-                        // --- Removal conditions (ADDED) ---
+                        // --- Removal conditions ---
                         if (npc.isDead()) {
                             npcToRemove = npc;
                         }
@@ -444,9 +449,10 @@ public class DataSaving {
             stmt.executeUpdate("DELETE FROM player;");
             stmt.executeUpdate("DELETE FROM inventory;");
             stmt.executeUpdate("DELETE FROM npc_state;");
-            System.out.println("Save deleted.");
+            System.out.println("Deleted earlier game.");
         } catch (SQLException e) {
-            System.err.println("Could not delete save:");
+            System.err.println("Could not delete earlier game.");
+            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
     }
