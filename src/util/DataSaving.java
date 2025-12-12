@@ -326,6 +326,7 @@ public class DataSaving {
         };
     }
 
+    // Helper method to convert string to CharacterClass object
     public CharacterClass getClassFromString(String className) {
         return switch (className.toLowerCase()) {
             case "warrior" -> CharacterClass.createWarrior();
