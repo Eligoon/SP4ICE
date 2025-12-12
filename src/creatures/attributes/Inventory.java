@@ -2,6 +2,7 @@ package creatures.attributes;
 
 import collectibles.Armor;
 import collectibles.Weapon;
+import creatures.Player;
 import util.TextUI;
 import collectibles.Item;
 import java.util.ArrayList;
@@ -75,6 +76,102 @@ public class Inventory {
 
     public void equipArmor(Armor armor) {
         this.equippedArmor = armor;
+    }
+
+    private List<Weapon> getWeapons(){
+        List<Weapon> weapons = new ArrayList<>();
+        for(Item item : items){
+            if(item instanceof Weapon){
+                weapons.add((Weapon) item);
+            }
+        }
+        return weapons;
+    }
+
+    private List<Armor> getArmors(){
+        List<Armor> armors = new ArrayList<>();
+        for (Item item : items){
+            if(item instanceof Armor){
+                armors.add((Armor) item);
+            }
+        }
+        return armors;
+    }
+
+    public void equipWeapon(){
+        List<Weapon> weapons = getWeapons();
+
+        if (weapons.isEmpty()){
+            ui.displayMsg("You have no weapons to equip!");
+            return;
+        }
+        ui.displayMsg("Choose a weapon ot equip:");
+        ArrayList<String> weaponNames = new ArrayList<>();
+
+        for (Weapon w : weapons){
+            weaponNames.add(w.getName());
+        }
+        int choice = ui.promptNumeric("Enter Number:") - 1;
+        if (choice < 0 || choice >= weapons.size()){
+            ui.displayMsg("Invalid choice!");
+            return;
+        }
+        equippedWeapon = weapons.get(choice);
+        ui.displayMsg("Equipped Weapon: " + equippedWeapon.getName());
+    }
+
+    public void equipArmor(){
+        List<Armor> armors = getArmors();
+
+        if (armors.isEmpty()){
+            ui.displayMsg("You have no armor to equip!");
+            return;
+        }
+        ui.displayMsg("Choose armor to equip:");
+        ArrayList<String> armorNames = new ArrayList<>();
+
+        for(Armor a : armors){
+            armorNames.add(a.getName());
+        }
+        int choice = ui.promptNumeric("Enter number:") - 1;
+        if(choice <0 || choice >=armors.size()){
+            ui.displayMsg("Invalid choice!");
+            return;
+        }
+        equippedArmor = armors.get(choice);
+        ui.displayMsg("Equipped armor: " + equippedArmor.getName());
+    }
+
+    //to make this work, we would Need a: public void use(Player player) method
+
+    public void useItem(Player Player){
+        if (items.isEmpty()){
+            ui.displayMsg("You have no items to use!");
+            return;
+        }
+
+        ui.displayMsg("Choose an item to use:");
+
+        ArrayList<String> itemNames = new ArrayList<>();
+        for(Item i : items){
+            itemNames.add(i.getName());
+        }
+
+        int choice = ui.promptNumeric("Enter number:") -1;
+
+        if(choice <0 || choice >= items.size()){
+            ui.displayMsg("Invalid choice!");
+            return;
+        }
+        Item vhoosenItem = items.get(choice);
+
+        //call the item's effect on the player
+        chosenItem.user(player);
+
+        //if item is consumable!, we remove it!
+        if(chosenItem.isConsumable()){
+            removeItem(chosenItem);
+        }
     }
 
 
