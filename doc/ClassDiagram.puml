@@ -102,7 +102,9 @@ enum ChoiceType {
     MOVE
     COMBAT
     INTERACT
-    USEOBJECT
+    USEITEM
+    EQUIPARMOUR
+    EQUIPWEAPON
 
     AND
     OR
