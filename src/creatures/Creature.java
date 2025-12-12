@@ -21,9 +21,9 @@ public class Creature {
 
     // Apply damage to the creature
     public void takeDamage(int damage) {
-        stats.setCurrentHP(stats.getCurrentHP() - damage);
-        if (stats.getCurrentHP() <= 0) {
-            stats.setCurrentHP(0);
+        stats.setCurrentHealth(stats.getCurrentHealth() - damage);
+        if (stats.getCurrentHealth() <= 0) {
+            stats.setCurrentHealth(0);
             isDead = true;
         }
     }

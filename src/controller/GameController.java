@@ -5,6 +5,7 @@ import collectibles.Health;
 import controller.Choices.Choice;
 import creatures.Creature;
 import creatures.NPC;
+import creatures.Player;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
