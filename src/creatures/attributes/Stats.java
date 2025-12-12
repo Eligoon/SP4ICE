@@ -2,25 +2,25 @@ package creatures.attributes;
 
 public class Stats {
     /* The Stats class holds the basic numerical attributes for any Creature:
-     * health, strength, dexterity, intelligence. */
-    private int health;
-    private int maxHealth;
+     * current health, maximum health, strength, dexterity, intelligence. */
+    private int maxHealth;         // Maximum health
+    private int currentHealth;     // Current health, decreases with damage
     private int strength;
     private int dexterity;
     private int intelligence;
 
     // --- Constructor to set the initial stats ---
-    public Stats(int health, int strength, int dexterity, int intelligence) {
-        this.health = health;
-        this.maxHealth = health; // Store maxHealth
+    public Stats(int maxHealth, int strength, int dexterity, int intelligence) {
+        this.maxHealth = maxHealth;
+        this.currentHealth = maxHealth; // Start at full health
         this.strength = strength;
         this.dexterity = dexterity;
         this.intelligence = intelligence;
     }
 
     // --- Getters ---
-    public int getHealth() {
-        return health;
+    public int getCurrentHealth() {
+        return currentHealth;
     }
 
     public int getMaxHealth() {
@@ -40,8 +40,19 @@ public class Stats {
     }
 
     // --- Setters ---
-    public void setHealth(int value) {
-        this.health = Math.min(value, maxHealth); // Cannot exceed maxHealth
+    public void setCurrentHealth(int value) {
+        if (value > maxHealth) {
+            this.currentHealth = maxHealth; // Cannot exceed max health
+        } else if (value < 0) {
+            this.currentHealth = 0;         // Cannot go below 0
+        } else {
+            this.currentHealth = value;     // Normal case
+        }
+    }
+
+    public void setMaxHealth(int value) {
+        this.maxHealth = value;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
     }
 
     public void setStrength(int value) {
@@ -56,11 +67,11 @@ public class Stats {
         this.intelligence = value;
     }
 
-    // Applies a modifier to one of the stats (health, strength, dexterity, intelligence)
+    // Apply a modifier to one of the stats
     public void applyModifier(String stat, int modifier) {
         switch (stat.toLowerCase()) {
             case "health":
-                setHealth(this.health + modifier);
+                setCurrentHealth(this.currentHealth + modifier);
                 break;
             case "strength":
                 setStrength(this.strength + modifier);
@@ -76,14 +87,13 @@ public class Stats {
         }
     }
 
-    // Reduce health by damage amount
+    // Take damage
     public void takeDamage(int damage) {
-        this.health -= damage;
-        if (this.health < 0) this.health = 0;
+        setCurrentHealth(currentHealth - damage);
     }
 
     // Heal by a fixed amount
     public void heal(int amount) {
-        setHealth(this.health + amount);
+        setCurrentHealth(currentHealth + amount);
     }
 }

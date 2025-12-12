@@ -46,11 +46,11 @@ public class Creature {
         return stats;
     }
     public int getCurrentHP() {
-        return stats.getCurrentHP();
+        return stats.getCurrentHealth();
     }
 
     public int getMaxHP() {
-        return stats.getMaxHP();
+        return stats.getMaxHealth();
     }
 
     public boolean getIsDead() {
