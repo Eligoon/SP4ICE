@@ -1,9 +1,12 @@
 package controller;
+import controller.Choices.Choice;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
 import world.Objects;
 import world.Story;
+
+import java.util.List;
 
 public class GameController {
     // --- Fields / Attributes ---
@@ -55,7 +58,12 @@ public class GameController {
         return currentLocation;
     }
 
-//--- Database handling --- used for save/load
+    public List<Choice> getLocationChoices() {
+        return currentLocation.getAvailableChoices();
+    }
+
+
+    //--- Database handling --- used for save/load
    private DataSaving db = new DataSaving();
    private String url = "jdbc:sqlite:identifier.sqlite";
 
