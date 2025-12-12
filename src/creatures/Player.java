@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* The Player class represents the main character controlled by the user.
-* It extends Creature and inherits name, race and stats. */
+ * It extends Creature and inherits name, race and stats. */
 
 public class Player extends Creature {
     // Player choose a class
