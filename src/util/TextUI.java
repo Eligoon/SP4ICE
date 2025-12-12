@@ -88,7 +88,7 @@ public class TextUI {
     public void displayInventory(Inventory inventory){
         displayMsg("=== INVENTORY ===");
         for (Item item : inventory.getItems()){
-            displayMsg("- "+ item.getName());
+            displayMsg("- "+ item.getItemName());
         }
     }
 
