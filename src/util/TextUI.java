@@ -99,4 +99,27 @@ public class TextUI {
         return result;
     }
 
+    public Choice promptChoiceOb(List<Choice> choices, String msg) {
+        displayMsg(msg);
+        displayChoices(choices);
+
+        int num;
+        while (true) {
+            try {
+                displayMsg("Enter choice number:");
+                num = Integer.parseInt(sc.nextLine());
+
+                if (num < 1 || num > choices.size()) {
+                    displayMsg("Invalid choice. Try again.");
+                } else {
+                    return choices.get(num - 1); // return the actual Choice
+                }
+
+            } catch (NumberFormatException e) {
+                displayMsg("Please enter a valid number.");
+            }
+        }
+    }
+
+
 }
