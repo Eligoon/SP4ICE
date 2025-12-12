@@ -11,6 +11,7 @@ public class NPC extends Creature {
     private Item itemHeld;             // Item the NPC is holding
     private boolean isHostile;         // Determines if NPC will attack player
     private boolean isDead;            // Tracks if NPC is dead
+    private String originalLocation;   // Original location for NPC, needed for despawn if needed
 
     private boolean despawnsWhenLeaving = false; // For a specific NPC type at a specific location
 
@@ -64,5 +65,13 @@ public class NPC extends Creature {
 
     public void setDead(boolean dead) {
         isDead = dead;
+    }
+
+    public String getOriginalLocation() {
+        return originalLocation;
+    }
+
+    public void setOriginalLocation(String originalLocation) {
+        this.originalLocation = originalLocation;
     }
 }

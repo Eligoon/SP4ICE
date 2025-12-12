@@ -374,14 +374,13 @@ public class DataSaving {
 
 
     // LoadNPCs
-    public void loadNPCs(Map<String, Location> allLocations) {
+    public void loadNPCs(Map<String, Location> allLocations, String savedLocation) {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state"))
         {
 
             while (rs.next())
             {
-
                 String npcName = rs.getString("npc_name");
                 String locName = rs.getString("location_name");
                 boolean isDead = rs.getBoolean("is_dead");
@@ -389,24 +388,36 @@ public class DataSaving {
 
                 Location location = allLocations.get(locName);
                 if (location == null) {
-                    System.err.println("WARNING: Location '" + locName
-                            + "' not found while loading NPC '"
-                            + npcName + "'.");
+                    System.err.println("WARNING: Location " + locName
+                            + " not found while loading NPC "
+                            + npcName + ".");
                     continue;
                 }
 
                 boolean npcFound = false;
+                NPC npcToRemove = null;
 
                 for (Creature c : location.getCreatures()) {
                     if (c instanceof NPC npc && npc.getName().equals(npcName)) {
                         npcFound = true;
-                        npc.isDead = isDead;
-                        npc.isHostile = isHostile;
 
+                        npc.setDead(isDead);
+                        npc.setHostile(isHostile);
+
+                        // --- Removal conditions (ADDED) ---
                         if (npc.isDead()) {
-                            location.removeCreature(npc);
+                            npcToRemove = npc;
+                        }
+                        else if (npc.doesDespawnWhenLeaving() &&
+                                !savedLocation.equals(npc.getOriginalLocation())) {
+                            npcToRemove = npc;
                         }
                     }
+                }
+
+                // Remove AFTER loop to avoid concurrent modification
+                if (npcToRemove != null) {
+                    location.removeCreature(npcToRemove);
                 }
 
                 if (!npcFound) {
@@ -422,6 +433,7 @@ public class DataSaving {
             e.printStackTrace();
         }
     }
+
 
 
     // Delete rows in the tables to prepare for a new game
