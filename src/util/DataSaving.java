@@ -10,7 +10,7 @@ import world.Location;
 import creatures.Player;
 import creatures.NPC;
 import creatures.Creature;
-import creatures.CharacterClass;
+import creatures.attributes.CharacterClass;
 
 // TRUNCATE is not supported in SQLite
 
