@@ -6,6 +6,7 @@ import controller.Choices.Choice;
 import creatures.Creature;
 import creatures.NPC;
 import creatures.Player;
+import creatures.attributes.Inventory;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
@@ -105,8 +106,8 @@ public class GameController {
                         ui.displayMsg(enemy.getName() + " has been defeated!");
                         break; // exit combat loop
                     }
-                } else if (choice == 2) {
-                    // Placeholder: implement item usage logic
+                } else {
+                    Inventory.useItem(player);
                     ui.displayMsg("You used an item!");
                 }
 
