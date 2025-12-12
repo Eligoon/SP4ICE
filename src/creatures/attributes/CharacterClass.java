@@ -52,7 +52,7 @@ public class CharacterClass {
 
     // --- Modifiers --- Apply the class stat bonuses to the given class
     public void applyCharacterClassBonuses(Stats stats){
-        stats.setHealth(stats.getHealth() + healthModifier);
+        stats.setCurrentHealth(stats.getCurrentHealth() + healthModifier);
         stats.setStrength(stats.getStrength() + strengthModifier);
         stats.setDexterity(stats.getDexterity() + dexterityModifier);
         stats.setIntelligence(stats.getIntelligence() + intelligenceModifier);
