@@ -65,4 +65,14 @@ public class GameController {
     public void newGame() {
         db.connect(url);
     }
+
+    /* Example of how choice could be processed
+    List<Choice> available = textUI.getAvailableChoices(allChoices, player);
+
+    Choice picked = textUI.promptChoice(available, "What do you want to do?");
+
+    picked.execute(this);   // <- triggers MOVE, COMBAT, etc.
+     */
+
 }
+
