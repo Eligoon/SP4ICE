@@ -1,5 +1,7 @@
 package controller;
 
+import collectibles.Armor;
+import collectibles.Health;
 import controller.Choices.Choice;
 import creatures.Creature;
 import util.TextUI;
@@ -7,6 +9,7 @@ import world.Location;
 import util.DataSaving;
 import world.Objects;
 import world.Story;
+import collectibles.Item;
 
 import java.util.List;
 
@@ -71,13 +74,28 @@ public class GameController {
     }
 
     public void handleCombat(Creature enemy) {
-        System.out.println("You engage in combat with " + enemy.getName());
+        ui.displayMsg("You engage in combat with " + enemy.getName());
         // combat logic here
     }
 
     public void handleNPCInteraction(Creature npc) {
-        System.out.println("You interact with " + npc.getName());
+        ui.displayMsg("You interact with " + npc.getName());
         // dialogue, quest logic, etc.
+    }
+
+    public void handleUseItem(Item item) {
+        ui.displayMsg("You use this item: " + Health.getItemName);
+        // Using health item logic
+    }
+
+    public void handleEquipArmour(Item armour) {
+        ui.displayMsg("You equip this piece of armor: " + Armor.getItemName);
+        // Equipping armor logic
+    }
+
+    public void handleEquipWeapon(Item weapon) {
+        ui.displayMsg("You equip this weapon: " + Weapon.getItemName);
+        // Equipping weapon logic
     }
 
 
@@ -90,7 +108,7 @@ public class GameController {
         return currentLocation.getAvailableChoices();
     }
 
-    /* Example of how choice could be processed
+    /* Example of how choice could be processed not full logic
     List<Choice> available = textUI.getAvailableChoices(allChoices, player);
 
     Choice picked = textUI.promptChoice(available, "What do you want to do?");

@@ -80,7 +80,7 @@ public class Choice {
     public void execute(GameController gc) {
         switch (type) {
             case MOVE:
-                gc.changeLocation(targetLocation);
+                gc.move(targetLocation);
                 break;
 
             case COMBAT:
