@@ -72,6 +72,9 @@ public class GameController {
     Choice picked = textUI.promptChoice(available, "What do you want to do?");
 
     picked.execute(this);   // <- triggers MOVE, COMBAT, etc.
+
+    // Mark it as taken so it turns gray next time
+    picked.setTaken(true);
      */
 
 }
