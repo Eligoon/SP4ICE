@@ -3,43 +3,56 @@
 'Game controller'
 class GameController {
     - currentLocation : Location
+    - ui : TextUI
+    - emeraldTear : Story
     - player : Player
-    - textUI : TextUI
-    - dataSaving : DataSaving
-    - String url
-    + newGame() : void
-    + loadGame() : void
-    + saveGame() : void
-    + createCharacter() : void
-    + processChoice(choice : Choice) : void
-    + handleCombat(creature : Creature) : void
-    + changeLocation(location : Location) : void
+    + move(direction:String)
+    + handleCombat(enemy:Creature)
+    + handleNPCInteraction(npc:Creature)
+    + handleUseItem(item:Item)
+    + handleEquipArmour(item:Item)
+    + handleEquipWeapon(item:Item)
+    + initializeGame() : void
 }
+
 
 'Text UI '
 class TextUI {
-    + displayMsg(text : String) : void
+    - static sc : Scanner
+    + displayMsg(msg : String) : void
     + displayChoices(choices : List<Choice>) : void
     + getPlayerInput() : String
     + displayInventory(inventory : Inventory) : void
     + displayCombatStatus(player : Player, enemy : Creature) : void
+    + promptChoice(options : ArrayList<String>, limit : int, msg : String) : ArrayList<String>
+    + displayList(list : ArrayList<String>, msg : String) : void
+    + promptNumeric(msg : String) : int
+    + promptText(msg : String) : String
+    + promptBinary(msg : String) : boolean
+    + getAvailableChoices(all : List<Choice>, player : Player) : List<Choice>
+    + promptChoiceOb(choices : List<Choice>, msg : String) : Choice
 }
+
 
 'Saving data '
 class DataSaving {
-    + connect(String url)
+    - connection : Connection
+    + connect(url : String) : void
     + saveGameState(gameController : GameController) : void
-    + saveCurrentLocation()
-    + savePlayer()
-    + saveInventory()
-    + saveNPCs()
-    + loadGameState() : GameController
-    + loadLocation()
-    + loadPlayer()
-    + loadInventory()
-    + loadNPCs()
+    + saveCurrentLocation(location : Location) : void
+    + savePlayer(player : Player, location : Location) : void
+    + saveInventory(player : Player) : void
+    + saveNPCs(location : Location) : void
+    + loadGameState() : String
+    + loadLocation(locationName : String, allLocations : Map<String, Location>) : Location
+    + loadPlayer() : Player
+    + loadInventory(player : Player) : void
+    + loadNPCs(allLocations : Map<String, Location>, savedLocation : String) : void
     + deleteSave() : void
+    + getRaceFromString(raceName : String) : Race
+    + getClassFromString(className : String) : CharacterClass
 }
+
 
 'Story'
 class Story {
@@ -47,25 +60,30 @@ class Story {
 }
 
 'Choice'
-class Choice {
-    - description : String
-    - targetLocation : Location
-    - taken : boolean
-    - enemy : Creature
-    - type : ChoiceType
-    +  Choice(String description, Location targetLocation)
-    +  Choice(String description, Creature enemy)
-    + execute(gameController : GameController) : void
-    + addRequirement(rec : Requirement) : void
-    + isAvailable(player : Player) : boolean
-    + getDescription() : String
-    + getType() : ChoiceType
-    + getTargetLocation() : Location
-    + getEnemy() : Creature
-    + getRequirements() : List<Requirement>
-    + isTaken() : boolean
-    + setTaken(boolean taken)
-}
+ class Choice {
+        - description : String
+        - taken : boolean
+        - type : ChoiceType
+        - targetLocation : Location
+        - enemy : Creature
+        - npc : Creature
+        - item : Item
+        - requirements : List<Requirement>
+
+        + addRequirement(req: Requirement) : void
+        + isAvailable(player: Player) : boolean
+        + execute(gc: GameController) : void
+
+        + getDescription() : String
+        + getType() : ChoiceType
+        + getTargetLocation() : Location
+        + getEnemy() : Creature
+        + getNpc() : Creature
+        + getItem() : Item
+        + getRequirements() : List<Requirement>
+        + isTaken() : boolean
+        + setTaken(taken: boolean) : void
+ }
 
 ' Classes for requirements used in choices
 
@@ -143,30 +161,40 @@ abstract class Creature {
 
 'Player'
 class Player {
-    - characterClass : Class
+    - characterClass : String
     - inventory : Inventory
     - questLog : List<Quest>
+    - equippedWeapon : Weapon
     + interact() : void
-    + useItem(item : Item) : void
-    + equipWeapon(weapon : Weapon) : void
-    + equipArmor(armor : Armor) : void
     + addQuest(quest : Quest) : void
-    + completeQuest(questId : String) : void
+    + completeQuest(questID : String) : void
+    + attack(target : Creature) : int
+    + heal(amount : int) : void
+    + getCharacterClass() : String
+    + getInventory() : Inventory
+    + getQuestLog() : List<Quest>
+    + getEquippedWeapon() : Weapon
 }
 
-'NPC'
+' NPC '
 class NPC {
     - dialogue : List<String>
-    - questToGive : Quest
+    - questToGive : Object
     - itemHeld : Item
     - isHostile : boolean
     - isDead : boolean
-    + interact() : void
-    + CPU_Interaction() : void
-    + CPU_Attack() : void
-    + giveQuest(player : Player) : void
-    + getQuestItem(player : Player) : boolean
-    + giveReward(player : Player) : void
+    - originalLocation : String
+    - despawnsWhenLeaving : boolean
+    - ui : TextUI
+    + CPU_Attack(player: Player) : void
+    + doesDespawnWhenLeaving() : boolean
+    + setDespawnWhenLeaving(value: boolean) : void
+    + isHostile() : boolean
+    + setHostile(hostile: boolean) : void
+    + isDead() : boolean
+    + setDead(dead: boolean) : void
+    + getOriginalLocation() : String
+    + setOriginalLocation(location: String) : void
 }
 
 ' Race '
@@ -182,16 +210,24 @@ class Race {
     + getSpecialAbility() : String
 }
 
-'Class'
-class Class {
-    - className : String
-    - baseHealth : int
-    - primaryStat : String
+' CharacterClass '
+class CharacterClass {
+    - characterClassName : String
+    - healthModifier : int
+    - strengthModifier : int
+    - dexterityModifier : int
+    - intelligenceModifier : int
     - specialSkills : List<String>
-    + applyClassBonuses(stats : Stats) : void
-    + getClassName() : String
+    + CharacterClass(characterClassName : String, healthModifier : int, strengthModifier : int, dexterityModifier : int, intelligenceModifier : int, specialSkills : List<String>)
+    + createWarrior() : CharacterClass
+    + createMage() : CharacterClass
+    + createRanger() : CharacterClass
+    + getAllCharacterClasses() : List<CharacterClass>
+    + applyCharacterClassBonuses(stats : Stats) : void
+    + getCharacterClassName() : String
     + getSpecialSkills() : List<String>
 }
+
 
 'Location'
 class Location {
@@ -320,9 +356,11 @@ Creature "1" --> "1" Race : has
 Creature "1" --> "1" Stats : has
 
 ' Player composition
-Player "1" --> "1" Class : has
+Player "1" --> "1" CharacterClass : has
 Player "1" --> "1" Inventory : has
 Player "1" --> "*" Quest : tracks
+Player "1" --> "0..1" Weapon : equippedWeapon
+Player "1" --> "0..1" Armor : equippedArmor
 Player --> Choice : can make
 
 ' NPC composition
@@ -347,6 +385,10 @@ Item <|-- Quest : extends
 
 ' Choice relationship
 Choice "1" --> "0..1" Location : leadsTo
+Choice --> "0..1" Creature : enemy
+Choice --> "0..1" Creature : npc
+Choice --> "0..1" Item : item
+Choice --> GameController : execute()
 Choice --> ChoiceType : uses
 Choice --> ClassRequirement : uses
 Choice --> ItemRequirement : uses
