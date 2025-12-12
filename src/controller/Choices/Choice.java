@@ -1,27 +1,31 @@
 package controller.Choices;
 
+import controller.GameController;
 import creatures.Creature;
 import creatures.Player;
+import collectibles.Item;
 import world.Location;
-import controller.GameController;
+import world.Objects;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Choice {
 
     private String description;        // Text shown to the player
-
     private boolean taken = false;     // Boolean to check if an option has already been taken
-
-    private ChoiceType type;           // What the choice does (move, combat, etc.) (Enum)
+    private ChoiceType type;           // What the choice does (move, combat, etc.)
 
     private Location targetLocation;   // For MOVE choices
     private Creature enemy;            // For COMBAT choices
+    private Objects object;            // For INTERACT choices
+    private Item item;                 // For USEITEM / EQUIPARMOUR / EQUIPWEAPON choices
 
     private List<Requirement> requirements = new ArrayList<>();
     // Requirements: item, npc dead, race, class
 
-    // Constructors below for choices
+
+    // Constructors
 
     // Movement choice
     public Choice(String description, Location targetLocation) {
@@ -37,44 +41,69 @@ public class Choice {
         this.type = ChoiceType.COMBAT;
     }
 
-    // Requirement for choices
+    // Interact choice
+    public Choice(String description, Objects object) {
+        this.description = description;
+        this.object = object;
+        this.type = ChoiceType.INTERACT;
+    }
 
-    // Add a requirement (item, race, class, npc dead, etc.)
+    // Item-based choices (use / equip)
+    public Choice(String description, Item item, ChoiceType type) {
+        this.description = description;
+        this.item = item;
+        this.type = type;
+    }
+
+
+    // Requirement handling
+
     public void addRequirement(Requirement req) {
         requirements.add(req);
     }
 
-    // Check if ALL requirements for this choice are met
     public boolean isAvailable(Player player) {
         for (Requirement req : requirements) {
             if (!req.isMet(player)) {
-                return false;  // A requirement failed means the choice is hidden
+                return false;
             }
         }
         return true;
     }
 
-    // Execution to gamecontroller
 
-    // Tell GameController what to do when this choice is picked
+    // Execute the choice to gamecontroller
+
     public void execute(GameController gc) {
 
         switch (type) {
 
             case MOVE:
-                // Move player to another location
                 gc.changeLocation(targetLocation);
                 break;
 
             case COMBAT:
-                // Start a fight
                 gc.handleCombat(enemy);
                 break;
 
             case INTERACT:
-            case USEOBJECT:
+                gc.handleInteraction(object);
+                break;
 
+            case USEITEM:
+                gc.handleUseItem(item);
+                break;
+
+            case EQUIPARMOUR:
+                gc.handleEquipArmour(item);
+                break;
+
+            case EQUIPWEAPON:
+                gc.handleEquipWeapon(item);
+                break;
         }
+
+        taken = true; // Mark choice as taken
     }
 
 
@@ -94,6 +123,14 @@ public class Choice {
 
     public Creature getEnemy() {
         return enemy;
+    }
+
+    public Objects getObject() {
+        return object;
+    }
+
+    public Item getItem() {
+        return item;
     }
 
     public List<Requirement> getRequirements() {
