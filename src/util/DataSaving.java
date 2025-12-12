@@ -134,7 +134,7 @@ public class DataSaving {
             try (PreparedStatement stmt = connection.prepareStatement(
                     "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
             )) {
-                stmt.setString(1, gameController.currentLocation.getLocationName());
+                stmt.setString(1, gameController.getCurrentLocation().getLocationName());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 System.err.println("ERROR: Failed to save game state.");
@@ -175,7 +175,7 @@ public class DataSaving {
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getRace().getRaceName());
             stmt.setString(3, player.getCharacterClass().getClassName());
-            stmt.setInt(4, player.getStats().getHealth());
+            stmt.setInt(4, player.getStats().getCurrentHealth());
             stmt.setInt(5, player.getStats().getStrength());
             stmt.setInt(6, player.getStats().getDexterity());
             stmt.setInt(7, player.getStats().getIntelligence());
@@ -290,7 +290,7 @@ public class DataSaving {
                             rs.getString("class")
                     );
 
-                    player.getStats().setHealth(rs.getInt("health"));
+                    player.getStats().setCurrentHealth(rs.getInt("health"));
                     player.getStats().setStrength(rs.getInt("strength"));
                     player.getStats().setDexterity(rs.getInt("dexterity"));
                     player.getStats().setIntelligence(rs.getInt("intelligence"));
