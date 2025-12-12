@@ -10,18 +10,6 @@ import world.Story;
 import java.util.List;
 
 public class GameController {
-
-    // Static initializer for database connection
-    // Runs once when the class is loaded
-    static {
-        try {
-            db.connect(url);
-        } catch (Exception e) {
-            System.out.println("Failed to connect to database: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     // --- Fields / Attributes ---
     //Tracks the players current location
     private Location currentLocation;
@@ -34,6 +22,16 @@ public class GameController {
     private static DataSaving db = new DataSaving();
     private static String url = "jdbc:sqlite:identifier.sqlite";
 
+    // Static initializer for database connection
+    // Runs once when the class is loaded
+    static {
+        try {
+            db.connect(url);
+        } catch (Exception e) {
+            System.out.println("Failed to connect to database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     // ---- Initializing the game ---
     public void initializeGame() {
