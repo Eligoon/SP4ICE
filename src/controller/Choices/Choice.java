@@ -11,6 +11,8 @@ public class Choice {
 
     private String description;        // Text shown to the player
 
+    private boolean taken = false;     // Boolean to check if an option has already been taken
+
     private ChoiceType type;           // What the choice does (move, combat, etc.) (Enum)
 
     private Location targetLocation;   // For MOVE choices
@@ -76,7 +78,7 @@ public class Choice {
     }
 
 
-    // Getters
+    // Getters and setters
 
     public String getDescription() {
         return description;
@@ -96,5 +98,13 @@ public class Choice {
 
     public List<Requirement> getRequirements() {
         return requirements;
+    }
+
+    public boolean isTaken() {
+        return taken;
+    }
+
+    public void setTaken(boolean taken) {
+        this.taken = taken;
     }
 }
