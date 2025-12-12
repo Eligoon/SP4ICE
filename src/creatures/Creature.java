@@ -33,6 +33,11 @@ public class Creature {
         return !isDead;
     }
 
+    // Setter for dead status
+    public void setDead(boolean dead) {
+        this.isDead = dead;
+    }
+
     // Getters
     public String getName() {
         return name;
@@ -45,6 +50,7 @@ public class Creature {
     public Stats getStats() {
         return stats;
     }
+
     public int getCurrentHP() {
         return stats.getCurrentHealth();
     }
