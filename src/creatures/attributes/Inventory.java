@@ -105,7 +105,7 @@ public class Inventory {
             ui.displayMsg("You have no weapons to equip!");
             return;
         }
-        ui.displayMsg("Choose a weapon ot equip:");
+        ui.displayMsg("Choose a weapon to equip:");
         ArrayList<String> weaponNames = new ArrayList<>();
 
         for (Weapon w : weapons){
