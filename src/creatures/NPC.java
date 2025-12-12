@@ -6,16 +6,19 @@ import util.TextUI;
 import java.util.List;
 
 public class NPC extends Creature {
-    private List<String> dialogue;  // Lines the NPC can say
-    private Object questToGive;     // Placeholder for a Quest class
-    private Item itemHeld;          // Item the NPC is holding
-    private boolean isHostile;      // Determines if NPC will attack player
-    private boolean isDead;         // Tracks if NPC is dead
+    private List<String> dialogue;     // Lines the NPC can say
+    private Object questToGive;        // Placeholder for a Quest class
+    private Item itemHeld;             // Item the NPC is holding
+    private boolean isHostile;         // Determines if NPC will attack player
+    private boolean isDead;            // Tracks if NPC is dead
 
-    private TextUI ui = new TextUI(); // TextUI instance for displaying combat messages
+    private boolean despawnsWhenLeaving = false; // For a specific NPC type at a specific location
+
+    private TextUI ui = new TextUI();  // TextUI instance for displaying combat messages
 
     // --- Constructor ---
-    public NPC(String name, Stats stats, List<String> dialogue, boolean isHostile, Item itemHeld, Object questToGive) {
+    public NPC(String name, Stats stats, List<String> dialogue,
+               boolean isHostile, Item itemHeld, Object questToGive) {
         super(name, null, stats);
         this.dialogue = dialogue;
         this.isHostile = isHostile;
@@ -35,6 +38,15 @@ public class NPC extends Creature {
                 ui.displayMsg(player.getName() + " has been defeated by " + getName() + "!");
             }
         }
+    }
+
+    // --- Despawn getter/setter ---
+    public boolean doesDespawnWhenLeaving() {
+        return despawnsWhenLeaving;
+    }
+
+    public void setDespawnWhenLeaving(boolean value) {
+        this.despawnsWhenLeaving = value;
     }
 
     // --- Getters and setters ---
