@@ -66,11 +66,21 @@ public class TextUI {
 
     }
 
-    public void displayChoices(List<Choice> choices){
-        for(int i = 0; i < choices.size(); i++){
-            displayMsg((i + 1)+". "+ choices.get(i).getDescription());
+    public void displayChoices(List<Choice> choices) {
+        for (int i = 0; i < choices.size(); i++) {
+            Choice c = choices.get(i);
+            String text = (i + 1) + ". " + c.getDescription();
+
+            if (c.isTaken()) {
+                // gray text
+                System.out.println("\u001B[90m" + text + "\u001B[0m");
+            } else {
+                System.out.println(text);
+            }
         }
     }
+
+
     public String getPlayerInput(){
         return sc.nextLine();
     }
