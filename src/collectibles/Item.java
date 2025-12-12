@@ -21,4 +21,8 @@ protected int weight;
 
     // Method to allow items to be copied to the ItemRegistry
     public abstract Item copy();
+
+    public String getItemName() {
+        return itemName;
+    }
 }

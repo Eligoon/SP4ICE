@@ -144,7 +144,7 @@ public class Inventory {
 
     //to make this work, we would Need a: public void use(Player player) method
 
-    public void useItem(Player Player){
+    public static void useItem(Player Player){
         if (items.isEmpty()){
             ui.displayMsg("You have no items to use!");
             return;
@@ -163,7 +163,7 @@ public class Inventory {
             ui.displayMsg("Invalid choice!");
             return;
         }
-        Item vhoosenItem = items.get(choice);
+        Item chosenItem = items.get(choice);
 
         //call the item's effect on the player
         chosenItem.user(player);

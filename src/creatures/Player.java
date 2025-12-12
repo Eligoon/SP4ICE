@@ -13,18 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* The Player class represents the main character controlled by the user.
-* It extends Creature and inherits name, race and stats. */
-
+ * It extends Creature and inherits name, race and stats. */
 public class Player extends Creature {
-    // Player choose a class
-    private Class characterClass;
-    //The players inventory holding items
+    // Player chooses a class
+    private String characterClass;
+    // The player's inventory holding items
     private Inventory inventory;
-    //A list of quests the player has accepted
+    // A list of quests the player has accepted
     private List<Quest> questLog;
+    // The currently equipped weapon
+    private Weapon equippedWeapon;
 
     // --- Constructor for new player object ---
-    public Player(String name, Race race, Class characterClass, Stats stats) {
+    public Player(String name, Race race, String characterClass, Stats stats) {
         super(name, race, stats);
 
         this.characterClass = characterClass;
@@ -36,24 +37,68 @@ public class Player extends Creature {
     }
 
     @Override
-    public void interact() { //Interaction placeholder
+    public void interact() { // Interaction placeholder
         //TODO
     }
 
-    public void useItem(Item item) { //called when the player uses an item
-        //TODO
-    }
-    public void equipWeapon(Weapon weapon){ //Equip a weapon from the players inventory
-        //TODO
-    }
-    public void equipArmor(Armor armor){ //Equip armor from the players inventory
-        //TODO
-    }
-    public void addQuest(Quest quest){ //add a quest the players quest log
+    public void addQuest(Quest quest){ // add a quest to the player's quest log
         questLog.add(quest);
     }
+
     public void completeQuest(String questID){ // Marks quest as completed
         //TODO
     }
 
+    // Combat methods
+
+    // Player attacks a target
+    public int attack(Creature target) {
+        int baseDamage = 0;
+
+        // Damage scales with class + equipped weapon
+        switch (characterClass.toLowerCase()) {
+            case "warrior":
+                baseDamage = stats.getStrength();
+                break;
+            case "ranger":
+                baseDamage = stats.getDexterity();
+                break;
+            case "mage":
+                baseDamage = stats.getIntelligence();
+                break;
+        }
+
+        // Add weapon damage if equipped
+        if (equippedWeapon != null) {
+            baseDamage += equippedWeapon.getDamage();
+        }
+
+        // Apply damage to the target
+        target.takeDamage(baseDamage);
+
+        return baseDamage;
+    }
+
+    // Player can heal a fixed amount
+    public void heal(int amount) {
+        int newHP = stats.getCurrentHealth() + amount;
+        stats.setCurrentHealth(Math.min(newHP, stats.getMaxHealth())); // cannot exceed max HP
+    }
+
+    // --- Getters ---
+    public String getCharacterClass() {
+        return characterClass;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public List<Quest> getQuestLog() {
+        return questLog;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
 }

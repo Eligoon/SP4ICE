@@ -4,6 +4,9 @@ import collectibles.Armor;
 import collectibles.Health;
 import controller.Choices.Choice;
 import creatures.Creature;
+import creatures.NPC;
+import creatures.Player;
+import creatures.attributes.Inventory;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
@@ -74,9 +77,68 @@ public class GameController {
     }
 
     public void handleCombat(Creature enemy) {
-        ui.displayMsg("You engage in combat with " + enemy.getName());
-        // combat logic here
+        if (enemy == null) return;
+
+        ui.displayMsg("You engage in combat with " + enemy.getName() + "!");
+
+        boolean playerTurn = true;
+
+        // Combat continues until either the player or the enemy is dead
+        while (!enemy.isDead() && !player.isDead()) {
+            if (playerTurn) {
+                ui.displayCombatStatus(player, enemy);
+
+                int choice = -1;
+                // Force valid input
+                while (choice != 1 && choice != 2) {
+                    ui.displayMsg("Choose your action:");
+                    ui.displayMsg("1. Attack");
+                    ui.displayMsg("2. Use Item");
+                    choice = ui.promptNumeric("Enter choice number:");
+                }
+
+                if (choice == 1) {
+                    int playerDamage = player.attack(enemy); // scales with class + weapon
+                    ui.displayMsg(player.getName() + " attacks " + enemy.getName() + " for " + playerDamage + " damage!");
+
+                    if (enemy.getCurrentHP() <= 0) {
+                        enemy.setDead(true);
+                        ui.displayMsg(enemy.getName() + " has been defeated!");
+                        break; // exit combat loop
+                    }
+                } else {
+                    Inventory.useItem(player);
+                    ui.displayMsg("You used an item!");
+                }
+
+            } else {
+                // Enemy turn
+                if (enemy instanceof NPC) {
+                    NPC npc = (NPC) enemy;
+                    npc.CPU_Attack(player); // automatic attack
+
+                    if (player.getCurrentHP() <= 0) {
+                        player.setDead(true);
+                        ui.displayMsg(player.getName() + " has been defeated by " + npc.getName() + "!");
+                        break; // exit combat loop
+                    }
+
+                    if (npc.getCurrentHP() <= 0) {
+                        npc.setDead(true);
+                        ui.displayMsg(npc.getName() + " has been defeated!");
+                        break; // exit combat loop
+                    }
+                }
+            }
+
+            // Switch turns
+            playerTurn = !playerTurn;
+        }
+
+        ui.displayMsg("Combat has ended.");
     }
+
+
 
     public void handleNPCInteraction(Creature npc) {
         ui.displayMsg("You interact with " + npc.getName());

@@ -4,10 +4,13 @@ import java.util.Map;
 
 import collectibles.Item;
 import controller.GameController;
+import creatures.attributes.Race;
+import creatures.attributes.Stats;
 import world.Location;
 import creatures.Player;
 import creatures.NPC;
 import creatures.Creature;
+import creatures.CharacterClass;
 
 // TRUNCATE is not supported in SQLite
 
@@ -39,18 +42,19 @@ public class DataSaving {
             stmt.executeUpdate(sqlGameState);
 
             String sqlPlayer = """
-                CREATE TABLE IF NOT EXISTS player (
-                     id INTEGER PRIMARY KEY,
-                     name VARCHAR(100),
-                     race VARCHAR(50),
-                     class VARCHAR(50),
-                     health INTEGER,
-                     strength INTEGER,
-                     dexterity INTEGER,
-                     intelligence INTEGER,
-                     location VARCHAR(100)
-                );
-                """;
+                 CREATE TABLE IF NOT EXISTS player (
+                      id INTEGER PRIMARY KEY,
+                      name VARCHAR(100),
+                      race VARCHAR(50),
+                      class VARCHAR(50),
+                      max_health INTEGER,
+                      current_health INTEGER,
+                      strength INTEGER,
+                      dexterity INTEGER,
+                      intelligence INTEGER,
+                      location VARCHAR(100)
+                 );
+                 """;
             stmt.executeUpdate(sqlPlayer);
 
             String sqlInventory = """
@@ -134,7 +138,7 @@ public class DataSaving {
             try (PreparedStatement stmt = connection.prepareStatement(
                     "REPLACE INTO game_state (id, current_location) VALUES (1, ?)"
             )) {
-                stmt.setString(1, gameController.currentLocation.getLocationName());
+                stmt.setString(1, gameController.getCurrentLocation().getLocationName());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 System.err.println("ERROR: Failed to save game state.");
@@ -169,52 +173,57 @@ public class DataSaving {
     // - Current location
     public void savePlayer(Player player, Location location) {
         try (PreparedStatement stmt = connection.prepareStatement(
-                "REPLACE INTO player (id, name, race, class, health, strength, dexterity, intelligence, location) " +
-                        "VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)"))
+                "REPLACE INTO player (id, name, race, class, max_health, current_health, strength, dexterity, intelligence, location) " +
+                        "VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)"))
         {
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getRace().getRaceName());
-            stmt.setString(3, player.getCharacterClass().getClassName());
-            stmt.setInt(4, player.getStats().getHealth());
-            stmt.setInt(5, player.getStats().getStrength());
-            stmt.setInt(6, player.getStats().getDexterity());
-            stmt.setInt(7, player.getStats().getIntelligence());
-            stmt.setString(8, location.getLocationName());
+            stmt.setString(3, player.getCharacterClass().getCharacterClassName());
+
+            stmt.setInt(4, player.getStats().getMaxHealth());
+            stmt.setInt(5, player.getStats().getCurrentHealth());
+            stmt.setInt(6, player.getStats().getStrength());
+            stmt.setInt(7, player.getStats().getDexterity());
+            stmt.setInt(8, player.getStats().getIntelligence());
+            stmt.setString(9, location.getLocationName());
+
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to save player.");
-            System.err.println("Reason: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
 
     // the ? will be replaced once we have a concrete inventory by the getter methods (part of preparedstatement)
     // Saves all items currently in the player's inventory.
     // Each item is stored in a separate row.
     // Before saving, the table is cleared to avoid duplicates.
-        public void saveInventory(Player player) {
-            try (Statement clear = connection.createStatement()) {
-                clear.executeUpdate("DELETE FROM inventory;");
-            } catch (SQLException e) {
-                System.err.println("ERROR: Failed to clear inventory before saving.");
-                e.printStackTrace();
+    public void saveInventory(Player player) {
+        try (Statement clear = connection.createStatement()) {
+            clear.executeUpdate("DELETE FROM inventory WHERE player_id = 1;");
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to clear inventory before saving.");
+            e.printStackTrace();
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "INSERT INTO inventory (player_id, item_name) VALUES (1, ?)"))
+        {
+            for (Item item : player.getInventory().getItems()) {
+                stmt.setString(1, item.getItemName());
+                stmt.addBatch();
             }
 
-            try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO inventory (player_id, item_name) VALUES (1, ?)"))
-            {
-                for (Item item : player.getInventory().getItems()) {
-                    stmt.setString(1, item.getItemName());
-                    stmt.addBatch();
-                }
-                stmt.executeBatch();
-            } catch (SQLException e) {
-                System.err.println("ERROR: Failed to save inventory.");
-                System.err.println("Reason: " + e.getMessage());
-                e.printStackTrace();
-            }
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save inventory.");
+            e.printStackTrace();
         }
+    }
+
 
 
     // the ? will be replaced once we have a concrete NPCs by the getter methods (part of preparedstatement)
@@ -228,8 +237,8 @@ public class DataSaving {
                 if (c instanceof NPC npc) {
                     stmt.setString(1, npc.getName());
                     stmt.setString(2, location.getLocationName());
-                    stmt.setBoolean(3, npc.isDead);
-                    stmt.setBoolean(4, npc.isHostile);
+                    stmt.setBoolean(3, npc.isDead());
+                    stmt.setBoolean(4, npc.isHostile());
                     stmt.executeUpdate();
                 }
             }
@@ -278,54 +287,81 @@ public class DataSaving {
 
     // Loads the player's basic information and stats from the database.
     // Returns a Player object, or null if no saved player exists.
-        public Player loadPlayer() {
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
-            {
+    public Player loadPlayer() {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
+        {
+            if (rs.next()) {
 
-                if (rs.next()) {
-                    Player player = new Player(
-                            rs.getString("name"),
-                            rs.getString("race"),
-                            rs.getString("class")
-                    );
+                Race race = getRaceFromString(rs.getString("race"));
+                CharacterClass cls = getClassFromString(rs.getString("class"));
 
-                    player.getStats().setHealth(rs.getInt("health"));
-                    player.getStats().setStrength(rs.getInt("strength"));
-                    player.getStats().setDexterity(rs.getInt("dexterity"));
-                    player.getStats().setIntelligence(rs.getInt("intelligence"));
+                Stats stats = new Stats(
+                        rs.getInt("max_health"),
+                        rs.getInt("strength"),
+                        rs.getInt("dexterity"),
+                        rs.getInt("intelligence")
+                );
 
-                    return player;
-                }
+                stats.setCurrentHealth(rs.getInt("current_health"));
 
-            } catch (SQLException e) {
-                System.err.println("ERROR: Failed to load player.");
-                e.printStackTrace();
+                return new Player(
+                        rs.getString("name"),
+                        race,
+                        cls,
+                        stats
+                );
             }
 
-            return null;
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to load player.");
+            e.printStackTrace();
         }
+
+        return null;
+    }
+
+
+    // Helper method to convert string to Race object
+    public Race getRaceFromString(String raceName) {
+        return switch (raceName.toLowerCase()) {
+            case "human" -> Race.createHuman();
+            case "dwarf" -> Race.createDwarf();
+            case "elf" -> Race.createElf();
+            case "orc" -> Race.createOrc();
+            default -> Race.createHuman(); // fallback
+        };
+    }
+
+    // Helper method to convert string to CharacterClass object
+    public CharacterClass getClassFromString(String className) {
+        return switch (className.toLowerCase()) {
+            case "warrior" -> CharacterClass.createWarrior();
+            case "mage"    -> CharacterClass.createMage();
+            case "ranger"  -> CharacterClass.createRanger();
+            default -> CharacterClass.createWarrior(); // fallback
+        };
+    }
 
 
     // Loads all items in the player's inventory from the database
     // Uses the ItemRegistry to create item instances by name
-    public void loadInventory(Player player)
-    {
+    public void loadInventory(Player player) {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT item_name FROM inventory WHERE player_id = 1"))
         {
-            // Clear current inventory first
+            // clear existing inventory
             player.getInventory().clear();
 
-            while (rs.next())
-            {
+            while (rs.next()) {
                 String itemName = rs.getString("item_name");
+
                 Item item = ItemRegistry.create(itemName);
 
                 if (item != null) {
                     player.getInventory().addItem(item);
                 } else {
-                    System.err.println("WARNING: Item '" + itemName + "' could not be loaded into inventory.");
+                    System.err.println("WARNING: Item '" + itemName + "' not found in ItemRegistry.");
                 }
             }
 
@@ -336,15 +372,15 @@ public class DataSaving {
     }
 
 
+
     // LoadNPCs
-    public void loadNPCs(Map<String, Location> allLocations) {
+    public void loadNPCs(Map<String, Location> allLocations, String savedLocation) {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state"))
         {
 
             while (rs.next())
             {
-
                 String npcName = rs.getString("npc_name");
                 String locName = rs.getString("location_name");
                 boolean isDead = rs.getBoolean("is_dead");
@@ -352,24 +388,36 @@ public class DataSaving {
 
                 Location location = allLocations.get(locName);
                 if (location == null) {
-                    System.err.println("WARNING: Location '" + locName
-                            + "' not found while loading NPC '"
-                            + npcName + "'.");
+                    System.err.println("WARNING: Location " + locName
+                            + " not found while loading NPC "
+                            + npcName + ".");
                     continue;
                 }
 
                 boolean npcFound = false;
+                NPC npcToRemove = null;
 
                 for (Creature c : location.getCreatures()) {
                     if (c instanceof NPC npc && npc.getName().equals(npcName)) {
                         npcFound = true;
-                        npc.isDead = isDead;
-                        npc.isHostile = isHostile;
 
-                        if (npc.isDead) {
-                            location.removeCreature(npc);
+                        npc.setDead(isDead);
+                        npc.setHostile(isHostile);
+
+                        // --- Removal conditions (ADDED) ---
+                        if (npc.isDead()) {
+                            npcToRemove = npc;
+                        }
+                        else if (npc.doesDespawnWhenLeaving() &&
+                                !savedLocation.equals(npc.getOriginalLocation())) {
+                            npcToRemove = npc;
                         }
                     }
+                }
+
+                // Remove AFTER loop to avoid concurrent modification
+                if (npcToRemove != null) {
+                    location.removeCreature(npcToRemove);
                 }
 
                 if (!npcFound) {
@@ -385,6 +433,7 @@ public class DataSaving {
             e.printStackTrace();
         }
     }
+
 
 
     // Delete rows in the tables to prepare for a new game

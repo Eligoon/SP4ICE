@@ -1,48 +1,65 @@
 package creatures;
 
-import collectibles.Item;
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
-import world.Location;
 
 /* The Creature class represents any living being in the game.
-* This is a superclass for Player and NPC. */
+ * This is a superclass for Player and NPC. */
 public class Creature {
-    protected String name; //The creatures display name
-    protected String description; //
-    protected Race race; // The creatures tace (Human, Elf, Orc, Dwarf)
-    protected Stats stats; // Thea creatures stats (health, strength, dexterity and intelligence)
+    protected String name;             // The creature's display name
+    protected String description;      // Description of the creature
+    protected Race race;               // The creature's race (Human, Elf, Orc, Dwarf)
+    protected Stats stats;             // The creature's stats (health, strength, dexterity, intelligence)
+    protected boolean isDead = false;  // Tracks if creature is dead
 
-// --- Constructor for creating a Creature ---
+    // Constructor for NPC or general creature
     public Creature(String name, Race race, Stats stats) {
-
         this.name = name;
         this.race = race;
         this.stats = stats;
     }
 
-    public void interact(){ // Allows creature to interact with something in the game world.
-         //TODO
-    }
-    public void fight (Creature target) { //Handles combat with another creature
-         //TODO
-    }
-
-    public void pickUpItem (Item item) { // Adds a item to the creatures inventory (for Player)
-        //TODO
+    // Apply damage to the creature
+    public void takeDamage(int damage) {
+        stats.setCurrentHealth(stats.getCurrentHealth() - damage);
+        if (stats.getCurrentHealth() <= 0) {
+            stats.setCurrentHealth(0);
+            isDead = true;
+        }
     }
 
-// --- Getters ---
-    public String getName () {
+    // Check if creature is alive
+    public boolean isAlive() {
+        return !isDead;
+    }
+
+    // Setter for dead status
+    public void setDead(boolean dead) {
+        this.isDead = dead;
+    }
+
+    // Getters
+    public String getName() {
         return name;
     }
 
-    public Race getRace () {
+    public Race getRace() {
         return race;
     }
 
-    public Stats getStats () {
+    public Stats getStats() {
         return stats;
     }
 
+    public int getCurrentHP() {
+        return stats.getCurrentHealth();
+    }
+
+    public int getMaxHP() {
+        return stats.getMaxHealth();
+    }
+
+    public boolean getIsDead() {
+        return isDead;
+    }
 }

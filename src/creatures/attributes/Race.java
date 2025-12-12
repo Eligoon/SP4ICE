@@ -61,7 +61,7 @@ class Race {
 
     // --- Modifiers to apply stats ---
     public void applyRacialBonuses(Stats stats){
-        stats.setHealth(stats.getHealth() + healthModifier);
+        stats.setCurrentHealth(stats.getCurrentHealth() + healthModifier);
         stats.setStrength(stats.getStrength() + strengthModifier);
         stats.setDexterity(stats.getDexterity() + dexterityModifier);
         stats.setIntelligence(stats.getIntelligence() + intelligenceModifier);
