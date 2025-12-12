@@ -5,7 +5,6 @@ import creatures.Creature;
 import creatures.Player;
 import collectibles.Item;
 import world.Location;
-import world.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,55 +12,61 @@ import java.util.List;
 public class Choice {
 
     private String description;        // Text shown to the player
-    private boolean taken = false;     // Boolean to check if an option has already been taken
-    private ChoiceType type;           // What the choice does (move, combat, etc.)
+    private boolean taken = false;     // Checks if this choice has already been taken
+    private ChoiceType type;           // Type of choice (MOVE, COMBAT, INTERACT, USEITEM, etc.)
 
-    private Location targetLocation;   // For MOVE choices
-    private Creature enemy;            // For COMBAT choices
-    private Objects object;            // For INTERACT choices
-    private Item item;                 // For USEITEM / EQUIPARMOUR / EQUIPWEAPON choices
+    private Location targetLocation;   // For movement choices
+    private Creature enemy;            // For combat choices
+    private Creature npc;              // For NPC interaction choices
+    private Item item;                 // For item-related choices (use/equip)
 
-    private List<Requirement> requirements = new ArrayList<>();
-    // Requirements: item, npc dead, race, class
+    private List<Requirement> requirements = new ArrayList<>(); // Requirements for the choice
 
+    // Private constructor to prevent direct instantiation
+    private Choice() { }
 
-    // Constructors
-
-    // Movement choice
-    public Choice(String description, Location targetLocation) {
-        this.description = description;
-        this.targetLocation = targetLocation;
-        this.type = ChoiceType.MOVE;
+    // Method to create a movement choice
+    public static Choice moveChoice(String description, Location location) {
+        Choice c = new Choice();
+        c.description = description;
+        c.targetLocation = location;
+        c.type = ChoiceType.MOVE;
+        return c;
     }
 
-    // Combat choice
-    public Choice(String description, Creature enemy) {
-        this.description = description;
-        this.enemy = enemy;
-        this.type = ChoiceType.COMBAT;
+    // Method to create a combat choice
+    public static Choice combatChoice(String description, Creature enemy) {
+        Choice c = new Choice();
+        c.description = description;
+        c.enemy = enemy;
+        c.type = ChoiceType.COMBAT;
+        return c;
     }
 
-    // Interact choice
-    public Choice(String description, Objects object) {
-        this.description = description;
-        this.object = object;
-        this.type = ChoiceType.INTERACT;
+    // Method to create an NPC interaction choice
+    public static Choice interactChoice(String description, Creature npc) {
+        Choice c = new Choice();
+        c.description = description;
+        c.npc = npc;
+        c.type = ChoiceType.INTERACT;
+        return c;
     }
 
-    // Item-based choices (use / equip)
-    public Choice(String description, Item item, ChoiceType type) {
-        this.description = description;
-        this.item = item;
-        this.type = type;
+    // Method to create an item-based choice
+    public static Choice itemChoice(String description, Item item, ChoiceType type) {
+        Choice c = new Choice();
+        c.description = description;
+        c.item = item;
+        c.type = type;
+        return c;
     }
 
-
-    // Requirement handling
-
+    // Add a requirement to this choice
     public void addRequirement(Requirement req) {
         requirements.add(req);
     }
 
+    // Check if the choice is available to the player
     public boolean isAvailable(Player player) {
         for (Requirement req : requirements) {
             if (!req.isMet(player)) {
@@ -71,23 +76,23 @@ public class Choice {
         return true;
     }
 
-
-    // Execute the choice to gamecontroller
-
+    // Execute the choice in the game controller
     public void execute(GameController gc) {
-
         switch (type) {
-
             case MOVE:
                 gc.changeLocation(targetLocation);
                 break;
 
             case COMBAT:
-                gc.handleCombat(enemy);
+                if (enemy != null) {
+                    gc.handleCombat(enemy);
+                }
                 break;
 
             case INTERACT:
-                gc.handleInteraction(object);
+                if (npc != null) {
+                    gc.handleNPCInteraction(npc);
+                }
                 break;
 
             case USEITEM:
@@ -102,13 +107,10 @@ public class Choice {
                 gc.handleEquipWeapon(item);
                 break;
         }
-
-        taken = true; // Mark choice as taken
+        taken = true;
     }
 
-
     // Getters and setters
-
     public String getDescription() {
         return description;
     }
@@ -125,8 +127,8 @@ public class Choice {
         return enemy;
     }
 
-    public Objects getObject() {
-        return object;
+    public Creature getNpc() {
+        return npc;
     }
 
     public Item getItem() {

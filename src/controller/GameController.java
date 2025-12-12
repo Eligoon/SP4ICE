@@ -1,6 +1,7 @@
 package controller;
 
 import controller.Choices.Choice;
+import creatures.Creature;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
@@ -68,6 +69,17 @@ public class GameController {
         Objects object = new Objects();
         object.checkForTraps(currentLocation);
     }
+
+    public void handleCombat(Creature enemy) {
+        System.out.println("You engage in combat with " + enemy.getName());
+        // combat logic here
+    }
+
+    public void handleNPCInteraction(Creature npc) {
+        System.out.println("You interact with " + npc.getName());
+        // dialogue, quest logic, etc.
+    }
+
 
     //--- Getters ---
     public Location getCurrentLocation() {
