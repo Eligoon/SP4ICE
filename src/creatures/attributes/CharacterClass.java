@@ -12,7 +12,7 @@ public class CharacterClass {
     private int dexterityModifier;
     private int intelligenceModifier;
 
-    //Special skills a CharacterClass has
+    //Special skills a CharacterClass has.
     private List<String> specialSkills;
 
 //--- Constructur--- defines how much this class modifies the base stats
