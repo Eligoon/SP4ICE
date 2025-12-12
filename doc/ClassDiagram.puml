@@ -50,6 +50,7 @@ class Story {
 class Choice {
     - description : String
     - targetLocation : Location
+    - taken : boolean
     - enemy : Creature
     - type : ChoiceType
     +  Choice(String description, Location targetLocation)
@@ -62,6 +63,8 @@ class Choice {
     + getTargetLocation() : Location
     + getEnemy() : Creature
     + getRequirements() : List<Requirement>
+    + isTaken() : boolean
+    + setTaken(boolean taken)
 }
 
 ' Classes for requirements used in choices
