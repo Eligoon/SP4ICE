@@ -7,7 +7,10 @@ import controller.Choices.Choice;
 import creatures.Creature;
 import creatures.NPC;
 import creatures.Player;
+import creatures.attributes.CharacterClass;
 import creatures.attributes.Inventory;
+import creatures.attributes.Race;
+import creatures.attributes.Stats;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
@@ -44,19 +47,71 @@ public class GameController {
         }
     }
 
+    public void createPlayer() {
+        // --- Player Name ---
+        String name = ui.promptText("Enter your character's name:");
+
+        // --- Choose Race ---
+        List<Race> races = Race.getAllRaces();
+        ui.displayMsg("Choose your race:");
+        for (int i = 0; i < races.size(); i++) {
+            Race r = races.get(i);
+            ui.displayMsg((i + 1) + ". " + r.getRaceName() + " - " + r.getSpecialAbility());
+        }
+
+        int raceChoice = -1;
+        while (raceChoice < 1 || raceChoice > races.size()) {
+            raceChoice = ui.promptNumeric("Enter choice number:");
+        }
+        Race chosenRace = races.get(raceChoice - 1);
+
+        // --- Choose Class ---
+        List<CharacterClass> classes = CharacterClass.getAllCharacterClasses();
+        ui.displayMsg("Choose your class:");
+        for (int i = 0; i < classes.size(); i++) {
+            CharacterClass c = classes.get(i);
+            ui.displayMsg((i + 1) + ". " + c.getCharacterClassName() + " - Skills: " + String.join(", ", c.getSpecialSkills()));
+        }
+
+        int classChoice = -1;
+        while (classChoice < 1 || classChoice > classes.size()) {
+            classChoice = ui.promptNumeric("Enter choice number:");
+        }
+        CharacterClass chosenClass = classes.get(classChoice - 1);
+
+        // --- Base Stats ---
+        Stats stats = new Stats(100, 10, 10, 10); // Default: HP, STR, DEX, INT
+
+        // Apply racial and class bonuses
+        chosenRace.applyRacialBonuses(stats);
+        chosenClass.applyCharacterClassBonuses(stats);
+
+        // --- Create Player ---
+        this.player = new Player(name, chosenRace, chosenClass, stats);
+
+        // --- Display class-specific intro ---
+        displayClassSpecificIntro();
+    }
+
+
     // ---- Initializing the game ---
     public void initializeGame() {
-        // Displays the welcome message
+        // 1. Display welcome message
         emeraldTear.displayWelcomeMessage();
 
-        // Loads story, with locations and connects all locations together
+        // 2. Load story, including all locations and connections
         emeraldTear.loadStory();
 
-        // Set starting location to be current location
-        currentLocation = emeraldTear.getLocation("The Clearing");
+        // 3. Create the player character
+        createPlayer();
 
-        // TODO Show character specific intro, might need a characterCreator helper class
+        // 4. Display class-specific intro immediately after player creation
+        displayClassSpecificIntro();
+
+        // 5. Set starting location
+        currentLocation = emeraldTear.getLocation("The Clearing");
     }
+
 
     // Method to show class specific intros
     private void displayClassSpecificIntro(){
