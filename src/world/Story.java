@@ -652,7 +652,7 @@ public class Story {
                 break;
 
             default:
-                ui.displayMsg("Merchant: ...");
+                ui.displayMsg("NPC: ...");
                 break;
         }
     }
