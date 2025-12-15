@@ -90,26 +90,16 @@ public class NPC extends Creature {
         // Get dialogue choices as Choice objects
         List<Choice> dialogueChoices = story.getDialogueChoices(this, player);
 
+        // If no dialogue is available, just return silently
         if (dialogueChoices.isEmpty()) {
-            ui.displayMsg(this.getName() + " has nothing to say.");
             return;
         }
 
         // Display options and prompt the player
-        ArrayList<String> optionTexts = new ArrayList<>();
-        for (Choice c : dialogueChoices) {
-            optionTexts.add(c.getDescription());
-        }
-
-        int choiceIndex = Integer.parseInt(ui.promptChoice(optionTexts, 1, "Choose your dialogue:").get(0)) - 1;
-
-        if (choiceIndex < 0 || choiceIndex >= dialogueChoices.size()) {
-            ui.displayMsg("Invalid choice.");
-            return;
-        }
+        Choice selected = ui.promptChoiceOb(dialogueChoices, "Choose your dialogue:");
 
         // Handle the chosen dialogue
-        story.handleDialogue(this, player, choiceIndex);
+        story.handleDialogue(this, player, dialogueChoices.indexOf(selected));
 
         // Give quest if available
         if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
@@ -123,12 +113,14 @@ public class NPC extends Creature {
             itemHeld = null;
         }
 
-        // Hostile NPC check
-        if (isHostile()) {
+        // Trigger combat if the NPC is hostile
+        if (isHostile() && !isDead()) {
             ui.displayMsg(getName() + " seems hostile!");
-            // Combat could be triggered here if you want
+            // Call your combat handler here if needed
+            // e.g., combatManager.startCombat(player, this);
         }
     }
+
 
 
     // --- Despawn getter/setter ---

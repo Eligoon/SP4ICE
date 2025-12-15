@@ -188,36 +188,30 @@ public class GameController {
         if (!(creature instanceof NPC)) return;
 
         NPC npc = (NPC) creature;
-        if (npc.isDead()) {
-            ui.displayMsg(npc.getName() + " is no longer here.");
-            return;
-        }
 
-        // Get dialogue choices as Choice objects
+        // Get list of choices from Story
         List<Choice> dialogueOptions = emeraldTear.getDialogueChoices(npc, player);
-
         if (dialogueOptions.isEmpty()) {
             ui.displayMsg(npc.getName() + " has nothing to say.");
             return;
         }
 
-        // Prepare descriptions for displaying to the player
-        ArrayList<String> optionTexts = new ArrayList<>();
-        for (Choice c : dialogueOptions) {
-            optionTexts.add(c.getDescription());
-        }
-
         // Prompt the player to choose a dialogue
-        int choiceIndex = Integer.parseInt(ui.promptChoice(optionTexts, 1, "Choose your dialogue:").get(0)) - 1;
+        Choice selected = ui.promptChoiceOb(dialogueOptions, "Choose your dialogue:");
 
-        if (choiceIndex < 0 || choiceIndex >= dialogueOptions.size()) {
-            ui.displayMsg("Invalid choice.");
-            return;
-        }
+        // Find index of selected choice
+        int choiceIndex = dialogueOptions.indexOf(selected);
 
-        // Handle effects of chosen dialogue
+        // Handle the chosen dialogue
         emeraldTear.handleDialogue(npc, player, choiceIndex);
+
+        // Trigger combat if NPC is hostile
+        if (npc.isHostile() && !npc.isDead()) {
+            ui.displayMsg(npc.getName() + " attacks!");
+            handleCombat(npc); // call your combat handler
+        }
     }
+
 
 
 
