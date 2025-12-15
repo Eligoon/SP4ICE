@@ -519,17 +519,20 @@ public class Story {
     public void handleDialogue(NPC npc, Player player, Choice selectedChoice) {
         if (npc == null || npc.isDead() || selectedChoice == null) return;
 
+        List<Choice> choices = getDialogueChoices(npc, player);
+        int choiceIndex = choices.indexOf(selectedChoice); // determine the index of the selected choice
+
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                handleSirenDialogue(player, selectedChoice);
+                handleSirenDialogue(player, selectedChoice, choiceIndex);
                 break;
 
             case "merchant":
-                handleMerchantDialogue(player, selectedChoice);
+                handleMerchantDialogue(player, selectedChoice, choiceIndex);
                 break;
 
             case "witch":
-                handleWitchDialogue(player, selectedChoice);
+                handleWitchDialogue(player, selectedChoice, choiceIndex);
                 break;
 
             default:
@@ -542,38 +545,36 @@ public class Story {
 
 
 
+
     // MERCHANT DIALOGUE
-    // Greeting quest is the direwolf quest
     public List<Choice> getMerchantDialogueChoices(Player player) {
         List<Choice> choices = new ArrayList<>();
         NPC merchant = npcs.get("merchant");
 
         if (merchant == null || merchant.isDead()) return choices;
 
-        // --- Greeting & quest offer for humans ---
+        // Greeting & quest offer for humans
         if (player.isHuman() && !player.hasFlag("merchant_quest_given")) {
-            Choice greetingQuest = Choice.interactChoice(
+            Choice humanQuest = Choice.interactChoice(
                     "Old man, you should be careful around these parts, they are not safe anymore. The " +
                             "world balance has been upset. I have little money left, and cannot buy your wares, " +
                             "but perhaps I can help you in exchange for a few of your things?",
                     merchant
             );
-            // Only available to humans
-            greetingQuest.addRequirement(new RaceRequirement("Human"));
-            choices.add(greetingQuest);
+            choices.add(humanQuest);
         }
 
-        // --- Quest option for any non-human ---
+        // Quest offer for non-humans
         if (!player.isHuman() && !player.hasFlag("merchant_quest_given")) {
-            Choice questOption = Choice.interactChoice(
+            Choice nonHumanQuest = Choice.interactChoice(
                     "I do not have much in the way of money, I have spent most of it on traveling supplies. " +
                             "But perhaps I can lend you my services instead?",
                     merchant
             );
-            choices.add(questOption);
+            choices.add(nonHumanQuest);
         }
 
-        // --- Quest completion if player has killed the dire wolf ---
+        // Quest completion
         if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")) {
             Choice completeQuest = Choice.interactChoice(
                     "I have brought back proof that I have removed the dire wolf from the path.",
@@ -582,14 +583,14 @@ public class Story {
             choices.add(completeQuest);
         }
 
-        // --- Kill merchant / steal loot option ---
+        // Kill / steal
         Choice killMerchant = Choice.interactChoice(
                 "I will take your things for myself old man!",
                 merchant
         );
         choices.add(killMerchant);
 
-        // --- Leave option ---
+        // Leave
         Choice leave = Choice.interactChoice(
                 "Be on your way and I will be on mine.",
                 merchant
@@ -599,16 +600,14 @@ public class Story {
         return choices;
     }
 
-
-    public void handleMerchantDialogue(Player player, Choice selectedChoice) {
+    public void handleMerchantDialogue(Player player, Choice selectedChoice, int choiceIndex) {
         NPC merchant = npcs.get("merchant");
         if (merchant == null || merchant.isDead() || selectedChoice == null) return;
 
-        int choiceNumber = selectedChoice.getChoiceNumber(); // each Choice now has a number
         ui.displayMsg("You: " + selectedChoice.getDescription());
 
-        switch (choiceNumber) {
-            case 1: // Greeting & quest for humans
+        switch (choiceIndex) {
+            case 0: // Greeting & quest for humans
                 if (player.isHuman()) {
                     player.addFlag("merchant_quest_given");
                     player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
@@ -620,7 +619,7 @@ public class Story {
                 }
                 break;
 
-            case 2: // Quest offer for non-humans
+            case 1: // Quest offer for non-humans
                 if (!player.isHuman()) {
                     player.addFlag("merchant_quest_given");
                     ui.displayMsg("Merchant: Well, a trade then. You see a dire wolf blocks my path to visit a town " +
@@ -629,7 +628,7 @@ public class Story {
                 }
                 break;
 
-            case 3: // Quest completion
+            case 2: // Quest completion
                 if (player.hasFlag("killed_dire_wolf") &&
                         player.getInventory().hasItem("Head of the Dire Wolf")) {
 
@@ -642,17 +641,22 @@ public class Story {
                 }
                 break;
 
-            case 4: // Kill merchant / steal loot
+            case 3: // Kill / steal
                 merchant.setDead(true);
                 player.addFlag("killed_merchant");
                 ui.displayMsg("Merchant: No... please have mercy...");
                 break;
 
-            case 5: // Leave
+            case 4: // Leave
                 ui.displayMsg("Merchant: Safe travels, stranger!");
+                break;
+
+            default:
+                ui.displayMsg("Merchant: ...");
                 break;
         }
     }
+
 
 
 
