@@ -118,7 +118,7 @@ public class GameController {
     public void handleCombat(Creature enemy) {
         if (enemy == null) return;
 
-        ui.displayMsg("You engage in combat with " + enemy.getName() + "!");
+        ui.displayMsg("You engage in combat with the " + enemy.getName() + "!");
 
         boolean playerTurn = true;
 
