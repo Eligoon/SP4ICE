@@ -3,55 +3,73 @@
 'Game controller'
 class GameController {
     - currentLocation : Location
+    'Attributes
     - ui : TextUI
     - emeraldTear : Story
+    - db : DataSaving
+    - url : String
     - player : Player
-    + move(direction:String)
-    + handleCombat(enemy:Creature)
-    + handleNPCInteraction(npc:Creature)
-    + handleUseItem(item:Item)
-    + handleEquipArmour(item:Item)
-    + handleEquipWeapon(item:Item)
+    'Game Flow
     + initializeGame() : void
+    - displayClassSpecificIntro() : void
+    'Movement
+    + move(direction:String) : void
+    + getCurrentLocation() : Location
+    + getLocationChoices() : List<Choice>
+    'Interaction
+    + handleCombat(enemy:Creature) :void
+    + handleNPCInteraction(npc:Creature) : void
+    + handleUseItem(item:Item) : void
+    + handleEquipArmour(item:Item) : void
+    + handleEquipWeapon(item:Item) : void
 }
 
 
 'Text UI '
 class TextUI {
-    - static sc : Scanner
-    + displayMsg(msg : String) : void
-    + displayChoices(choices : List<Choice>) : void
-    + getPlayerInput() : String
-    + displayInventory(inventory : Inventory) : void
-    + displayCombatStatus(player : Player, enemy : Creature) : void
+    - sc : Scanner {static}
+    'Prompts'
     + promptChoice(options : ArrayList<String>, limit : int, msg : String) : ArrayList<String>
-    + displayList(list : ArrayList<String>, msg : String) : void
     + promptNumeric(msg : String) : int
     + promptText(msg : String) : String
     + promptBinary(msg : String) : boolean
-    + getAvailableChoices(all : List<Choice>, player : Player) : List<Choice>
+    + getPlayerInput() : String
     + promptChoiceOb(choices : List<Choice>, msg : String) : Choice
+    'Display'
+    + displayMsg(msg : String) : void
+    + displayList(list : ArrayList<String>, msg : String) : void
+    + displayChoices(choices : List<Choice>) : void
+    + displayInventory(inventory : Inventory) : void
+    + displayCombatStatus(player : Player, enemy : Creature) : void
+    'Helper'
+    +getAvailableChoices(all : List<Choice>, player : Player) : List<Choice>
 }
 
 
-'Saving data '
+'Saving data'
 class DataSaving {
-    - connection : Connection
-    + connect(url : String) : void
-    + saveGameState(gameController : GameController) : void
-    + saveCurrentLocation(location : Location) : void
-    + savePlayer(player : Player, location : Location) : void
-    + saveInventory(player : Player) : void
-    + saveNPCs(location : Location) : void
-    + loadGameState() : String
-    + loadLocation(locationName : String, allLocations : Map<String, Location>) : Location
-    + loadPlayer() : Player
-    + loadInventory(player : Player) : void
-    + loadNPCs(allLocations : Map<String, Location>, savedLocation : String) : void
-    + deleteSave() : void
-    + getRaceFromString(raceName : String) : Race
-    + getClassFromString(className : String) : CharacterClass
+  - connection : Connection
+  + connect(url : String) : void
+  - createTables() : void
+  'Save
+  + saveGameState(gameController : GameController) : void
+  + saveCurrentLocation(location : Location) : void
+  + savePlayer(player : Player, location : Location) : void
+  + saveInventory(player : Player) : void
+  + saveNPCs(location : Location) : void
+  'Load
+  + loadGameState() : String
+  + loadLocation(locationName : String, allLocations : Map<String, Location>) : Location
+  + loadPlayer() : Player
+  + loadInventory(player : Player) : void
+  + loadNPCs(allLocations : Map<String, Location>, savedLocation : String) : void
+  'Helpers
+  + getRaceFromString(raceName : String) : Race
+  + getClassFromString(className : String) : CharacterClass
+  'Reset
+  + deleteSave() : void
 }
+
 
 
 'Story'
