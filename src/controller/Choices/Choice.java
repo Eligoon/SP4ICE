@@ -19,13 +19,12 @@ public class Choice {
     private Creature enemy;                // For combat choices
     private Creature npc;                  // For NPC interaction choices
     private Item item;                     // For item-related choices (use/equip)
-    private DialogueAction dialogueAction; // Optional: for INTERACT choices
 
     private List<Requirement> requirements = new ArrayList<>(); // Requirements for the choice
 
     private Choice() { }
 
-    // Helper methods
+    // Helper methods to create choices
 
     public static Choice moveChoice(String description, Location location) {
         Choice c = new Choice();
@@ -43,12 +42,11 @@ public class Choice {
         return c;
     }
 
-    public static Choice interactChoice(String description, Creature npc, DialogueAction action) {
+    public static Choice interactChoice(String description, Creature npc) {
         Choice c = new Choice();
         c.description = description;
         c.npc = npc;
         c.type = ChoiceType.INTERACT;
-        c.dialogueAction = action;
         return c;
     }
 
@@ -74,7 +72,6 @@ public class Choice {
     }
 
     // Execute choice in GameController
-
     public void execute(GameController gc) {
         switch (type) {
             case MOVE:
@@ -104,7 +101,7 @@ public class Choice {
         taken = true;
     }
 
-    // Getters and setters
+    // Getters and setters (preserved structure)
 
     public String getDescription() {
         return description;
@@ -141,9 +138,4 @@ public class Choice {
     public void setTaken(boolean taken) {
         this.taken = taken;
     }
-
-    public DialogueAction getDialogueAction() {
-        return dialogueAction;
-    }
-
 }
