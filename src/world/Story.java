@@ -501,7 +501,7 @@ public class Story {
 
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                return getSirenDialogue(player); // reuse your existing method
+                return getSirenDialogueChoices(player); // reuse your existing method
                 break;
             default:
                 // Generic dialogue fallback
@@ -518,7 +518,7 @@ public class Story {
 
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                handleSirenDialogue(choiceIndex + 1, player); // +1 because Story method expects 1-based choice
+                handleSirenDialogue(player, choiceIndex + 1); // +1 because Story method expects 1-based choice
                 break;
             default:
                 npc.speak("I have nothing special to say.");
@@ -529,101 +529,103 @@ public class Story {
 
 
     // MERCHANT DIALOGUE
-    public List<String> getMerchantDialogue (Player player){
+    public List<String> getMerchantDialogue(Player player) {
         List<String> options = new ArrayList<>();
-
         NPC merchant = npcs.get("merchant");
-        if (merchant == null || merchant.isDead()) {
+        if (merchant == null || merchant.isDead()) return options;
+
+        // Quest already completed
+        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")) {
+            options.add("I have brought back proof that I have removed the dire\nwolf from the path.");
             return options;
         }
 
-        // Check flags if player has killed the dire wolf
-        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")){
-            options.add("“I have brought back proof that I have removed the dire\n" +
-                    "wolf from the path.");
-            return options;
-        }
-
-        // Check if the merchant has already given the player the quest
-        if (player.hasFlag("merchant_quest_given")) {
+        // Quest already given
+        if (player.hasFlag("dire_wolf_quest_given")) {
             options.add("I am still working on it!");
+            options.add("I will take your things for myself old man!"); // Kill merchant
+            options.add("Be on your way and I will be on mine.");       // Leave
             return options;
         }
 
-        // First meeting condition!
+        // Initial meeting
         if (player.isHuman()) {
             options.add("Old man, you should be careful around these parts, they are not safe anymore. The\n" +
                     "world balance has been upset. I have little money left, and cannot buy your wares, but perhaps I\n" +
-                    "can help you in exchange for a few of your things?");
+                    "can help you in exchange for a few of your things?"); // Human greeting
+        } else {
+            options.add("I do not have much in the way of money, I have spent most of it on traveling supplies. But\n" +
+                    "perhaps I can lend you my services instead?"); // Non-human trade
         }
 
-        // Add rest of options
-
-        // Quest option
-        options.add("I do not have much in the way of money, I have spent most of it on traveling supplies. But\n" +
-                "perhaps I can lend you my services instead?");
-
-        // Kill merchant and steal loot
+        // Kill merchant and leave options are the same for everyone
         options.add("I will take your things for myself old man!");
-
-        // Leave
         options.add("Be on your way and I will be on mine.");
 
         return options;
     }
 
-    public String handleMerchantDialogue(int choice, Player player){
-        NPC merchant = npcs.get("merchant");
 
-        // Check if quest is already completed
+
+    public String handleMerchantDialogue(int choice, Player player) {
+        NPC merchant = npcs.get("merchant");
+        if (merchant == null || merchant.isDead()) return "";
+
+        // Quest completed
         if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")) {
             if (choice == 1) {
-                player.addFlag("merchant_quest_complete");
+                player.addFlag("dire_wolf_quest_complete");
                 player.addFlag("received_cabin_key");
                 player.getInventory().removeItem("Head of the Dire Wolf");
                 player.getInventory().addItem(new Item("Cabin Key","Cabin Key received from Merchant",1));
-                return "Thank you stranger! Now I can finally move on. Here take these, as we discussed!";
+                return "Thank you stranger! Now I can finally move on. Here, take these, as we discussed!";
             }
         }
 
-        // Dialogue if merchant has already given the quest
-        if (player.hasFlag("merchant_quest_given")) {
-            if (choice == 1) {
-                return "Oh well, get back to it please. I don’t have forever!";
-            } else if {
+        // Quest already given
+        if (player.hasFlag("dire_wolf_quest_given")) {
+            switch (choice) {
+                case 1:
+                    return "Oh well, get back to it please. I don’t have forever!";
+                case 2:
+                    merchant.setDead(true);
+                    player.addFlag("killed_merchant");
+                    return "No... please have mercy...";
+                case 3:
+                    return "Safe travels, stranger!";
+            }
+        }
+
+        // First meeting (giving the quest)
+        switch (choice) {
+            case 1:
+                if (player.isHuman()) { // Human greeting
+                    player.addFlag("dire_wolf_quest_given");
+                    player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.",1));
+                    return "Thank you. I shall be extremely careful, we have to look out for each other, don’t we?\n" +
+                            "Well here, take this to start with, for your kindness.\n*The old man hands you a red potion*";
+                } else { // Non-human trade
+                    player.addFlag("dire_wolf_quest_given");
+                    return "Well, a trade then. You see a dire wolf blocks my path to visit a town in the swamplands to the east\n" +
+                            "of here. If you kill it and bring back proof, you can get this here key I found near an old cabin in the\n" +
+                            "forest.";
+                }
+
+            case 2: // Kill merchant (human or non-human)
                 merchant.setDead(true);
                 player.addFlag("killed_merchant");
-                return "No... please have mercy..."; // Kill the merchant
-            }
+                return "No... Please have mercy...";
+
+            case 3: // Leave
+                return "Safe travels, stranger!";
+
+            default:
+                return "";
         }
 
-        // Dialogue of initial meeting
-
-        if (player.isHuman() && choice == 1) {
-            player.addFlag("merchant_quest_given");
-            player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.",1));
-            return "Thank you. I shall be extremely careful, we have to look out for each other, don’t we?\n" +
-                    "Well here take this to start with, for your kindness." + "\n*The old man hands you a red potion*";
-
-        // Choice to get the quest from the merchant
-        } else if (choice == 1 || (choice == 2 && !player.isHuman())){
-            player.addFlag("merchant_quest_given");
-            return "Well, a trade then. You see a dire wolf blocks my path to visit a town in the swamplands to the east\n" +
-                    "of here. If you kill it and bring back proof, you can get this here key I found near an old cabin in the\n" +
-                    "forest.";
-
-        // Kill merchant choice
-        } else if ((choice == 2 && player.isHuman()) || choice == 3){
-            merchant.setDead(true);
-            player.addFlag("killed_merchant");
-            return "No... Please have mercy...";
-
-        } else if (choice == 4 || (choice == 3 && !player.isHuman() && !player.hasFlag("merchant_quest_given"))) {
-            return "Safe travels, stranger!";
-        }
-
-        return "";
     }
+
+
 
     // SIREN DIALOGUE
     public List<Choice> getSirenDialogueChoices(Player player) {
