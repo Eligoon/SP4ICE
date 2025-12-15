@@ -103,6 +103,35 @@ public class GameController {
     }
 
 
+     // Saves the current game state, including player, inventory, NPCs, and other game data.
+     // Uses the existing DataSaving class connected to the database (db).
+
+    public void saveGame() {
+        if (player == null || currentLocation == null || db == null) {
+            ui.displayMsg("Unable to save game. Missing data.");
+            return;
+        }
+
+        try {
+            // Save player info and location
+            db.savePlayer(player, currentLocation);
+
+            // Save inventory
+            db.saveInventory(player);
+
+            // Save NPCs in current location
+            db.saveNPCs(currentLocation);
+
+            // Save overall game state
+            db.saveGameState(this);
+
+            ui.displayMsg("Game successfully saved!");
+        } catch (Exception e) {
+            ui.displayMsg("Error saving game: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     public void createPlayer() {
         // --- Player Name ---
@@ -206,28 +235,61 @@ public class GameController {
     }
 
     // --- Movement logic ---
-    // move: Handles movement from the players current location to another connected location.
     public void move(String direction) {
-        //Look up if there is a connected location in the given direction
+        // Look up if there is a connected location in the given direction
         Location newLocation = currentLocation.getConnectedLocation(direction);
-        //if the direction does not lead anywhere (null) block movement
+
+        // If the direction does not lead anywhere, block movement
         if (newLocation == null) {
             ui.displayMsg("You can't go that way.");
-            return; //stop the method here
+            return; // Stop the method
         }
-        //update the current location to the new valid location.
+
+        // Ask player if they want to save, quit, save+quit, or continue
+        String choice = ui.promptChoice(
+                "Do you want to save the game, quit, save and quit, or continue? (save/quit/savequit/continue)"
+        ).toLowerCase();
+
+        switch (choice) {
+            case "save":
+                saveGame(); // Save the current game
+                ui.displayMsg("Game saved!");
+                break;
+
+            case "quit":
+                ui.displayMsg("Quitting game...");
+                saveGame(); // Optional: save before quitting
+                System.exit(0);
+                break;
+
+            case "savequit":
+                saveGame();
+                ui.displayMsg("Game saved and quitting...");
+                System.exit(0);
+                break;
+
+            case "continue":
+            default:
+                // proceed to move
+                break;
+        }
+
+        // Update the current location to the new valid location
         currentLocation = newLocation;
 
-        // Feedback to the player showing movement and new location name
+        // Feedback to the player
         ui.displayMsg("You move " + direction + "...");
         ui.displayMsg("You are now at: " + currentLocation.getLocationName());
-
-        //Print the location's description so the player (Description is located in location.java)
         ui.displayMsg(currentLocation.getDescription());
-        // After movement, check for trap
-        Objects object = new Objects();
-        object.checkForTraps(currentLocation, player, emeraldTear);
+
+        // Check for traps
+        Objects worldObjects = new Objects();
+        worldObjects.checkForTraps(currentLocation, player, story);
+
+        // Display available choices after movement
+        displayAvailableChoices();
     }
+
 
     public void handleCombat(Creature enemy) {
         if (enemy == null) return;
