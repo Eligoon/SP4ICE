@@ -262,6 +262,23 @@ public class Story {
         );
     }
 
+    public String getTrapMessage(String locationName) {
+        if (locationName.equals("The Murky Waters")) {
+            return "You go around the bubbles, those are surely deadly right? " +
+                    "Well, someone placed a spiked trap below the waters!";
+        }
+        return "";
+    }
+
+    public String getTrapRevisitMessage(String locationName) {
+        if (locationName.equals("The Murky Waters")) {
+            return "You return to the murky waters. The trap is already triggered, " +
+                    "so it feels slightly easier to pass through.";
+        }
+        return "";
+    }
+
+
 
     public void storeLocations () {
             // Add locations to the map
