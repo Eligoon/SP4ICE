@@ -291,6 +291,9 @@ public class Story {
         }
     }
 
+    public Map<String, Location> getLocationsMap() {
+        return locations;
+    }
 
 
     // Connects all the locations based on the world map
