@@ -427,15 +427,8 @@ public class GameController {
     }
 
     public void handleUseItem(Item item) {
-        if (item == null) {
-            ui.displayMsg("No item selected.");
-            return;
+        player.getInventory().useItem(player);
         }
-
-        ui.displayMsg("You use the item: " + item.getItemName());
-        item.use(player); // Calls the item’s use() logic
-        player.getInventory().removeItem(item); // Remove from inventory if consumable
-    }
 
 
     public void handleEquipArmour(Item armourItem) {
