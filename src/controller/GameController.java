@@ -50,6 +50,42 @@ public class GameController {
 
         // Set starting location to be current location
         currentLocation = emeraldTear.getLocation("The Clearing");
+
+        // TODO Show character specific intro, might need a characterCreator helper class
+    }
+
+    // Method to show class specific intros
+    private void displayClassSpecificIntro(){
+        if(player.isWarror()){
+            ui.displayMsg("Since the times of renewal, when life became more than suffering, your family line has protected a small\n" +
+                    "village near the forests that guards the mountain and the eight great trees. The villagers know the\n" +
+                    "importance of the surrounding lands, and their dangers, respecting both.\n" +
+                    "But something has been astray recently, the wildlife and usual threats roaming nearby has become feral. A\n" +
+                    "few villagers have gone missing, including your little sister. You fear the worst, and thus you have sworn an\n" +
+                    "oath to your mother, that you will find the missing villagers, and find the reason for the upsetting of the\n" +
+                    "balance in your home region");
+        } else if (player.isMage()){
+            ui.displayMsg("Your life has never been normal. Magic flow through your veins and knowledge your mind. You are the peak\n" +
+                    "of sorcery at the tower of mages, the school for those gifted, such as yourself. But lately you have noticed\n" +
+                    "the elders, your teachers and mentors, have been scared, whispering together in the corridors of the towers\n" +
+                    "spiralling ascend.\n" +
+                    "Someone has felt a rift in the veil of magic, emanating from the mountain of origins, the likely source, being\n" +
+                    "one of the eight great trees. You are too young to be sent out on your own, yet the elders are too scared to\n" +
+                    "go themselves. But when have you ever followed orders from your elders anyways? You set out, to restore\n" +
+                    "the balance and prove yourself.\n");
+        } else if (player.isRanger()){
+            ui.displayMsg("Born near the swamplands that surround the eastern part of the mountain of origin, life was harsh but fair.\n" +
+                    "Food was plenty, if you knew what to eat and what would eat you. The air was humid and the land moist\n" +
+                    "and soggy. But it was home, and it was better than the scorching torment that the collective memory of\n" +
+                    "your people held from ages past.\n" +
+                    "Here to survive, you have to be fast and good with the weapons given to you from since you could walk.\n" +
+                    "Here you have to honour nature and be one with it, or it would swallow you whole. Yet as of late, the\n" +
+                    "swamp had not been whole, the waters were slowly drying up, the life that was always abundant, was not\n" +
+                    "dwindling. You will not stand for such, not if you have a say in it. Hence why you venture out, to find the\n" +
+                    "cause.\n");
+        }
+
+
     }
 
     // --- Movement logic ---
