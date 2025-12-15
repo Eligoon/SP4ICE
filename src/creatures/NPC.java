@@ -2,8 +2,11 @@ package creatures;
 
 import collectibles.Item;
 import collectibles.Quest;
+import controller.Choices.Choice;
 import creatures.attributes.Stats;
 import util.TextUI;
+
+import java.util.ArrayList;
 import java.util.List;
 import creatures.attributes.AttackStat;
 import world.Story;
@@ -82,14 +85,31 @@ public class NPC extends Creature {
         }
     }
 
-    // In NPC.java
     @Override
     public void interactWithPlayer(Player player, Story story, TextUI ui) {
-        List<String> dialogueLines = story.getDialogueForNPC(this, player); // use Story class
+        // Get dialogue choices as Choice objects
+        List<Choice> dialogueChoices = story.getDialogueChoices(this, player);
 
-        for (String line : dialogueLines) {
-            ui.displayMsg(this.getName() + " says: " + line);
+        if (dialogueChoices.isEmpty()) {
+            ui.displayMsg(this.getName() + " has nothing to say.");
+            return;
         }
+
+        // Display options and prompt the player
+        ArrayList<String> optionTexts = new ArrayList<>();
+        for (Choice c : dialogueChoices) {
+            optionTexts.add(c.getDescription());
+        }
+
+        int choiceIndex = Integer.parseInt(ui.promptChoice(optionTexts, 1, "Choose your dialogue:").get(0)) - 1;
+
+        if (choiceIndex < 0 || choiceIndex >= dialogueChoices.size()) {
+            ui.displayMsg("Invalid choice.");
+            return;
+        }
+
+        // Handle the chosen dialogue
+        story.handleDialogue(this, player, choiceIndex);
 
         // Give quest if available
         if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
@@ -106,9 +126,10 @@ public class NPC extends Creature {
         // Hostile NPC check
         if (isHostile()) {
             ui.displayMsg(getName() + " seems hostile!");
-            // You can call combat directly if needed
+            // Combat could be triggered here if you want
         }
     }
+
 
     // --- Despawn getter/setter ---
     public boolean doesDespawnWhenLeaving() {
