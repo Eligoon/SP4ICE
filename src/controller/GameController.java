@@ -322,11 +322,6 @@ public class GameController {
         }
     }
 
-
-
-
-
-
     public void handleUseItem(Item item) {
         if (item == null) {
             ui.displayMsg("No item selected.");
