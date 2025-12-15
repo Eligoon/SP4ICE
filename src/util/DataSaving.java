@@ -118,6 +118,8 @@ public class DataSaving {
      *      - Load NPCs into all locations, updating their status (dead/hostile).
      *
      * OTHER FUNCTIONALITY:
+     * - checkForSave()
+     *      - checks if there is a previously saved game.
      * - deleteSave()
      *      - Clears all saved data from the database tables.
      *      - Prepares the game for a fresh start.
@@ -439,7 +441,19 @@ public class DataSaving {
         }
     }
 
-
+    // Checks the database for a previously saved game
+    public boolean checkForSave() {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS save_count FROM game_state")) {
+            if (rs.next()) {
+                return rs.getInt("save_count") > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to check for save.");
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     // Delete rows in the tables to prepare for a new game
     public void deleteSave() {
