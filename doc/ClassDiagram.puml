@@ -71,11 +71,59 @@ class DataSaving {
 }
 
 
-
 'Story'
 class Story {
-    - storySegments : Map<String, String>
+  ' Attributes
+  - ui : TextUI
+  - locations : Map<String, Location>
+  - npcs : Map<String, NPC>
+  ' Individual locations
+  - theClearing : Location
+  - huntingCabin : Location
+  - theLake : Location
+  - theForestPath : Location
+  - theTravellingMerchant : Location
+  - theSwampPath : Location
+  - theMurkyWaters : Location
+  - theWitchHut : Location
+  - theOfferingBog : Location
+  - theFrozenBog : Location
+  - theMountainPath : Location
+  - theRootsOfTheMountain : Location
+  - theFreezingPass : Location
+  - theCave : Location
+  - theCrownOfTheWorld : Location
+  'Constructor
+  + Story()
+  'Story setup
+  + displayWelcomeMessage() : void
+  + loadStory() : void
+  + createLocations() : void
+  + storeLocations() : void
+  - connectLocations() : void
+  - createNPCs() : void
+  - populateCreatures() : void
+  'Location access
+  + getLocation(locationName : String) : Location
+  'Dialogue systems
+  + getMerchantDialogue(player : Player) : List<String>
+  + handleMerchantDialogue(choice : int, player : Player) : String
+  + getSirenDialogue(player : Player) : List<String>
+  + handleSirenDialogue(choice : int, player : Player) : String
+  + getWitchDialogue(player : Player) : List<String>
+  + handleWitchDialogue(choice : int, player : Player) : String
+  + getDragonDialogue(player : Player) : List<String>
+  + handleDragonDialogue(choice : int, player : Player) : String
+  + getDragonFollowUp(player : Player) : List<String>
+  + handleDragonFollowUp(choice : int, player : Player) : String
+  + getStagDialogue(player : Player) : List<String>
+  + handleStagDialogue(choice : int, player : Player) : String
+  + getOrcDialogue(player : Player) : List<String>
+  + handleOrcDialogue(choice : int, player : Player) : String
+  'Ending
+  + getEpilogue(player : Player) : String
 }
+
 
 'Choice'
  class Choice {
