@@ -7,6 +7,7 @@ import util.TextUI;
 import java.util.List;
 import java.util.function.Predicate;
 
+
 public class NPC extends Creature {
     private String NPC_ID;             // NPC Identifer s.t unique interactions can happen
     private List<String> dialogue;     // Lines the NPC can say
