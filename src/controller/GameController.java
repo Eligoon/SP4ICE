@@ -226,7 +226,7 @@ public class GameController {
         ui.displayMsg(currentLocation.getDescription());
         // After movement, check for trap
         Objects object = new Objects();
-        object.checkForTraps(currentLocation);
+        object.checkForTraps(currentLocation, player, emeraldTear);
     }
 
     public void handleCombat(Creature enemy) {
