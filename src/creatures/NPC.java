@@ -98,8 +98,8 @@ public class NPC extends Creature {
         // Display options and prompt the player
         Choice selected = ui.promptChoiceOb(dialogueChoices, "Choose your dialogue:");
 
-        // Handle the chosen dialogue
-        story.handleDialogue(this, player, dialogueChoices.indexOf(selected));
+        // Handle the chosen dialogue directly
+        story.handleDialogue(this, player, selected);
 
         // Give quest if available
         if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
