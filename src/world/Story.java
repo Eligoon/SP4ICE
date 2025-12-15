@@ -604,57 +604,56 @@ public class Story {
         NPC merchant = npcs.get("merchant");
         if (merchant == null || merchant.isDead() || selectedChoice == null) return;
 
-        String text = selectedChoice.getDescription();
-        ui.displayMsg("You: " + text);
+        int choiceNumber = selectedChoice.getChoiceNumber(); // each Choice now has a number
+        ui.displayMsg("You: " + selectedChoice.getDescription());
 
-        // Greeting & quest for humans
-        if (text.startsWith("Old man, you should be careful") && player.isHuman()) {
-            player.addFlag("merchant_quest_given");
-            player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
-            ui.displayMsg("Merchant: Thank you. I shall be extremely careful. " +
-                    "Well here take this to start with, for your kindness.\n*The old man hands you a red potion." +
-                    "A dire wolf blocks my path to visit a town " +
-                    "in the swamplands to the east of here. If you kill it and bring back proof, " +
-                            "you can get this here key I found near an old cabin in the forest.");
-            return;
-        }
+        switch (choiceNumber) {
+            case 1: // Greeting & quest for humans
+                if (player.isHuman()) {
+                    player.addFlag("merchant_quest_given");
+                    player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
+                    ui.displayMsg("Merchant: Thank you. I shall be extremely careful. " +
+                            "Well here, take this to start with for your kindness.\n" +
+                            "*The old man hands you a red potion. " +
+                            "A dire wolf blocks my path to visit a town in the swamplands to the east of here. " +
+                            "If you kill it and bring back proof, you can get this key I found near an old cabin in the forest.");
+                }
+                break;
 
-        // Quest offer for non-humans
-        if (text.startsWith("I do not have much in the way of money") && !player.isHuman()) {
-            player.addFlag("merchant_quest_given");
-            ui.displayMsg("Merchant: Well, a trade then. You see a dire wolf blocks my path to visit a town " +
-                    "in the swamplands to the east of here. If you kill it and bring back proof, " +
-                    "you can get this here key I found near an old cabin in the forest.");
-            return;
-        }
+            case 2: // Quest offer for non-humans
+                if (!player.isHuman()) {
+                    player.addFlag("merchant_quest_given");
+                    ui.displayMsg("Merchant: Well, a trade then. You see a dire wolf blocks my path to visit a town " +
+                            "in the swamplands to the east of here. If you kill it and bring back proof, " +
+                            "you can get this key I found near an old cabin in the forest.");
+                }
+                break;
 
-        // Quest completion
-        if (text.startsWith("I have brought back proof") &&
-                player.hasFlag("killed_dire_wolf") &&
-                player.getInventory().hasItem("Head of the Dire Wolf")) {
+            case 3: // Quest completion
+                if (player.hasFlag("killed_dire_wolf") &&
+                        player.getInventory().hasItem("Head of the Dire Wolf")) {
 
-            player.addFlag("merchant_quest_complete");
-            player.addFlag("received_cabin_key");
-            player.getInventory().removeItem("Head of the Dire Wolf");
-            player.getInventory().addItem(new Item("Cabin Key", "Cabin Key received from Merchant", 1));
+                    player.addFlag("merchant_quest_complete");
+                    player.addFlag("received_cabin_key");
+                    player.getInventory().removeItem("Head of the Dire Wolf");
+                    player.getInventory().addItem(new Item("Cabin Key", "Cabin Key received from Merchant", 1));
 
-           ui.displayMsg("Merchant: Thank you stranger! Now I can finally move on. Here take these, as we discussed!");
-            return;
-        }
+                    ui.displayMsg("Merchant: Thank you stranger! Now I can finally move on. Here take these, as we discussed!");
+                }
+                break;
 
-        // Kill merchant / steal loot
-        if (text.startsWith("I will take your things")) {
-            merchant.setDead(true);
-            player.addFlag("killed_merchant");
-            ui.displayMsg("Merchant: No... please have mercy...");
-            return;
-        }
+            case 4: // Kill merchant / steal loot
+                merchant.setDead(true);
+                player.addFlag("killed_merchant");
+                ui.displayMsg("Merchant: No... please have mercy...");
+                break;
 
-        // Leave
-        if (text.startsWith("Be on your way")) {
-            ui.displayMsg("Merchant: Safe travels, stranger!");
+            case 5: // Leave
+                ui.displayMsg("Merchant: Safe travels, stranger!");
+                break;
         }
     }
+
 
 
 
@@ -703,34 +702,29 @@ public class Story {
     }
 
 
-    public void handleSirenDialogue(Player player, Choice selectedChoice) {
+    public void handleSirenDialogue(Player player, Choice selectedChoice, int choiceIndex) {
         NPC siren = npcs.get("siren");
-        if (siren == null || siren.isDead()) return;
-
-        String text = selectedChoice.getDescription();
+        if (siren == null || siren.isDead() || selectedChoice == null) return;
 
         // Display the chosen dialogue
-        ui.displayMsg("You: " + text);
+        ui.displayMsg("You: " + selectedChoice.getDescription());
 
-        switch (text) {
-            case "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
-                         "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?":
+        switch (choiceIndex) {
+            case 0: // First choice
+                ui.displayMsg("Kin of mine. I thank you for your flattery. I feel the balance shifting in my waters, I feel it in\n" +
+                        "the air. The mountain trembles even if only faintly. One of the tears has been stolen. It must be\n" +
+                        "returned to its tree, or soon the world may change for the worse.");
+                break;
+
+            case 1: // Second choice
                 ui.displayMsg("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
                 break;
 
-            case "Do you know what has happened to the world balance?":
-                ui.displayMsg("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
-                break;
-
-            case "I have no choice but to slay you!":
-                // Make Siren hostile
+            case 2: // Attack / combat choice
                 siren.setHostile(true);
                 ui.displayMsg("The Siren becomes hostile!");
-
-                // Start combat via GameController
                 gc.handleCombat(siren);
 
-                // If player won, give the heart
                 if (siren.isDead()) {
                     player.addFlag("killed_siren");
                     player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
@@ -740,11 +734,16 @@ public class Story {
                 }
                 break;
 
-            case "I was just passing by":
+            case 3: // Leaving / generic choice
                 ui.displayMsg("Siren: Farewell.");
+                break;
+
+            default:
+                ui.displayMsg("Siren: ...");
                 break;
         }
     }
+
 
 
 
@@ -753,20 +752,19 @@ public class Story {
         List<Choice> options = new ArrayList<>();
         NPC witch = npcs.get("witch");
 
-        if (witch == null || witch.isDead()) {
-            return options;
-        }
+        if (witch == null || witch.isDead()) return options;
 
         // Quest completed
         if (player.getInventory().hasItem("Heart of the Flower") &&
                 player.getInventory().hasItem("Heart of the Siren") &&
                 player.getInventory().hasItem("Heart of the Bog")) {
+
             options.add(Choice.interactChoice("Here you go witch, I have your spell ingredients.", witch));
             options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
             return options;
         }
 
-        // Quest already given but not completed
+        // Quest given but not completed
         if (player.hasFlag("witch_quest_given")) {
             options.add(Choice.interactChoice("I uh, do not have all three of the hearts. I will go now.", witch));
             options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
@@ -775,85 +773,69 @@ public class Story {
 
         // First meeting
         if (player.isMage()) {
-            // Mage-specific dialogue
-            options.add(Choice.interactChoice(
-                    "What are you, a witch,\na druid? Some sort of nature priestess?", witch
-            ));
+            options.add(Choice.interactChoice("What are you, a witch,\na druid? Some sort of nature priestess?", witch));
         } else {
-            // Generic greeting only if not a mage
-            options.add(Choice.interactChoice(
-                    "I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?",
-                    witch
-            ));
+            options.add(Choice.interactChoice("I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?", witch));
         }
 
-        // Combat / attack choice (available to all)
+        // Attack / combat choice
         options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
-        // Leave choice (available to all)
+
+        // Leave
         options.add(Choice.interactChoice("Ah… wrong way. Sorry for intruding", witch));
 
         return options;
     }
 
 
-    public void handleWitchDialogue(Player player, Choice selectedChoice) {
+
+    public void handleWitchDialogue(Player player, Choice selectedChoice, int choiceIndex) {
         NPC witch = npcs.get("witch");
-        if (witch == null || witch.isDead()) return;
+        if (witch == null || witch.isDead() || selectedChoice == null) return;
 
-        String text = selectedChoice.getDescription();
+        ui.displayMsg("You: " + selectedChoice.getDescription());
 
-        // Display player's choice
-        ui.displayMsg("You: " + text);
-
-        switch (text) {
-            // Quest completed - hand in items
-            case "Here you go witch, I have your spell ingredients.":
+        switch (choiceIndex) {
+            case 0: // Quest completed
                 player.addFlag("witch_barrier_open");
                 // TODO: remove quest items from inventory
                 player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch", 2));
                 ui.displayMsg("Witch: I thank you, stranger. As promised. A key to my barrier, you may now pass, and take this with you as well.");
                 break;
 
-            // Attack / combat choice
-            case "You have met your match. Prepare to die!":
-                // Make Witch hostile
+            case 1: // Attack / combat choice (available when quest completed)
+            case 3: // Attack / combat choice (available when quest not completed)
                 witch.setHostile(true);
                 ui.displayMsg("Witch: So be it! Prepare yourself!");
-
-                // Start combat via GameController
                 gc.handleCombat(witch);
-
-                // If player won
-                if (witch.isDead()) {
-                    player.addFlag("killed_witch");
-                } else {
-                    ui.displayMsg("You were defeated.");
-                }
+                if (witch.isDead()) player.addFlag("killed_witch");
+                else ui.displayMsg("You were defeated.");
                 break;
 
-            // Quest given but not completed
-            case "I uh, do not have all three of the hearts. I will go now.":
+            case 2: // Quest given but not completed
                 ui.displayMsg("Witch: Well get to it then! I may be an elf, but my time is still precious!");
                 break;
 
-            // First meeting - mage
-            case "What are you, a witch,\na druid? Some sort of nature priestess?":
+            case 4: // First meeting - mage
                 player.addFlag("witch_quest_given");
                 ui.displayMsg("Witch: Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I do not eat children! But yes, I know what has upset the balance...");
                 break;
 
-            // Generic greeting for non-mages
-            case "I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?":
+            case 5: // First meeting - non-mage
                 player.addFlag("witch_quest_given");
                 ui.displayMsg("Witch: Hmph, curious mortal… you seek what disrupts the balance? Listen well...");
                 break;
 
-            // Leaving
-            case "Ah… wrong way. Sorry for intruding":
+            case 6: // Leaving
                 ui.displayMsg("Witch: Leaving so soon?");
+                break;
+
+            default:
+                ui.displayMsg("Witch: ...");
                 break;
         }
     }
+
 
 
     // Implement dialogue for dragon, stag and orcs
