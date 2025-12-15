@@ -74,7 +74,7 @@ public class NPC extends Creature {
         this.despawnsWhenLeaving = value;
     }
 
-    // Method to add dialogue, check s tory class
+    // Method to add dialogue, check story class
     public void speak(String text){
         ui.displayMsg(name + " says: " + text);
     }
