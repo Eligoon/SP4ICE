@@ -4,6 +4,7 @@ import collectibles.Armor;
 import collectibles.Health;
 import collectibles.Weapon;
 import controller.Choices.Choice;
+import controller.Choices.ChoiceType;
 import creatures.Creature;
 import creatures.NPC;
 import creatures.Player;
@@ -295,42 +296,57 @@ public class GameController {
     }
 
 
-     // Displays available choices at the current location.
-     // If npc is provided, shows NPC interaction choices instead of location choices.
+    // Displays available choices at the current location.
+// If npc is provided, shows NPC interaction choices instead of location choices.
     public void displayAvailableChoices(NPC npc) {
         if (currentLocation == null || player == null) return;
 
-        List<Choice> allChoices;
+        // --- 1. Display location description ---
+        ui.displayMsg(currentLocation.getDescription());
+
+        // --- 2. Get all possible choices ---
+        List<Choice> allChoices = new ArrayList<>();
 
         if (npc != null) {
-            // 1. Get dialogue/interaction choices for this NPC
-            allChoices = emeraldTear.getDialogueChoices(npc, player);
+            // --- NPC interaction choices ---
+            allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
         } else {
-            // 2. Get normal location choices
-            allChoices = currentLocation.getAvailableChoices();
+            // --- Normal location choices ---
+            allChoices.addAll(currentLocation.getAvailableChoices());
         }
 
-        // 3. Filter choices based on player state
+        // --- 3. Add move options automatically ---
+        for (String direction : currentLocation.getConnectedLocations().keySet()) {
+            Choice moveChoice = new Choice(
+                    "Move " + direction,
+                    ChoiceType.MOVE,
+                    direction
+            );
+            allChoices.add(moveChoice);
+        }
+
+        // --- 4. Filter choices based on player state ---
         List<Choice> availableChoices = ui.getAvailableChoices(allChoices, player);
 
-        // 4. Check if any actions are available
+        // --- 5. Check if any actions are available ---
         if (availableChoices.isEmpty()) {
             ui.displayMsg("There are no actions available here.");
             return;
         }
 
-        // 5. Display the available choices
+        // --- 6. Display the available choices ---
         ui.displayMsg("What would you like to do?");
         ui.displayChoices(availableChoices);
 
-        // 6. Prompt player to choose one
+        // --- 7. Prompt player to choose one ---
         Choice selected = ui.promptChoiceOb(availableChoices, "Choose your action:");
 
-        // 7. Execute the chosen action
+        // --- 8. Execute the chosen action ---
         if (selected != null) {
             selected.execute(this);
         }
     }
+
 
 
     public void handleCombat(Creature enemy) {
