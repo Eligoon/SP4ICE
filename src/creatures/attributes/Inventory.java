@@ -20,7 +20,7 @@ public class Inventory {
         this.maxCapacity = maxCapacity;
     }
 
-    public static boolean addItem(Item item){
+    public boolean addItem(Item item){
         if (items.size() >= maxCapacity){
             ui.displayMsg("Inventory is full! Cannot add: " + item.getName());
             return false;
@@ -144,7 +144,7 @@ public class Inventory {
 
     //to make this work, we would Need a: public void use(Player player) method
 
-    public static void useItem(Player Player){
+    public void useItem(Player Player){
         if (items.isEmpty()){
             ui.displayMsg("You have no items to use!");
             return;
@@ -172,6 +172,14 @@ public class Inventory {
         if(chosenItem.isConsumable()){
             removeItem(chosenItem);
         }
+    }
+
+    public void clearInventory(){
+        items.clear();
+        equippedWeapon = null;
+        equippedArmor = null;
+
+        ui.displayMsg("Inventory has been cleared!");
     }
 
 
