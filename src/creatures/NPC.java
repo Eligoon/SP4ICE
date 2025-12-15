@@ -170,4 +170,7 @@ public class NPC extends Creature {
         this.originalLocation = originalLocation;
     }
 
+    public String getNPC_ID() {
+        return NPC_ID;
+    }
 }
