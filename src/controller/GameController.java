@@ -245,30 +245,29 @@ public class GameController {
             return; // Stop the method
         }
 
-        // Ask player if they want to save, quit, save+quit, or continue
-        String choice = ui.promptChoice(
-                "Do you want to save the game, quit, save and quit, or continue? (save/quit/savequit/continue)"
-        ).toLowerCase();
+        // Ask player if they want to save, quit, save+quit, or continue before moving
+        int choice = ui.promptNumeric(
+                "Do you want to save the game, quit, save and quit, or continue? Type a number \n 1. (save) \n 2. (quit) \n 3. (save & quit) \n 4. (continue)");
 
         switch (choice) {
-            case "save":
-                saveGame(); // Save the current game
+            case 1:
+                saveGame();
                 ui.displayMsg("Game saved!");
                 break;
 
-            case "quit":
+            case 2:
                 ui.displayMsg("Quitting game...");
-                saveGame(); // Optional: save before quitting
+                saveGame();
                 System.exit(0);
                 break;
 
-            case "savequit":
+            case 3:
                 saveGame();
                 ui.displayMsg("Game saved and quitting...");
                 System.exit(0);
                 break;
 
-            case "continue":
+            case 4:
             default:
                 // proceed to move
                 break;
@@ -284,7 +283,7 @@ public class GameController {
 
         // Check for traps
         Objects worldObjects = new Objects();
-        worldObjects.checkForTraps(currentLocation, player, story);
+        worldObjects.checkForTraps(currentLocation, player, emeraldTear);
 
         // Display available choices after movement
         displayAvailableChoices();
