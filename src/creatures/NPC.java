@@ -6,6 +6,7 @@ import creatures.attributes.Stats;
 import util.TextUI;
 import java.util.List;
 import creatures.attributes.AttackStat;
+import world.Story;
 
 public class NPC extends Creature {
     private String NPC_ID;             // NPC Identifer s.t unique interactions can happen
@@ -35,6 +36,7 @@ public class NPC extends Creature {
 
     }
 
+    // Stats for combat
     private int getAttackStatValue() {
         int str = stats.getStrength();
         int dex = stats.getDexterity();
@@ -77,6 +79,34 @@ public class NPC extends Creature {
                 ui.displayMsg(player.getName()
                         + " has been defeated by " + getName() + "!");
             }
+        }
+    }
+
+    // In NPC.java
+    @Override
+    public void interactWithPlayer(Player player, Story story, TextUI ui) {
+        List<String> dialogueLines = story.getDialogueForNPC(this, player); // use Story class
+
+        for (String line : dialogueLines) {
+            ui.displayMsg(this.getName() + " says: " + line);
+        }
+
+        // Give quest if available
+        if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
+            giveQuest(player);
+        }
+
+        // Give held item if available
+        if (itemHeld != null) {
+            player.pickUpItem(itemHeld);
+            ui.displayMsg(getName() + " gives you " + itemHeld.getItemName());
+            itemHeld = null;
+        }
+
+        // Hostile NPC check
+        if (isHostile()) {
+            ui.displayMsg(getName() + " seems hostile!");
+            // You can call combat directly if needed
         }
     }
 

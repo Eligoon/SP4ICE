@@ -183,10 +183,8 @@ public class GameController {
     }
 
 
-
-    public void handleNPCInteraction(Creature npc) {
-        ui.displayMsg("You interact with " + npc.getName());
-        // dialogue, quest logic, etc.
+    public void handleNPCInteraction(Creature creature) {
+        creature.interactWithPlayer(player, emeraldTear, ui);
     }
 
     public void handleUseItem(Item item) {

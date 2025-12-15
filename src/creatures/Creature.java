@@ -2,6 +2,8 @@ package creatures;
 
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
+import util.TextUI;
+import world.Story;
 
 /* The Creature class represents any living being in the game.
  * This is a superclass for Player and NPC. */
@@ -17,6 +19,11 @@ public class Creature {
         this.name = name;
         this.race = race;
         this.stats = stats;
+    }
+
+    // In Creature.java
+    public void interactWithPlayer(Player player, Story story, TextUI ui) {
+        ui.displayMsg("This creature cannot be interacted with.");
     }
 
     // Apply damage to the creature
