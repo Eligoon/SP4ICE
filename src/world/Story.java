@@ -340,7 +340,6 @@ public class Story {
         }
 
     // NPC CREATION
-
     private void createNPCs(){
         // Travelling Merchant
             NPC merchant = new NPC(
@@ -488,7 +487,7 @@ public class Story {
 
     // DIALOGUE OPTIONS
 
-    // MERCHANT
+    // MERCHANT DIALOGUE
     public List<String> getMerchantDialogue (Player player){
         List<String> options = new ArrayList<>();
 
@@ -506,9 +505,487 @@ public class Story {
 
         // Check if the merchant has already given the player the quest
         if (player.hasFlag("merchant_quest_given")) {
-            // TODO Implement dialogues and PLAYER methods
+            options.add("I am still working on it!");
+            return options;
+        }
+
+        // First meeting condition!
+        if (player.isHuman()) {
+            options.add("Old man, you should be careful around these parts, they are not safe anymore. The\n" +
+                    "world balance has been upset. I have little money left, and cannot buy your wares, but perhaps I\n" +
+                    "can help you in exchange for a few of your things?");
+        }
+
+        // Add rest of options
+
+        // Quest option
+        options.add("I do not have much in the way of money, I have spent most of it on traveling supplies. But\n" +
+                "perhaps I can lend you my services instead?");
+
+        // Kill merchant and steal loot
+        options.add("I will take your things for myself old man!");
+
+        // Leave
+        options.add("Be on your way and I will be on mine.");
+
+        return options;
+    }
+
+    public String handleMerchantDialogue(int choice, Player player){
+        NPC merchant = npcs.get("merchant");
+
+        // Check if quest is already completed
+        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")) {
+            if (choice == 1) {
+                player.addFlag("merchant_quest_complete");
+                player.addFlag("received_cabin_key");
+                player.getInventory().removeItem("Head of the Dire Wolf");
+                player.getInventory().addItem(new Item("Cabin Key","Cabin Key received from Merchant",1));
+                return "Thank you stranger! Now I can finally move on. Here take these, as we discussed!";
+            }
+        }
+
+        // Dialogue if merchant has already given the quest
+        if (player.hasFlag("merchant_quest_given")) {
+            if (choice == 1) {
+                return "Oh well, get back to it please. I don’t have forever!";
+            } else if {
+                merchant.setDead(true);
+                player.addFlag("killed_merchant");
+                return "No... please have mercy..."; // Kill the merchant
+            }
+        }
+
+        // Dialogue of initial meeting
+
+        if (player.isHuman() && choice == 1) {
+            player.addFlag("merchant_quest_given");
+            player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.",1));
+            return "Thank you. I shall be extremely careful, we have to look out for each other, don’t we?\n" +
+                    "Well here take this to start with, for your kindness." + "\n*The old man hands you a red potion*";
+
+        // Choice to get the quest from the merchant
+        } else if (choice == 1 || (choice == 2 && !player.isHuman())){
+            player.addFlag("merchant_quest_given");
+            return "Well, a trade then. You see a dire wolf blocks my path to visit a town in the swamplands to the east\n" +
+                    "of here. If you kill it and bring back proof, you can get this here key I found near an old cabin in the\n" +
+                    "forest.";
+
+        // Kill merchant choice
+        } else if ((choice == 2 && player.isHuman()) || choice == 3){
+            merchant.setDead(true);
+            player.addFlag("killed_merchant");
+            return "No... Please have mercy...";
+
+        } else if (choice == 4 || (choice == 3 && !player.isHuman() && !player.hasFlag("merchant_quest_given"))) {
+            return "Safe travels, stranger!";
+        }
+
+        return "";
+    }
+
+    // SIREN DIALOGUE
+    public List<String> getSirenDialogue(Player player){
+        List<String> options = new ArrayList<>();
+
+        NPC siren = npcs.get("siren");
+
+        // Error handling - check if Siren is dead or not instantiated
+        if (siren == null || siren.isDead()){
+            return options;
+        }
+
+        // Check special interaction with elf
+        if (player.isElf()) {
+            options.add("Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
+                    "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?");
+        }
+
+        // Add remaining options
+        options.add("Do you know what has happened to the world balance?");
+        options.add("I have no choice but to slay you!");
+        options.add("I was just passing by");
+
+        return options;
+    }
+
+    public String handleSirenDialogue(int choice, Player player){
+        NPC siren = npcs.get("siren");
+
+        // Special dialogue
+        if (player.isElf() && choice == 1) {
+            return "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
+                    "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?";
+
+        // Dialogue options if not elf
+        } else if ((player.isElf() && choice == 2) || (!player.isElf() && choice == 1)) {
+            return "I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been\n" +
+                    "taken. It must be returned to its nest in its tree.";
+
+        // Attack Siren
+        } else if ((player.isElf() && choice == 3) || (!player.isElf() && choice == 2)) {
+            siren.setDead(true);
+            player.addFlag("killed_siren");
+            player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
+            return "";
+
+        } else {
+            return "Farewell";
         }
     }
+
+    // WITCH DIALOGUE
+    public List<String> getWitchDialogue(Player player){
+        List<String> options = new ArrayList<>();
+
+        NPC witch = npcs.get("witch");
+
+        // Error handling
+        if (witch == null || witch.isDead()) {
+            return options;
+        }
+
+        // Check if the witch quest is complete
+        if (player.getInventory().hasItem("Heart of the Flower") &&
+            player.getInventory().hasItem("Heart of the Siren") &&
+            player.getInventory().hasItem("Heart of the Bog")) {
+            options.add("Here you go witch, I have your spell ingredients.");
+            options.add("You have met your match. Prepare to die!");
+            return options;
+        }
+
+        // Check if quest has been given before
+        if (player.hasFlag("witch_quest_given")){
+            options.add("I uh, do not have all three of the hearts. I will go now.");
+            options.add("You have met your match. Prepare to die!");
+            return options;
+        }
+
+        // First meeting
+        if(player.isMage()) { // Special interaction if player is a mage
+            options.add("What are you, a witch,\n" +
+                    "a druid? Some sort of nature priestess?");
+        }
+
+        // Remaining dialogue options
+        options.add("I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\n" +
+                "know something?");
+        options.add("You have met your match. Prepare to die!");
+        options.add("Ah… wrong way. Sorry for intruding");
+
+        return options;
+    }
+
+    public String handleWitchDialogue(int choice, Player player){
+        NPC witch = npcs.get("witch");
+
+        // If quest is complete
+        if (player.getInventory().hasItem("Heart of the Flower") &&
+                player.getInventory().hasItem("Heart of the Siren") &&
+                player.getInventory().hasItem("Heart of the Bog")){
+            if (choice == 1) {
+                player.addFlag("witch_barrier_open");
+                // TODO REMOVE QUEST ITEMS FROM INVENTORY
+                player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch",2));
+                return "I thank you, stranger. As promised." + "\nA key to my barrier, you may now pass, and take this with you as well.\n" +
+                        "It is not every day I get visitors."
+
+            } else if (choice == 2){
+                witch.setHostile(true);
+                player.addFlag("killed_witch");
+                player.addFlag("witch_barrier_open"); // Does barrier also open when she's dead?
+                return "";
+            }
+        }
+
+        // Check if player already has quest
+        if (player.hasFlag("witch_quest_given")) {
+            if (choice == 1) {
+                return "Well get to it then! I may be an elf, but my time is still precious!";
+            } else if (choice == 2) {
+                witch.setDead(true);
+                player.addFlag("killed_witch");
+                player.addFlag("witch_barrier_open");
+                return "";
+            }
+        }
+
+        // First meeting
+        if (player.isMage() && choice == 1) {
+            player.addFlag("witch_quest_given");
+            return "Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I\n" +
+                    "do not eat children!" + "\nBut yes, I know what has\n" +
+                    "upset the balance, a thief, a common bandit, has stolen the emerald tear from a great tree. He tried\n" +
+                    "to sell it to me, stupid oaf! No he likely now tries to return it to the stag atop the crown of the\n" +
+                    "world, the very peak of the mountain, for some great mythical reward.";
+
+        // Kill witch
+        } else if ((player.isMage() && choice == 2) || (!player.isMage() && choice == 1)) {
+            witch.setDead(true);
+            player.addFlag("killed_witch");
+            player.addFlag("witch_barrier_open");
+            return "";
+        } else {
+            return "Leaving so soon?";
+        }
+    }
+
+    // Implement dialogue for dragon, stag and orcs
+
+    // ICE DRAGON DIALOGUE
+    public List<String> getDragonDialogue(Player player) {
+        List<String> options = new ArrayList<>();
+
+        NPC dragon = npcs.get("ice_dragon");
+
+        // Error handling
+        if (dragon == null || dragon.isDead()) {
+            return options;
+        }
+
+        // Dialogue options
+        options.add("Mighty dragon, I have not come to harm\n" +
+                "you, nor to intrude on your territory. I however must go to the peak of the mountain, the crown of\n" +
+                "the world. For a tear of the great white stag has been damaged, and must be repaired and thus\n" +
+                "promptly returned to its nest, or the world shall fall into chaos.");
+        options.add("I will give you all my treasures if you take me to the peak.");
+        options.add("Prepare to fight, dragon!");
+
+        return options;
+    }
+
+
+    public String handleDragonDialogue(int choice, Player player) {
+        NPC dragon = npcs.get("ice_dragon");
+
+        // First interaction
+        if (choice == 1) {
+            player.addFlag("dragon_first_interaction");
+            return "A little stranger, here to bring balance to the world, why would the great stag even repair the tear? " +
+                    "Why would I take you? What if I am just awaiting the new cycle to come. Hrmm…";
+        } else if (choice == 2) {
+            // Bartering with the dragon
+            player.addFlag("dragon_will_help");
+            player.addFlag("dragon_barter");
+            for(Item i : player.getInventory().getItems()){ // Removes all items from inventory
+                player.getInventory().removeItem(i);
+            }
+            return "Oh, how humorous, yet I am not one to say no to such frivolous mortal behavior. " +
+                    "Come, climb on my back as you have paid your toll.";
+        } else if (choice == 3) {
+            // Choosing to fight the dragon
+            dragon.setHostile(true);
+            return "You dare challenge me?! So be it!";
+        }
+
+        return "";
+    }
+
+    // Dragon follow-up dialogue
+    public List<String> getDragonFollowUp(Player player) {
+        List<String> options = new ArrayList<>();
+
+        // In case we have already talked to the dragon before
+        if (!player.hasFlag("dragon_first_interaction")) {
+            return options;
+        }
+
+        // Additional dialogue options
+        options.add("Oh great dragon, I know my quest might be foolish in your wise eyes, but I must give it a\n" +
+                "try none the less, for if I did not try, I would regret it for the rest of my life.");
+        options.add("A new cycle can begin another time, for now is my time where I choose to try and mend\n" +
+                "the cycle that already is.");
+
+        return options;
+    }
+
+    public String handleDragonFollowUp(int choice, Player player) {
+        if (choice == 1) {
+            player.addFlag("dragon_will_help"); // Helps you both ways
+            return "Very well, little one. Your determination moves me. Climb upon my back."; // Added dialogue
+        } else if (choice == 2) {
+            player.addFlag("dragon_will_not_help"); // Only helps you up
+            return "Very well. I shall take you to the peak, but you must find your own way down."; // Added dialogue
+        }
+
+        return "";
+    }
+
+    // WHITE STAG DIALOGUE
+    public List<String> getStagDialogue(Player player) {
+        List<String> options = new ArrayList<>();
+
+        // Error handling
+        NPC stag = npcs.get("white_stag");
+        if (stag == null || stag.isDead()) {
+            return options;
+        }
+
+        // Dialogue options for stag
+        options.add("Please mighty white stag, repair your tear, let the cycle continue as it is now.");
+        options.add("*If I can kill a god, maybe I too will become a god.*"); // Added internal dialogue as an option
+
+        return options;
+    }
+
+    public String handleStagDialogue(int choice, Player player) {
+        NPC stag = npcs.get("white_stag");
+
+        // Checking for different flags to change ending
+        if (choice == 1) {
+            // Check what player has done to determine ending
+            if (player.hasFlag("killed_merchant")) {
+                player.addFlag("bad_ending_merchant"); // Killed merchant, tear is not repaired
+                return "Killer of the innocent, you speak of hope but forbid it of others yourself? " +
+                        "No… let the cycle end, let the mortals learn from their mistakes.";
+
+            } else if (player.hasFlag("killed_siren")) {
+                player.addFlag("sacrifice_ending"); // Killed siren, sacrifice yourself to repair tear
+                return "Killer of the unknown, of beauty, of nature. You are scared of fear itself. " +
+                        "I cannot blame you for such, as it is the flaw of mortals. Yet it fills me with sorrow. " +
+                        "I ask of you to lay your own life down, and I will repair the tear, to balance the world, " +
+                        "and balance your choice.";
+
+            } else if (player.hasFlag("killed_offering_orc_1") || player.hasFlag("killed_offering_orc_2")) {
+                player.addFlag("good_ending");
+                return "Worship is a dangerous thing when fear takes the hearts of those who seek favors. " +
+                        "I do not blame you for the loss of life to save another. You brought hope to that girl, " +
+                        "so I will repay the favor in her stead.";  // Killed the orc keeping the girl captive, good ending
+
+            } else if (player.hasFlag("killed_witch")) {
+                player.addFlag("bad_ending_witch");
+                return "Nature takes, and nature gives. Nature is not confined to the mortals' standards of evil and good. " +
+                        "You kill that of which is just taking their own interest at heart and that of nature. " +
+                        "I have nothing to give you that you cannot try and mend yourself."; // Tear is not repaired
+
+            } else if(player.hasFlag("killed_witch") && player.hasFlag("killed_siren")) {
+                player.addFlag("bad_ending_death");
+                return "To take from nature and not return anything, take its guardians and deprive it of healing is just as\n" +
+                        "the scorching sun did ages past. You have shown you are no different, and for that, you have\n" +
+                        "discarded my mercy, my hope, my dream for the mortals."; // Player dies and tear is not repaired
+
+            } else if (player.hasFlag("killed_witch") && player.hasFlag("killed_siren") && player.hasFlag("killed_merchant")) {
+                player.addFlag("bad_ending_stag_fight");
+                return "Murderer…your heart desires nothing but blood, your soul empty like a gaping hole sucking\n" +
+                        "everything in without embracing it. Greed rules your mind, bloodlust your heart and I have nothing\n" +
+                        "to give you but death, even though that is merciful to you, I shall heal the world by removing your\n" +
+                        "stain upon it."; // Bad ending with boss fight
+            }
+
+            else {
+                player.addFlag("good_ending");
+                return "*The great white stag gently bows its head down to you, despite all you have been through a little bit\n" +
+                        "of fear run through your body yet its warm breath like a summers breeze warms your body. Its milky\n" +
+                        "eyes beholds the cracked gem and then looks carefully at you, even though you feel that it is\n" +
+                        "looking -through- you.*"; // Good ending! Didn't kill anyone unnecessarily, tear gets repaired
+            }
+        } else if (choice == 2) {
+            // Attacking the stag
+            stag.setHostile(true);
+            player.addFlag("attacked_stag");
+            return "*Throw the tear to the ground, if you can kill a god like being, maybe you too will become a god. You\n" +
+                    "charge at the giant stag.*"; // Boss fight
+        }
+
+        return "";
+    }
+
+    // OFFERING BOG ORC DIALOGUE
+    public List<String> getOrcDialogue(Player player) {
+        List<String> options = new ArrayList<>();
+
+        // Deal with just one orc talking for this scenario
+        NPC orc1 = npcs.get("offering_orc_1");
+
+        // Check if orc is dead
+        if (orc1 == null || orc1.isDead()) {
+            return options;
+        }
+
+        // Check class / race specific dialogue
+        if (player.isOrc()) {
+            options.add("I am not here for you. Do your thing, let our god know we still praise him. I just need something from the bog when you are done!");
+        }
+        if (player.isWarrior()) {
+            options.add("That is my sister!"); // Added dialogue for if warrior
+        }
+        if (player.isOrc() && player.isWarrior()) {
+            options.add("The girl is too skinny! Not enough " +
+                    "fat or muscle to please our god. Let me take her instead, go hunt a big fat boar!"); // If orc and warrior
+        }
+        if (!player.isWarrior()) {
+            options.add("*Hunker down and hope they think it was a critter.*"); // If anything else than warrior
+            options.add("*Crawl away back to the swamp path.*");
+        }
+
+        // Remaining options
+        options.add("*Rise and charge at them to save the girl*");
+        options.add("*Mimic the sound of some horrid and big animal to scare them away.*");
+
+        return options;
+    }
+
+    public String handleOrcDialogue(int choice, Player player) {
+        NPC orc1 = npcs.get("offering_orc_1");
+        NPC orc2 = npcs.get("offering_orc_2");
+        List<String> options = getOrcDialogue(player);
+
+        // TODO Implement all the dialogue choices for orcs
+
+
+
+    }
+    // EPILOGUE
+    public String getEpilogue(Player player){
+        if (player.hasFlag("dragon_will_help")){
+            return "The dragon lets you climb onto its back, it says nothing to you but keeps it promise of safe travel down\n" +
+                    "below. It places you at the clearing in the forest and bids you no farewell before surge of wind knocks you\n" +
+                    "off your feet as it takes off once more towards its cave."; // If dragon helped you down
+
+        } else if (player.hasFlag("dragon_will_help") && player.isWarrior() && player.hasFlag("killed_merchant")) {
+            return "The dragon lets you climb onto its back, it says nothing, but at your request it does take you to your home\n" +
+                    "village where your sister took the merchants horses to. It places you down and bids you no farewell before\n" +
+                    "surge of wind knocks you off your feet as it takes off once more towards its cave. Your sister and mother\n" +
+                    "come running towards you and jumps into your embrace."; // If dragon helped you down as a warrior and merchant is dead
+
+        } else if (player.hasFlag("dragon_will_help") && player.isWarrior() && player.hasFlag("merchant_quest_complete")) {
+            return "The dragon lets you climb onto its back, it says nothing, but at your request it does take you to the swamp\n" +
+                    "town where your sister and the merchant are. It places you down and bids you no farewell before surge of\n" +
+                    "wind knocks you off your feet as it takes off once more towards its cave. Your sister comes running towards\n" +
+                    "you and jumps into your embrace."; // Dragon helped you and you're a warrior and you finished merchant quest
+
+        } else if (player.hasFlag("dragon_will_not_help")) {
+            return "You look down the dizzying tall peak, you flew up here, it took not a moment for a dragon, but for you it will\n" +
+                    "take days, weeks. You have so little food left, but at the very least you can chew snow for water you\n" +
+                    "suppose.\n" +
+                    "It is one step at a time, and by the time you finally do reach the bottom, you are worse for wear. Scratches,\n" +
+                    "frost bite, and disease ravage through your body. Something it will never truly heal from, but at least you\n" +
+                    "are still alive."; // Dragon doesn't help you down
+
+        } else if (player.hasFlag("dragon_will_not_help") && player.isWarrior()) {
+            return "You look down the dizzying tall peak, you flew up here, it took not a moment for a dragon, but for you it will\n" +
+                    "take days, weeks. You have so little food left, but at the very least you can chew snow for water you\n" +
+                    "suppose.\n" +
+                    "It is one step at a time, the thoughts of your sister fill you with determination, and by the time you finally do\n" +
+                    "reach the bottom, you are worse for wear. Scratches, frost bite, and disease ravage through your body.\n" +
+                    "Something it will never truly heal from, but at least you are still alive. You are not sure why you still live, but\n" +
+                    "likely it is the deep oath to yourself and your mother that kept you going at the hardest of times.\n"; // Dragon didn't help you down as warrior
+
+        } else if (player.hasFlag("attacked_stag")) {
+            return "You did it, you stand covered in the blood of godhood, you are bathed by the few sunrays that dare make its\n" +
+                    "way inside the crack, the dragon staring in disbelief. You, YOU DID IT. You killed the deity like creature that\n" +
+                    "brought life to the world and now, in your lust for power, you stand at the very peak of the world, and it\n" +
+                    "should tremble for what is to come.";
+        } else {
+            return "";
+        }
+    }
+
+
+}
+
+
+
 
 
 

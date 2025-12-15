@@ -5,7 +5,6 @@ import collectibles.Item;
 import collectibles.Quest;
 import collectibles.Weapon;
 import creatures.attributes.CharacterClass;
-import creatures.attributes.Class;
 import creatures.attributes.Inventory;
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
@@ -44,6 +43,8 @@ public class Player extends Creature {
         // create empty quest log
         this.questLog = new ArrayList<>();
 
+        this.flags = new ArrayList<>();
+
         // Apply race and class bonuses
         race.applyRacialBonuses(this.stats);
         characterClass.applyCharacterClassBonuses(this.stats);
@@ -73,7 +74,7 @@ public class Player extends Creature {
     // Method to complete quest for the player
     public void completeQuest(String questID){ // Marks quest as completed
         for (Quest quest : questLog) {
-            if (quest.getQuestID.equals(questID)) {
+            if (quest.getQuestID().equals(questID)) {
                 completeQuest(this);
                 ui.displayMsg("The quest: " + quest.getQuestName() + "has been completed!");
                 return;
@@ -81,9 +82,45 @@ public class Player extends Creature {
         }
     }
 
+    // Flag management
+
+    // Add flag to Player flags
+    public void addFlag(String flag) {
+        if (!flags.contains(flag)) {
+            flags.add(flag);
+        }
+    }
+
+    // Check if player already has flags
+    public boolean hasFlag(String flag){
+        return flags.contains(flag);
+    }
+
+    // Remove flag
+    public void removeFlag(String flag){
+        flags.remove(flag);
+    }
+
+    // Getter
+    public List<String> getFlags(){
+        return flags;
+    }
+
+    // Inventory handling
+
     // Method to receive / pickup an item
     public void pickUpItem(Item item){
         Inventory.addItem(item);
+    }
+
+    // Getter for inventory
+    public Inventory getInventory(){
+        return inventory;
+    }
+
+    // Getter for questlog
+    public List<Quest> getQuestLog() {
+        return questLog;
     }
 
     // Booleans to check if a player is a specific class or race - needed for specific interactions
