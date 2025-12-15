@@ -2,6 +2,7 @@ package controller;
 
 import collectibles.Armor;
 import collectibles.Health;
+import collectibles.Weapon;
 import controller.Choices.Choice;
 import creatures.Creature;
 import creatures.NPC;
