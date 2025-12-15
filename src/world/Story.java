@@ -282,6 +282,16 @@ public class Story {
             locations.put("The Crown of the World", theCrownOfTheWorld);
         }
 
+        // Getting the location description
+    public String getLocationDescription(Location loc) {
+        if (loc != null) {
+            return loc.getDescription();
+        } else {
+            return "Location description not found";
+        }
+    }
+
+
 
     // Connects all the locations based on the world map
     private void connectLocations () {
