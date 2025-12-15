@@ -162,7 +162,10 @@ abstract class Creature {
 enum AttackStat {
 STRENGTH,
 INTELLIGENCE,
-DEXTERITY
+DEXTERITY,
+STRDEX,
+INTSTR,
+DEXINT,
 }
 
 'Player'
