@@ -253,13 +253,6 @@ public class Story {
                         "them atop. A great white stag, taller than a house stand before you, its eyes blind and grey as the clouds\n" +
                         "that swirl further down the mountain."
         );
-        //--- Traps ---
-        Location theMurkyWatersTrap = new Location(
-                "The Murky Waters Trap",
-                "You go around the bubbles, those are surely deadly right?\n" +
-                        "Well, someone thought about that and placed a spiked trap below the waters.\n" +
-                        "It snaps around your leg, but you still manage to move forward."
-        );
     }
 
     public String getTrapMessage(String locationName) {
