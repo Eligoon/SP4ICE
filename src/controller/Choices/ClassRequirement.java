@@ -12,6 +12,6 @@ public class ClassRequirement implements Requirement {
 
     @Override
     public boolean isMet(Player player) {
-        return player.getCharacterClass().getClassName().equalsIgnoreCase(requiredClass);
+        return player.getCharacterClass().getCharacterClassName().equalsIgnoreCase(requiredClass);
     }
 }
