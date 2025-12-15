@@ -1,15 +1,13 @@
 package creatures;
 
-import collectibles.Armor;
+
 import collectibles.Item;
 import collectibles.Quest;
-import collectibles.Weapon;
 import creatures.attributes.CharacterClass;
 import creatures.attributes.Inventory;
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
 import util.TextUI;
-import world.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,20 +49,11 @@ public class Player extends Creature {
 
     }
 
-    @Override
+
     public void interact() { //Interaction placeholder
         //TODO
     }
 
-    public void useItem(Item item) { //called when the player uses an item
-        //TODO
-    }
-    public void equipWeapon(Weapon weapon){ //Equip a weapon from the players inventory
-        //TODO
-    }
-    public void equipArmor(Armor armor){ //Equip armor from the players inventory
-        //TODO
-    }
     public void addQuest(Quest quest){ //add a quest the players quest log
         questLog.add(quest);
         ui.displayMsg("New quest acquired: " + quest.getQuestName());
@@ -104,6 +93,10 @@ public class Player extends Creature {
     // Getter
     public List<String> getFlags(){
         return flags;
+    }
+
+    public CharacterClass getCharacterClass() {
+        return this.characterClass;
     }
 
     // Inventory handling
