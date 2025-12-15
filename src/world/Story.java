@@ -1,6 +1,7 @@
 package world;
 
 import collectibles.Item;
+import controller.Choices.Choice;
 import creatures.NPC;
 import creatures.Player;
 import creatures.attributes.Stats;
@@ -449,7 +450,7 @@ public class Story {
             npcs.put("glistening_flower", flower);
 
             NPC orc_1 = new NPC(
-                    "Offering Borg Orc 1",
+                    "Offering Bog Orc 1",
                     "offering_orc_1",
                     new Stats(40,10,10,3), // Proposed stats
                     Arrays.asList("Who is there?!"),
@@ -460,7 +461,7 @@ public class Story {
             npcs.put("offering_orc_1",orc_1);
 
             NPC orc_2 = new NPC(
-                    "Offering Borg Orc 2",
+                    "Offering Bog Orc 2",
                     "offering_orc_2",
                     new Stats(40,10,10,3), // Proposed stats
                     Arrays.asList(""),
@@ -486,6 +487,67 @@ public class Story {
         }
 
     // DIALOGUE OPTIONS
+
+    // Generic getter for dialogue choice to go to game controller
+    public List<Choice> getDialogueChoices(NPC npc, Player player) {
+        List<Choice> options = new ArrayList<>();
+        if (npc == null || npc.isDead()) return options;
+
+        List<String> dialogueLines = getNPCDialogue(npc, player);
+
+        for (String line : dialogueLines) {
+            options.add(Choice.interactChoice(line, npc));
+        }
+
+        return options;
+    }
+
+    // Generic method to provide dialogue lines
+    private List<String> getNPCDialogue(NPC npc, Player player) {
+        List<String> lines = new ArrayList<>();
+
+        switch (npc.getName().toLowerCase()) {
+            case "siren":
+                // Elf special line
+                if (player.isElf()) {
+                    lines.add("Kin of the water, I see your beauty... Do you know what has happened?");
+                }
+                lines.add("Do you know what has happened to the world balance?");
+                lines.add("I have no choice but to slay you!");
+                lines.add("I was just passing by");
+                break;
+
+            // Add more NPCs here
+            // case "merchant":
+            //     lines.add("Welcome to my shop!");
+            //     break;
+
+            default:
+                lines.add("Hello, traveler.");
+                break;
+        }
+
+        return lines;
+    }
+
+
+    // Generic handler for dialogue choice to go to game controller
+    public String handleDialogue(NPC npc, int choiceIndex, Player player) {
+        if (npc == null || npc.isDead()) return "";
+
+        String npcName = npc.getName().toLowerCase();
+
+        switch (npcName) {
+            case "siren":
+                return handleSirenDialogue(choiceIndex, player, npc);
+
+            // Add more NPCs here
+            default:
+                return "The NPC has nothing to say.";
+        }
+    }
+
+
 
     // MERCHANT DIALOGUE
     public List<String> getMerchantDialogue (Player player){
