@@ -1,6 +1,6 @@
 package collectibles;
 
-public abstract class Item {
+public class Item {
 
 protected String itemName;
 protected String description;
@@ -20,9 +20,19 @@ protected int weight;
     }
 
     // Method to allow items to be copied to the ItemRegistry
-    public abstract Item copy();
+    public Item copy(){
+        return null;
+    }
 
     public String getItemName() {
         return itemName;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public int getWeight(){
+        return weight;
     }
 }

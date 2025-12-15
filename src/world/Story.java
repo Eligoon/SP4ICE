@@ -259,236 +259,236 @@ public class Story {
     }
 
 
-    public void storeLocations () {
-            // Add locations to the map
-            locations.put("The Clearing", theClearing);
-            locations.put("The Hunting Cabin", huntingCabin);
-            locations.put("The Lake", theLake);
-            locations.put("The Forest Path", theForestPath);
-            locations.put("The Travelling Merchant", theTravellingMerchant);
-            locations.put("The Swamp Path", theSwampPath);
-            locations.put("The Murky Waters", theMurkyWaters);
-            locations.put("The Witch's Hut", theWitchHut);
-            locations.put("The Offering Bog", theOfferingBog);
-            locations.put("The Frozen Bog", theFrozenBog);
-            locations.put("The Mountain Path", theMountainPath);
-            locations.put("The Roots of the Mountain", theRootsOfTheMountain);
-            locations.put("The Freezing Pass", theFreezingPass);
-            locations.put("The Cave", theCave);
-            locations.put("The Crown of the World", theCrownOfTheWorld);
-        }
+    public void storeLocations() {
+        // Add locations to the map
+        locations.put("The Clearing", theClearing);
+        locations.put("The Hunting Cabin", huntingCabin);
+        locations.put("The Lake", theLake);
+        locations.put("The Forest Path", theForestPath);
+        locations.put("The Travelling Merchant", theTravellingMerchant);
+        locations.put("The Swamp Path", theSwampPath);
+        locations.put("The Murky Waters", theMurkyWaters);
+        locations.put("The Witch's Hut", theWitchHut);
+        locations.put("The Offering Bog", theOfferingBog);
+        locations.put("The Frozen Bog", theFrozenBog);
+        locations.put("The Mountain Path", theMountainPath);
+        locations.put("The Roots of the Mountain", theRootsOfTheMountain);
+        locations.put("The Freezing Pass", theFreezingPass);
+        locations.put("The Cave", theCave);
+        locations.put("The Crown of the World", theCrownOfTheWorld);
+    }
 
 
     // Connects all the locations based on the world map
-    private void connectLocations () {
-            // The Clearing connected locations
-            theClearing.addConnectedLocation("north", huntingCabin);
-            theClearing.addConnectedLocation("south", theLake);
-            theClearing.addConnectedLocation("east", theForestPath);
+    private void connectLocations() {
+        // The Clearing connected locations
+        theClearing.addConnectedLocation("north", huntingCabin);
+        theClearing.addConnectedLocation("south", theLake);
+        theClearing.addConnectedLocation("east", theForestPath);
 
-            // The Hunting Cabin connected locations
-            huntingCabin.addConnectedLocation("south", theClearing);
+        // The Hunting Cabin connected locations
+        huntingCabin.addConnectedLocation("south", theClearing);
 
-            // The lake connected locations
-            theLake.addConnectedLocation("north", theClearing);
+        // The lake connected locations
+        theLake.addConnectedLocation("north", theClearing);
 
-            // The forest path connected locations
-            theForestPath.addConnectedLocation("north", theMountainPath);
-            theForestPath.addConnectedLocation("south", theTravellingMerchant);
-            theForestPath.addConnectedLocation("east", theSwampPath);
-            theForestPath.addConnectedLocation("west", theClearing);
+        // The forest path connected locations
+        theForestPath.addConnectedLocation("north", theMountainPath);
+        theForestPath.addConnectedLocation("south", theTravellingMerchant);
+        theForestPath.addConnectedLocation("east", theSwampPath);
+        theForestPath.addConnectedLocation("west", theClearing);
 
-            // The offering bog connected locations
-            theOfferingBog.addConnectedLocation("north", theSwampPath);
+        // The offering bog connected locations
+        theOfferingBog.addConnectedLocation("north", theSwampPath);
 
-            // The swamp path connected locations
-            theSwampPath.addConnectedLocation("south", theOfferingBog);
-            theSwampPath.addConnectedLocation("west", theForestPath);
-            theSwampPath.addConnectedLocation("north", theFrozenBog);
-            theSwampPath.addConnectedLocation("east", theMurkyWaters);
+        // The swamp path connected locations
+        theSwampPath.addConnectedLocation("south", theOfferingBog);
+        theSwampPath.addConnectedLocation("west", theForestPath);
+        theSwampPath.addConnectedLocation("north", theFrozenBog);
+        theSwampPath.addConnectedLocation("east", theMurkyWaters);
 
-            // The murky waters connected locations
-            theMurkyWaters.addConnectedLocation("west", theSwampPath);
-            theMurkyWaters.addConnectedLocation("east", theWitchHut);
+        // The murky waters connected locations
+        theMurkyWaters.addConnectedLocation("west", theSwampPath);
+        theMurkyWaters.addConnectedLocation("east", theWitchHut);
 
-            // The witch's hut connected locations
-            theWitchHut.addConnectedLocation("west", theMurkyWaters);
+        // The witch's hut connected locations
+        theWitchHut.addConnectedLocation("west", theMurkyWaters);
 
-            // The frozen bog connected locations
-            theFrozenBog.addConnectedLocation("south", theSwampPath);
-            theFrozenBog.addConnectedLocation("west", theMountainPath);
-            theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
+        // The frozen bog connected locations
+        theFrozenBog.addConnectedLocation("south", theSwampPath);
+        theFrozenBog.addConnectedLocation("west", theMountainPath);
+        theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
 
-            // The roots of the mountain connected locations
-            theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
-            theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
+        // The roots of the mountain connected locations
+        theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
+        theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
 
-            //  The freezing pass connected locations
-            theFreezingPass.addConnectedLocation("east", theCave);
-            theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
+        //  The freezing pass connected locations
+        theFreezingPass.addConnectedLocation("east", theCave);
+        theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
 
-            // The cave connected locations
-            theCave.addConnectedLocation("north", theCrownOfTheWorld);
-            theCave.addConnectedLocation("west", theFreezingPass);
+        // The cave connected locations
+        theCave.addConnectedLocation("north", theCrownOfTheWorld);
+        theCave.addConnectedLocation("west", theFreezingPass);
 
-            // The crown of the world connected locations
-            theCrownOfTheWorld.addConnectedLocation("south", theCave);
-        }
+        // The crown of the world connected locations
+        theCrownOfTheWorld.addConnectedLocation("south", theCave);
+    }
 
-    public Location getLocation (String locationName){
-            return locations.get(locationName);
-        }
+    public Location getLocation(String locationName) {
+        return locations.get(locationName);
+    }
 
     // NPC CREATION
-    private void createNPCs(){
+    private void createNPCs() {
         // Travelling Merchant
-            NPC merchant = new NPC(
-                    "The Travelling Merchant",
-                    "merchant",
-                    new Stats(0,0,0,0),
-                    Arrays.asList(
-                            "Why hello stranger, care to see my wares?"
-                    ),
-                    false, // Not hostile
-                    null, // Item Held until items are created, has cabin key
-                    null // Dire wolf quest - added later
-                    );
-            npcs.put("merchant", merchant); // Map NPC id to merchant
+        NPC merchant = new NPC(
+                "The Travelling Merchant",
+                "merchant",
+                new Stats(0, 0, 0, 0),
+                Arrays.asList(
+                        "Why hello stranger, care to see my wares?"
+                ),
+                false, // Not hostile
+                null, // Item Held until items are created, has cabin key
+                null // Dire wolf quest - added later
+        );
+        npcs.put("merchant", merchant); // Map NPC id to merchant
 
         // FIGHTABLE NPCs
 
         // Lake Siren
-            NPC siren = new NPC(
-                    "Lake Siren", // Name
-                    "siren",            // NPC ID
-                    new Stats(10,10,10,10),
-                    Arrays.asList(
-                            "What seek you here, at my lake?"
-                    ),
-                    false, // Only hostile when provoked
-                    null, // Item held, has the heart of the siren - drops if slayed
-                    null // Has no quest
-            );
-            npcs.put("siren", siren); // Map NPC id to siren
+        NPC siren = new NPC(
+                "Lake Siren", // Name
+                "siren",            // NPC ID
+                new Stats(10, 10, 10, 10),
+                Arrays.asList(
+                        "What seek you here, at my lake?"
+                ),
+                false, // Only hostile when provoked
+                null, // Item held, has the heart of the siren - drops if slayed
+                null // Has no quest
+        );
+        npcs.put("siren", siren); // Map NPC id to siren
 
-            // Witch
-            NPC witch = new NPC(
-                    "Witch of the Witch's hut",
-                    "witch",
-                    new Stats(10,10,10,10), // Base stats
-                    Arrays.asList(
-                            " "
-                    ),
-                    false, // Can be hostile
-                    null, // Has special loot
-                    null // She does have a quest
-            );
-            npcs.put("witch",witch);
+        // Witch
+        NPC witch = new NPC(
+                "Witch of the Witch's hut",
+                "witch",
+                new Stats(10, 10, 10, 10), // Base stats
+                Arrays.asList(
+                        " "
+                ),
+                false, // Can be hostile
+                null, // Has special loot
+                null // She does have a quest
+        );
+        npcs.put("witch", witch);
 
-            // Ice dragon
-            NPC ice_dragon = new NPC(
-                    "Ice Dragon",
-                    "ice_dragon",
-                    new Stats(200,30,20,50), // Proposed stats
-                    Arrays.asList("" +
-                            "What brings you to my cave?"
-                    ),
-                    false, // Not necessarily hostile
-                    null, // No item
-                    null // No quest
-            );
-            npcs.put("ice_dragon", ice_dragon);
+        // Ice dragon
+        NPC ice_dragon = new NPC(
+                "Ice Dragon",
+                "ice_dragon",
+                new Stats(150, 30, 20, 50), // Proposed stats
+                Arrays.asList("" +
+                        "What brings you to my cave?"
+                ),
+                false, // Not necessarily hostile
+                null, // No item
+                null // No quest
+        );
+        npcs.put("ice_dragon", ice_dragon);
 
-            // Dire wolf
-            NPC dire_wolf = new NPC(
-                    "Dire Wolf",
-                    "dire_wolf",
-                    new Stats(10,10,10,10), // Base stats
-                    List.of(""), // No voice lines
-                    true, // Is hostile
-                    new Item("Head of the Dire Wolf", "Dropped when killing the Dire Wolf", 2), // Drops head of the dire wolf
-                    null // Doesn't give quest
-            );
-            npcs.put("dire_wolf", dire_wolf);
+        // Dire wolf
+        NPC dire_wolf = new NPC(
+                "Dire Wolf",
+                "dire_wolf",
+                new Stats(10, 10, 10, 10), // Base stats
+                List.of(""), // No voice lines
+                true, // Is hostile
+                new Item("Head of the Dire Wolf", "Dropped when killing the Dire Wolf", 2), // Drops head of the dire wolf
+                null // Doesn't give quest
+        );
+        npcs.put("dire_wolf", dire_wolf);
 
-            // Mountain goat
-            NPC mountain_goat = new NPC(
-                    "Mountain Goat",
-                    "mountain_goat",
-                    new Stats(30,5,10,5), // Proposed stats
-                    Arrays.asList(""),
-                    true, // Is hostile towards player
-                    null, // Has minor loot
-                    null
-            );
-            npcs.put("mountain_goat", mountain_goat);
+        // Mountain goat
+        NPC mountain_goat = new NPC(
+                "Mountain Goat",
+                "mountain_goat",
+                new Stats(30, 5, 10, 5), // Proposed stats
+                Arrays.asList(""),
+                true, // Is hostile towards player
+                null, // Has minor loot
+                null
+        );
+        npcs.put("mountain_goat", mountain_goat);
 
-            // Great white stag
-            NPC stag = new NPC(
-                    "Great White Stag",
-                    "white_stag",
-                    new Stats(90,20,15,10),
-                    Arrays.asList(""),
-                    false, // Can be hostile if provoked
-                    null,
-                    null // No quest to give
-            );
-            npcs.put("great_white_stag", stag);
+        // Great white stag
+        NPC stag = new NPC(
+                "Great White Stag",
+                "white_stag",
+                new Stats(200, 20, 15, 10),
+                Arrays.asList(""),
+                false, // Can be hostile if provoked
+                null,
+                null // No quest to give
+        );
+        npcs.put("great_white_stag", stag);
 
-            // Glistening flower
-            NPC flower = new NPC(
-                    "Glistening Flower",
-                    "glistening_flower",
-                    new Stats(40,5,5,5), // Proposed stats
-                    Arrays.asList(""),
-                    true, // Hostile towards player
-                    new Item("Heart of the Flower", "Heart of the flower gained by defeating" +
-                            "the Glistening Flower in The Clearing", 1), // Need to implement Item class
-                    null // Doesn't give quest
-            );
-            npcs.put("glistening_flower", flower);
+        // Glistening flower
+        NPC flower = new NPC(
+                "Glistening Flower",
+                "glistening_flower",
+                new Stats(40, 5, 5, 5), // Proposed stats
+                Arrays.asList(""),
+                true, // Hostile towards player
+                new Item("Heart of the Flower", "Heart of the flower gained by defeating" +
+                        "the Glistening Flower in The Clearing", 1), // Need to implement Item class
+                null // Doesn't give quest
+        );
+        npcs.put("glistening_flower", flower);
 
-            NPC orc_1 = new NPC(
-                    "Offering Borg Orc 1",
-                    "offering_orc_1",
-                    new Stats(40,10,10,3), // Proposed stats
-                    Arrays.asList("Who is there?!"),
-                    false, // Only when given the right dialogue
-                    new Item("Heart of the Bog", "Looted by defeating the orcs or looted from the already dead orcs", 1),
-                    null // No quests to give
-            );
-            npcs.put("offering_orc_1",orc_1);
+        NPC orc_1 = new NPC(
+                "Offering Borg Orc 1",
+                "offering_orc_1",
+                new Stats(40, 10, 10, 3), // Proposed stats
+                Arrays.asList("Who is there?!"),
+                false, // Only when given the right dialogue
+                new Item("Heart of the Bog", "Looted by defeating the orcs or looted from the already dead orcs", 1),
+                null // No quests to give
+        );
+        npcs.put("offering_orc_1", orc_1);
 
-            NPC orc_2 = new NPC(
-                    "Offering Borg Orc 2",
-                    "offering_orc_2",
-                    new Stats(40,10,10,3), // Proposed stats
-                    Arrays.asList(""),
-                    false, // Only when given the right dialogue
-                    null, // Only one orc holds item
-                    null // No quests to give
-            );
-            npcs.put("offering_orc_2",orc_2);
+        NPC orc_2 = new NPC(
+                "Offering Borg Orc 2",
+                "offering_orc_2",
+                new Stats(40, 10, 10, 3), // Proposed stats
+                Arrays.asList(""),
+                false, // Only when given the right dialogue
+                null, // Only one orc holds item
+                null // No quests to give
+        );
+        npcs.put("offering_orc_2", orc_2);
 
-        }
+    }
 
-    private void populateCreatures(){
-            theClearing.addCreature(npcs.get("glistening_flower"));
-            theLake.addCreature(npcs.get("siren"));
-            theTravellingMerchant.addCreature(npcs.get("merchant"));
-            theSwampPath.addCreature(npcs.get("dire_wolf"));
-            theWitchHut.addCreature(npcs.get("witch"));
-            theFreezingPass.addCreature(npcs.get("mountain_goat"));
-            theCave.addCreature(npcs.get("ice_dragon"));
-            theCrownOfTheWorld.addCreature(npcs.get("great_white_stag"));
-            theOfferingBog.addCreature(npcs.get("offering_orc_1"));
-            theOfferingBog.addCreature(npcs.get("offering_orc_2"));
-        }
+    private void populateCreatures() {
+        theClearing.addCreature(npcs.get("glistening_flower"));
+        theLake.addCreature(npcs.get("siren"));
+        theTravellingMerchant.addCreature(npcs.get("merchant"));
+        theSwampPath.addCreature(npcs.get("dire_wolf"));
+        theWitchHut.addCreature(npcs.get("witch"));
+        theFreezingPass.addCreature(npcs.get("mountain_goat"));
+        theCave.addCreature(npcs.get("ice_dragon"));
+        theCrownOfTheWorld.addCreature(npcs.get("great_white_stag"));
+        theOfferingBog.addCreature(npcs.get("offering_orc_1"));
+        theOfferingBog.addCreature(npcs.get("offering_orc_2"));
+    }
 
     // DIALOGUE OPTIONS
 
     // MERCHANT DIALOGUE
-    public List<String> getMerchantDialogue (Player player){
+    public List<String> getMerchantDialogue(Player player) {
         List<String> options = new ArrayList<>();
 
         NPC merchant = npcs.get("merchant");
@@ -497,7 +497,7 @@ public class Story {
         }
 
         // Check flags if player has killed the dire wolf
-        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")){
+        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")) {
             options.add("“I have brought back proof that I have removed the dire\n" +
                     "wolf from the path.");
             return options;
@@ -531,7 +531,7 @@ public class Story {
         return options;
     }
 
-    public String handleMerchantDialogue(int choice, Player player){
+    public String handleMerchantDialogue(int choice, Player player) {
         NPC merchant = npcs.get("merchant");
 
         // Check if quest is already completed
@@ -540,7 +540,7 @@ public class Story {
                 player.addFlag("merchant_quest_complete");
                 player.addFlag("received_cabin_key");
                 player.getInventory().removeItem("Head of the Dire Wolf");
-                player.getInventory().addItem(new Item("Cabin Key","Cabin Key received from Merchant",1));
+                player.getInventory().addItem(new Item("Cabin Key", "Cabin Key received from Merchant", 1));
                 return "Thank you stranger! Now I can finally move on. Here take these, as we discussed!";
             }
         }
@@ -560,19 +560,19 @@ public class Story {
 
         if (player.isHuman() && choice == 1) {
             player.addFlag("merchant_quest_given");
-            player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.",1));
+            player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
             return "Thank you. I shall be extremely careful, we have to look out for each other, don’t we?\n" +
                     "Well here take this to start with, for your kindness." + "\n*The old man hands you a red potion*";
 
-        // Choice to get the quest from the merchant
-        } else if (choice == 1 || (choice == 2 && !player.isHuman())){
+            // Choice to get the quest from the merchant
+        } else if (choice == 1 || (choice == 2 && !player.isHuman())) {
             player.addFlag("merchant_quest_given");
             return "Well, a trade then. You see a dire wolf blocks my path to visit a town in the swamplands to the east\n" +
                     "of here. If you kill it and bring back proof, you can get this here key I found near an old cabin in the\n" +
                     "forest.";
 
-        // Kill merchant choice
-        } else if ((choice == 2 && player.isHuman()) || choice == 3){
+            // Kill merchant choice
+        } else if ((choice == 2 && player.isHuman()) || choice == 3) {
             merchant.setDead(true);
             player.addFlag("killed_merchant");
             return "No... Please have mercy...";
@@ -585,13 +585,13 @@ public class Story {
     }
 
     // SIREN DIALOGUE
-    public List<String> getSirenDialogue(Player player){
+    public List<String> getSirenDialogue(Player player) {
         List<String> options = new ArrayList<>();
 
         NPC siren = npcs.get("siren");
 
         // Error handling - check if Siren is dead or not instantiated
-        if (siren == null || siren.isDead()){
+        if (siren == null || siren.isDead()) {
             return options;
         }
 
@@ -609,7 +609,7 @@ public class Story {
         return options;
     }
 
-    public String handleSirenDialogue(int choice, Player player){
+    public String handleSirenDialogue(int choice, Player player) {
         NPC siren = npcs.get("siren");
 
         // Special dialogue
@@ -617,12 +617,12 @@ public class Story {
             return "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
                     "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?";
 
-        // Dialogue options if not elf
+            // Dialogue options if not elf
         } else if ((player.isElf() && choice == 2) || (!player.isElf() && choice == 1)) {
             return "I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been\n" +
                     "taken. It must be returned to its nest in its tree.";
 
-        // Attack Siren
+            // Attack Siren
         } else if ((player.isElf() && choice == 3) || (!player.isElf() && choice == 2)) {
             siren.setDead(true);
             player.addFlag("killed_siren");
@@ -635,7 +635,7 @@ public class Story {
     }
 
     // WITCH DIALOGUE
-    public List<String> getWitchDialogue(Player player){
+    public List<String> getWitchDialogue(Player player) {
         List<String> options = new ArrayList<>();
 
         NPC witch = npcs.get("witch");
@@ -647,22 +647,22 @@ public class Story {
 
         // Check if the witch quest is complete
         if (player.getInventory().hasItem("Heart of the Flower") &&
-            player.getInventory().hasItem("Heart of the Siren") &&
-            player.getInventory().hasItem("Heart of the Bog")) {
+                player.getInventory().hasItem("Heart of the Siren") &&
+                player.getInventory().hasItem("Heart of the Bog")) {
             options.add("Here you go witch, I have your spell ingredients.");
             options.add("You have met your match. Prepare to die!");
             return options;
         }
 
         // Check if quest has been given before
-        if (player.hasFlag("witch_quest_given")){
+        if (player.hasFlag("witch_quest_given")) {
             options.add("I uh, do not have all three of the hearts. I will go now.");
             options.add("You have met your match. Prepare to die!");
             return options;
         }
 
         // First meeting
-        if(player.isMage()) { // Special interaction if player is a mage
+        if (player.isMage()) { // Special interaction if player is a mage
             options.add("What are you, a witch,\n" +
                     "a druid? Some sort of nature priestess?");
         }
@@ -676,21 +676,21 @@ public class Story {
         return options;
     }
 
-    public String handleWitchDialogue(int choice, Player player){
+    public String handleWitchDialogue(int choice, Player player) {
         NPC witch = npcs.get("witch");
 
         // If quest is complete
         if (player.getInventory().hasItem("Heart of the Flower") &&
                 player.getInventory().hasItem("Heart of the Siren") &&
-                player.getInventory().hasItem("Heart of the Bog")){
+                player.getInventory().hasItem("Heart of the Bog")) {
             if (choice == 1) {
                 player.addFlag("witch_barrier_open");
                 // TODO REMOVE QUEST ITEMS FROM INVENTORY
-                player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch",2));
+                player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch", 2));
                 return "I thank you, stranger. As promised." + "\nA key to my barrier, you may now pass, and take this with you as well.\n" +
                         "It is not every day I get visitors."
 
-            } else if (choice == 2){
+            } else if (choice == 2) {
                 witch.setHostile(true);
                 player.addFlag("killed_witch");
                 player.addFlag("witch_barrier_open"); // Does barrier also open when she's dead?
@@ -719,7 +719,7 @@ public class Story {
                     "to sell it to me, stupid oaf! No he likely now tries to return it to the stag atop the crown of the\n" +
                     "world, the very peak of the mountain, for some great mythical reward.";
 
-        // Kill witch
+            // Kill witch
         } else if ((player.isMage() && choice == 2) || (!player.isMage() && choice == 1)) {
             witch.setDead(true);
             player.addFlag("killed_witch");
@@ -754,7 +754,6 @@ public class Story {
         return options;
     }
 
-
     public String handleDragonDialogue(int choice, Player player) {
         NPC dragon = npcs.get("ice_dragon");
 
@@ -767,7 +766,7 @@ public class Story {
             // Bartering with the dragon
             player.addFlag("dragon_will_help");
             player.addFlag("dragon_barter");
-            for(Item i : player.getInventory().getItems()){ // Removes all items from inventory
+            for (Item i : player.getInventory().getItems()) { // Removes all items from inventory
                 player.getInventory().removeItem(i);
             }
             return "Oh, how humorous, yet I am not one to say no to such frivolous mortal behavior. " +
@@ -858,7 +857,7 @@ public class Story {
                         "You kill that of which is just taking their own interest at heart and that of nature. " +
                         "I have nothing to give you that you cannot try and mend yourself."; // Tear is not repaired
 
-            } else if(player.hasFlag("killed_witch") && player.hasFlag("killed_siren")) {
+            } else if (player.hasFlag("killed_witch") && player.hasFlag("killed_siren")) {
                 player.addFlag("bad_ending_death");
                 return "To take from nature and not return anything, take its guardians and deprive it of healing is just as\n" +
                         "the scorching sun did ages past. You have shown you are no different, and for that, you have\n" +
@@ -870,9 +869,7 @@ public class Story {
                         "everything in without embracing it. Greed rules your mind, bloodlust your heart and I have nothing\n" +
                         "to give you but death, even though that is merciful to you, I shall heal the world by removing your\n" +
                         "stain upon it."; // Bad ending with boss fight
-            }
-
-            else {
+            } else {
                 player.addFlag("good_ending");
                 return "*The great white stag gently bows its head down to you, despite all you have been through a little bit\n" +
                         "of fear run through your body yet its warm breath like a summers breeze warms your body. Its milky\n" +
@@ -930,11 +927,127 @@ public class Story {
         NPC orc2 = npcs.get("offering_orc_2");
         List<String> options = getOrcDialogue(player);
 
-        // TODO Implement all the dialogue choices for orcs
+        // Choice 1 option varies by player -
+        if (choice == 1) {
+            // If player is an orc warrior
+            if (player.isOrc() && player.isWarrior()) {
+                // Orc Warrior - trick them to save sister
+                player.addFlag("saved_sister");
+                player.addFlag("got_heart_of_bog");
+                orc1.setDead(true);
+                orc2.setDead(true);
 
+                String response = "*The orcs eye the girl again and grunt, one of them hits the other on the shoulder and they " +
+                        "laugh before throwing the girl onto the ground before waddling off to find a bigger better offering. " +
+                        "You run over to embrace your sister. Before you do anything more however, you go to a corpse from " +
+                        "the bog, to take its heart.*\n";
 
+                if (player.hasFlag("killed_merchant")) {
+                    response += "*You tell your sister of the horses the merchant had in the forest. So you send her on her way back to your village.*";
+                } else if (player.hasFlag("merchant_quest_complete")) {
+                    response += "*You tell your sister of the traveling merchant near the swamp path. He could take her to safety.*";
+                } else {
+                    response += "*You tell your sister to wait at the hunters cabin. You promise to stay alive.*";
+                }
+                return response;
 
+            } else if (player.isOrc()) {
+                // For a regular orc we let
+                player.addFlag("girl_died");
+                player.addFlag("got_heart_of_bog");
+                orc1.setDead(true);
+                orc2.setDead(true);
+                return "*The orcs look at you and shrug. They return to throwing the girl into the bog, and soon her " +
+                        "cries are muffled by the still water and mud that sucked her in. The orcs leave you to your own " +
+                        "business. You now have free access to fishing up a heart from one of the bog corpses.*";
+
+            } else if (player.isWarrior()) {
+                // Warrior - attempt to save the sister
+                orc1.setHostile(true);
+                orc2.setHostile(true);
+                player.addFlag("saving_sister");
+                player.addFlag("combat_orcs");
+                return "*You feel your blood rage through your body, like fire spreading like venom. That is your sister! " +
+                        "Before you even think, you are already charging to save her!*";
+
+            } else {
+                // For a non orc non warrior
+                player.addFlag("girl_died");
+                player.addFlag("got_heart_of_bog");
+                orc1.setDead(true);
+                orc2.setDead(true);
+                return "*The two orcs look around and wait for a while. But since you do not move, they do indeed just " +
+                        "think it was the wind or a small critter. They throw the girl into the bog, and slowly let her sink into " +
+                        "its muddy abyss. Then they leave, letting you go about finding a heart from a bog corpse in your own time.*";
+            }
+        }
+
+        // Account for special options
+        int adjustedChoice = choice;
+
+        // If player had a special first option, other choices shift down
+        if (player.isOrc() || player.isWarrior()) {
+            adjustedChoice = choice; // Keep as is, choice 1 was used
+        } else {
+            adjustedChoice = choice + 1; //  Choose
+        }
+
+        // Now handle remaining choices
+        if (!player.isWarrior() && choice == 2) {
+            // Hunker down (for non-warriors who aren't orcs)
+            player.addFlag("girl_died");
+            player.addFlag("got_heart_of_bog");
+            orc1.setDead(true);
+            orc2.setDead(true);
+            return "*The two orcs look around and wait for a while. But since you do not move, they do indeed just " +
+                    "think it was the wind or a small critter. They throw the girl into the bog.*";
+        }
+
+        // Determine charge option position
+        int chargePosition = player.isWarrior() || player.isOrc() ? 2 : 3;
+        if (choice == chargePosition) {
+            // Charge at orcs
+            orc1.setHostile(true);
+            orc2.setHostile(true);
+            player.addFlag("combat_orcs");
+            player.addFlag("saving_girl");
+            return "*You cannot let that stand! You rise and charge at the orcs!*";
+        }
+
+        // Determine mimic position
+        int mimicPosition = player.isWarrior() || player.isOrc() ? 3 : 4;
+        if (choice == mimicPosition) {
+            // Mimic animal
+            player.addFlag("girl_saved");
+            player.addFlag("got_heart_of_bog");
+            orc1.setDead(true);
+            orc2.setDead(true);
+
+            String response = "*Your screeching sounds and horrible mimics of a real animal is enough to convince the two " +
+                    "superstitious orcs that you are something even worse. They quickly abandon the girl on the ground " +
+                    "and run for it. You first go to collect a heart from one of the corpses from the bog.*\n";
+
+            if (player.hasFlag("killed_merchant")) {
+                response += "*You tell the girl of the horses the merchant had in the forest and send her on her way home.*";
+            } else if (player.hasFlag("merchant_quest_complete")) {
+                response += "*You tell the little girl to find the traveling merchant near the swamp path.*";
+            } else {
+                response += "*You tell the little girl to wait at the hunters cabin.*";
+            }
+            return response;
+        }
+
+        // Determine flee position (non-warriors only)
+        int fleePosition = player.isWarrior() || player.isOrc() ? 4 : 5;
+        if (!player.isWarrior() && choice == fleePosition) {
+            // Run
+            player.addFlag("abandoned_girl");
+            return "*You quietly crawl away back to the swamp path. You hear the girl's screams fade behind you.*";
+        }
+
+        return "*The orcs stare at you suspiciously...*";
     }
+
     // EPILOGUE
     public String getEpilogue(Player player){
         if (player.hasFlag("dragon_will_help")){
@@ -981,7 +1094,6 @@ public class Story {
         }
     }
 
-
 }
 
 
@@ -991,5 +1103,7 @@ public class Story {
 
 
 
-    }
+
+
+
 

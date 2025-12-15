@@ -51,20 +51,7 @@ public class Player extends Creature {
 
     }
 
-    @Override
-    public void interact() { //Interaction placeholder
-        //TODO
-    }
 
-    public void useItem(Item item) { //called when the player uses an item
-        //TODO
-    }
-    public void equipWeapon(Weapon weapon){ //Equip a weapon from the players inventory
-        //TODO
-    }
-    public void equipArmor(Armor armor){ //Equip armor from the players inventory
-        //TODO
-    }
     public void addQuest(Quest quest){ //add a quest the players quest log
         questLog.add(quest);
         ui.displayMsg("New quest acquired: " + quest.getQuestName());
@@ -110,7 +97,7 @@ public class Player extends Creature {
 
     // Method to receive / pickup an item
     public void pickUpItem(Item item){
-        Inventory.addItem(item);
+        inventory.addItem(item);
     }
 
     // Getter for inventory
