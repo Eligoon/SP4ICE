@@ -20,9 +20,9 @@ public class Inventory {
         this.maxCapacity = maxCapacity;
     }
 
-    public boolean addItem(Item item){
+    public static boolean addItem(Item item){
         if (items.size() >= maxCapacity){
-            ui.displayMsg("Inventory is full! Connot add: " + item.getName());
+            ui.displayMsg("Inventory is full! Cannot add: " + item.getName());
             return false;
         }
         items.add(item);
