@@ -605,13 +605,13 @@ public class Story {
         if (merchant == null || merchant.isDead() || selectedChoice == null) return;
 
         String text = selectedChoice.getDescription();
-        System.out.println("You: " + text);
+        ui.displayMsg("You: " + text);
 
         // Greeting & quest for humans
         if (text.startsWith("Old man, you should be careful") && player.isHuman()) {
             player.addFlag("merchant_quest_given");
             player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
-            System.out.println("Merchant: Thank you. I shall be extremely careful. " +
+            ui.displayMsg("Merchant: Thank you. I shall be extremely careful. " +
                     "Well here take this to start with, for your kindness.\n*The old man hands you a red potion." +
                     "A dire wolf blocks my path to visit a town " +
                     "in the swamplands to the east of here. If you kill it and bring back proof, " +
@@ -622,7 +622,7 @@ public class Story {
         // Quest offer for non-humans
         if (text.startsWith("I do not have much in the way of money") && !player.isHuman()) {
             player.addFlag("merchant_quest_given");
-            System.out.println("Merchant: Well, a trade then. You see a dire wolf blocks my path to visit a town " +
+            ui.displayMsg("Merchant: Well, a trade then. You see a dire wolf blocks my path to visit a town " +
                     "in the swamplands to the east of here. If you kill it and bring back proof, " +
                     "you can get this here key I found near an old cabin in the forest.");
             return;
@@ -638,7 +638,7 @@ public class Story {
             player.getInventory().removeItem("Head of the Dire Wolf");
             player.getInventory().addItem(new Item("Cabin Key", "Cabin Key received from Merchant", 1));
 
-            System.out.println("Merchant: Thank you stranger! Now I can finally move on. Here take these, as we discussed!");
+           ui.displayMsg("Merchant: Thank you stranger! Now I can finally move on. Here take these, as we discussed!");
             return;
         }
 
@@ -646,13 +646,13 @@ public class Story {
         if (text.startsWith("I will take your things")) {
             merchant.setDead(true);
             player.addFlag("killed_merchant");
-            System.out.println("Merchant: No... please have mercy...");
+            ui.displayMsg("Merchant: No... please have mercy...");
             return;
         }
 
         // Leave
         if (text.startsWith("Be on your way")) {
-            System.out.println("Merchant: Safe travels, stranger!");
+            ui.displayMsg("Merchant: Safe travels, stranger!");
         }
     }
 
@@ -710,22 +710,22 @@ public class Story {
         String text = selectedChoice.getDescription();
 
         // Display the chosen dialogue
-        System.out.println("You: " + text);
+        ui.displayMsg("You: " + text);
 
         switch (text) {
             case "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
                          "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?":
-                System.out.println("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
+                ui.displayMsg("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
                 break;
 
             case "Do you know what has happened to the world balance?":
-                System.out.println("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
+                ui.displayMsg("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
                 break;
 
             case "I have no choice but to slay you!":
                 // Make Siren hostile
                 siren.setHostile(true);
-                System.out.println("The Siren becomes hostile!");
+                ui.displayMsg("The Siren becomes hostile!");
 
                 // Start combat via GameController
                 gc.handleCombat(siren);
@@ -734,14 +734,14 @@ public class Story {
                 if (siren.isDead()) {
                     player.addFlag("killed_siren");
                     player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
-                    System.out.println("You have slain the Siren and obtained her Heart!");
+                    ui.displayMsg("You have slain the Siren and obtained her Heart!");
                 } else {
-                    System.out.println("You were defeated.");
+                    ui.displayMsg("You were defeated.");
                 }
                 break;
 
             case "I was just passing by":
-                System.out.println("Siren: Farewell.");
+                ui.displayMsg("Siren: Farewell.");
                 break;
         }
     }
@@ -803,7 +803,7 @@ public class Story {
         String text = selectedChoice.getDescription();
 
         // Display player's choice
-        System.out.println("You: " + text);
+        ui.displayMsg("You: " + text);
 
         switch (text) {
             // Quest completed - hand in items
@@ -811,14 +811,14 @@ public class Story {
                 player.addFlag("witch_barrier_open");
                 // TODO: remove quest items from inventory
                 player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch", 2));
-                System.out.println("Witch: I thank you, stranger. As promised. A key to my barrier, you may now pass, and take this with you as well.");
+                ui.displayMsg("Witch: I thank you, stranger. As promised. A key to my barrier, you may now pass, and take this with you as well.");
                 break;
 
             // Attack / combat choice
             case "You have met your match. Prepare to die!":
                 // Make Witch hostile
                 witch.setHostile(true);
-                System.out.println("Witch: So be it! Prepare yourself!");
+                ui.displayMsg("Witch: So be it! Prepare yourself!");
 
                 // Start combat via GameController
                 gc.handleCombat(witch);
@@ -827,30 +827,30 @@ public class Story {
                 if (witch.isDead()) {
                     player.addFlag("killed_witch");
                 } else {
-                    System.out.println("You were defeated.");
+                    ui.displayMsg("You were defeated.");
                 }
                 break;
 
             // Quest given but not completed
             case "I uh, do not have all three of the hearts. I will go now.":
-                System.out.println("Witch: Well get to it then! I may be an elf, but my time is still precious!");
+                ui.displayMsg("Witch: Well get to it then! I may be an elf, but my time is still precious!");
                 break;
 
             // First meeting - mage
             case "What are you, a witch,\na druid? Some sort of nature priestess?":
                 player.addFlag("witch_quest_given");
-                System.out.println("Witch: Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I do not eat children! But yes, I know what has upset the balance...");
+                ui.displayMsg("Witch: Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I do not eat children! But yes, I know what has upset the balance...");
                 break;
 
             // Generic greeting for non-mages
             case "I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?":
                 player.addFlag("witch_quest_given");
-                System.out.println("Witch: Hmph, curious mortal… you seek what disrupts the balance? Listen well...");
+                ui.displayMsg("Witch: Hmph, curious mortal… you seek what disrupts the balance? Listen well...");
                 break;
 
             // Leaving
             case "Ah… wrong way. Sorry for intruding":
-                System.out.println("Witch: Leaving so soon?");
+                ui.displayMsg("Witch: Leaving so soon?");
                 break;
         }
     }
