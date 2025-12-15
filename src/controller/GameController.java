@@ -199,18 +199,16 @@ public class GameController {
         // Prompt the player to choose a dialogue
         Choice selected = ui.promptChoiceOb(dialogueOptions, "Choose your dialogue:");
 
-        // Find index of selected choice
-        int choiceIndex = dialogueOptions.indexOf(selected);
-
-        // Handle the chosen dialogue
-        emeraldTear.handleDialogue(npc, player, choiceIndex);
+        // Handle the chosen dialogue directly
+        emeraldTear.handleDialogue(npc, player, selected);
 
         // Trigger combat if NPC is hostile
         if (npc.isHostile() && !npc.isDead()) {
             ui.displayMsg(npc.getName() + " attacks!");
-            handleCombat(npc); // call your combat handler
+            handleCombat(npc);
         }
     }
+
 
 
 
@@ -259,5 +257,13 @@ public class GameController {
 
     public List<Choice> getLocationChoices() {
         return currentLocation.getAvailableChoices();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public TextUI getUi() {
+        return ui;
     }
 }
