@@ -20,6 +20,7 @@ import collectibles.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameController {
     // --- Fields / Attributes ---
@@ -75,6 +76,32 @@ public class GameController {
         // Initialize new game
         initializeGame();
     }
+
+    private void loadGame() {
+        // 1. Load the last saved location
+        String savedLocationName = db.loadGameState();
+
+        // 2. Load all story locations
+        emeraldTear.loadStory();
+        Map<String, Location> allLocations = emeraldTear.getLocationsMap();
+
+        // 3. Load player
+        player = db.loadPlayer();
+
+        // 4. Set current location
+        currentLocation = db.loadLocation(savedLocationName, allLocations);
+
+        // 5. Load inventory
+        db.loadInventory(player);
+
+        // 6. Load NPC states
+        db.loadNPCs(allLocations, savedLocationName);
+
+        ui.displayMsg("Game loaded successfully!");
+        ui.displayMsg("You are at: " + currentLocation.getLocationName());
+        ui.displayMsg(currentLocation.getDescription());
+    }
+
 
 
     public void createPlayer() {
