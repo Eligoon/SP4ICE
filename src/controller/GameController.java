@@ -15,6 +15,7 @@ import world.Objects;
 import world.Story;
 import collectibles.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameController {
@@ -184,17 +185,28 @@ public class GameController {
 
 
     public void handleNPCInteraction(Creature creature) {
-        if (!(creature instanceof NPC npc)) return;
+        if (!(creature instanceof NPC)) return;
 
-        List<Choice> dialogueChoices = emeraldTear.getDialogueChoices(npc, player);
-        if (dialogueChoices.isEmpty()) return;
+        NPC npc = (NPC) creature;
+        if (npc.isDead()) {
+            ui.displayMsg(npc.getName() + " is no longer here.");
+            return;
+        }
 
-        Choice chosen = ui.promptChoiceOb(dialogueChoices, "Choose what to say:");
-        int choiceIndex = dialogueChoices.indexOf(chosen) + 1; // 1-based index for Story
+        List<String> dialogueOptions = emeraldTear.getDialogue(npc, player);
 
-        String response = emeraldTear.handleDialogue(npc, choiceIndex, player);
-        if (!response.isEmpty()) ui.displayMsg(response);
+        if (dialogueOptions.isEmpty()) {
+            ui.displayMsg(npc.getName() + " has nothing to say.");
+            return;
+        }
+
+        // Prompt the player to choose a dialogue
+        int choice = Integer.parseInt(ui.promptChoice(new ArrayList<>(dialogueOptions), 1, "Choose your dialogue:").get(0));
+
+        // Handle effects of chosen dialogue
+        emeraldTear.handleDialogue(npc, player, choice - 1); // convert to 0-based index
     }
+
 
 
     public void handleUseItem(Item item) {
