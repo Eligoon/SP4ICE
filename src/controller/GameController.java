@@ -47,6 +47,36 @@ public class GameController {
         }
     }
 
+    public void handleGameStart() {
+        boolean hasSave = db.checkForSave();
+
+        if (hasSave) {
+            ui.displayMsg("A saved game was found.");
+            ui.displayMsg("Do you want to load the saved game or start a new game?");
+            ui.displayMsg("1. Load saved game");
+            ui.displayMsg("2. Start a new game (overwrite old save)");
+
+            int option = -1;
+            while (option != 1 && option != 2) {
+                option = ui.promptNumeric("Enter choice number:");
+            }
+
+            if (option == 1) {
+                loadGame();  // load existing save
+                return;
+            } else {
+                ui.displayMsg("Starting a new game...");
+                db.deleteSave();  // clear old save
+            }
+        } else {
+            ui.displayMsg("No saved game found. Starting a new game...");
+        }
+
+        // Initialize new game
+        initializeGame();
+    }
+
+
     public void createPlayer() {
         // --- Player Name ---
         String name = ui.promptText("Enter your character's name:");
@@ -110,6 +140,7 @@ public class GameController {
 
         // 5. Set starting location
         currentLocation = emeraldTear.getLocation("The Clearing");
+        ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
     }
 
 
