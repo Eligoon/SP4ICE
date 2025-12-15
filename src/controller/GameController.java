@@ -236,57 +236,100 @@ public class GameController {
 
     // --- Movement logic ---
     public void move(String direction) {
-        // Look up if there is a connected location in the given direction
+        // 1. Look up if there is a connected location in the given direction
         Location newLocation = currentLocation.getConnectedLocation(direction);
 
-        // If the direction does not lead anywhere, block movement
+        // 2. If the direction does not lead anywhere, block movement
         if (newLocation == null) {
             ui.displayMsg("You can't go that way.");
-            return; // Stop the method
+            return;
         }
 
-        // Ask player if they want to save, quit, save+quit, or continue before moving
+        // 3. Ask player if they want to save, quit, save+quit, or continue
         int choice = ui.promptNumeric(
-                "Do you want to save the game, quit, save and quit, or continue? Type a number \n 1. (save) \n 2. (quit) \n 3. (save & quit) \n 4. (continue)");
+                "Do you want to save the game, quit, save and quit, or continue? Type a number \n" +
+                        "1. (save) \n2. (quit) \n3. (save & quit) \n4. (continue)"
+        );
 
         switch (choice) {
-            case 1:
+            case 1 -> {
                 saveGame();
                 ui.displayMsg("Game saved!");
-                break;
-
-            case 2:
+            }
+            case 2 -> {
                 ui.displayMsg("Quitting game...");
                 saveGame();
                 System.exit(0);
-                break;
-
-            case 3:
+            }
+            case 3 -> {
                 saveGame();
                 ui.displayMsg("Game saved and quitting...");
                 System.exit(0);
-                break;
-
-            case 4:
-            default:
-                // proceed to move
-                break;
+            }
+            case 4, default -> { /* continue to move */ }
         }
 
-        // Update the current location to the new valid location
+        // 4. Update the current location
         currentLocation = newLocation;
 
-        // Feedback to the player
+        // 5. Feedback to the player
         ui.displayMsg("You move " + direction + "...");
         ui.displayMsg("You are now at: " + currentLocation.getLocationName());
         ui.displayMsg(currentLocation.getDescription());
 
-        // Check for traps
+        // 6. Check for traps
         Objects worldObjects = new Objects();
         worldObjects.checkForTraps(currentLocation, player, emeraldTear);
 
-        // Display available choices after movement
-        displayAvailableChoices();
+        // 7. Display choices based on whether there are NPCs
+        List<NPC> npcs = currentLocation.getCreature();
+        if (!npcs.isEmpty()) {
+            // If NPCs exist, show NPC interaction choices first
+            for (NPC npc : npcs) {
+                displayAvailableChoices(npc);
+            }
+        } else {
+            // No NPCs, show normal location-based choices
+            displayAvailableChoices(null);
+        }
+    }
+
+
+     // Displays available choices at the current location.
+     // If npc is provided, shows NPC interaction choices instead of location choices.
+    public void displayAvailableChoices(NPC npc) {
+        if (currentLocation == null || player == null) return;
+
+        List<Choice> allChoices;
+
+        if (npc != null) {
+            // 1. Get dialogue/interaction choices for this NPC
+            allChoices = emeraldTear.getDialogueChoices(npc, player);
+        } else {
+            // 2. Get normal location choices
+            allChoices = currentLocation.getAvailableChoices();
+        }
+
+        // 3. Filter choices based on player state
+        List<Choice> availableChoices = ui.getAvailableChoices(allChoices, player);
+
+        // 4. Check if any actions are available
+        if (availableChoices.isEmpty()) {
+            ui.displayMsg("There are no actions available here.");
+            return;
+        }
+
+        // 5. Display the available choices
+        ui.displayMsg("What would you like to do?");
+        ui.displayChoices(availableChoices);
+
+        // 6. Prompt player to choose one
+        Choice selected = ui.promptChoiceOb(availableChoices, "Choose your action:");
+
+        // 7. Execute the chosen action
+        if (selected != null) {
+            selected.execute(this);
+        }
     }
 
 
