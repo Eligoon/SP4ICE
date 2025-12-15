@@ -2,6 +2,8 @@ package world;
 
 import collectibles.Item;
 import controller.Choices.Choice;
+import controller.Choices.RaceRequirement;
+import controller.GameController;
 import creatures.NPC;
 import creatures.Player;
 import creatures.attributes.Stats;
@@ -14,6 +16,7 @@ public class Story {
     TextUI ui = new TextUI();
     // Make map for connecting locations
     private Map<String, Location> locations;
+    GameController gc = new GameController();
 
     // Make each Location accessable individually
     private Location theClearing;
@@ -489,61 +492,37 @@ public class Story {
     // DIALOGUE OPTIONS
 
     // Generic getter for dialogue choice to go to game controller
-    public List<Choice> getDialogueChoices(NPC npc, Player player) {
-        List<Choice> options = new ArrayList<>();
-        if (npc == null || npc.isDead()) return options;
+    public List<String> getDialogue(NPC npc, Player player) {
+        List<String> options = new ArrayList<>();
 
-        List<String> dialogueLines = getNPCDialogue(npc, player);
-
-        for (String line : dialogueLines) {
-            options.add(Choice.interactChoice(line, npc));
+        if (npc == null || npc.isDead()) {
+            return options;
         }
 
-        return options;
-    }
-
-    // Generic method to provide dialogue lines
-    private List<String> getNPCDialogue(NPC npc, Player player) {
-        List<String> lines = new ArrayList<>();
-
-        switch (npc.getName().toLowerCase()) {
+        switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                // Elf special line
-                if (player.isElf()) {
-                    lines.add("Kin of the water, I see your beauty... Do you know what has happened?");
-                }
-                lines.add("Do you know what has happened to the world balance?");
-                lines.add("I have no choice but to slay you!");
-                lines.add("I was just passing by");
+                return getSirenDialogue(player); // reuse your existing method
                 break;
-
-            // Add more NPCs here
-            // case "merchant":
-            //     lines.add("Welcome to my shop!");
-            //     break;
-
             default:
-                lines.add("Hello, traveler.");
-                break;
+                // Generic dialogue fallback
+                options.add("Hello " + player.getName() + "!");
+                return options;
         }
-
-        return lines;
     }
+
 
 
     // Generic handler for dialogue choice to go to game controller
-    public String handleDialogue(NPC npc, int choiceIndex, Player player) {
-        if (npc == null || npc.isDead()) return "";
+    public void handleDialogue(NPC npc, Player player, int choiceIndex) {
+        if (npc == null || npc.isDead()) return;
 
-        String npcName = npc.getName().toLowerCase();
-
-        switch (npcName) {
+        switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                return handleSirenDialogue(choiceIndex, player, npc);
-
-            // Add more NPCs here
+                handleSirenDialogue(choiceIndex + 1, player); // +1 because Story method expects 1-based choice
+                break;
             default:
-                return "The NPC has nothing to say.";
+                npc.speak("I have nothing special to say.");
+                break;
         }
     }
 
@@ -647,54 +626,96 @@ public class Story {
     }
 
     // SIREN DIALOGUE
-    public List<String> getSirenDialogue(Player player){
-        List<String> options = new ArrayList<>();
-
+    public List<Choice> getSirenDialogueChoices(Player player) {
+        List<Choice> choices = new ArrayList<>();
         NPC siren = npcs.get("siren");
 
-        // Error handling - check if Siren is dead or not instantiated
-        if (siren == null || siren.isDead()){
-            return options;
+        if (siren == null || siren.isDead()) {
+            return choices;
         }
 
-        // Check special interaction with elf
-        if (player.isElf()) {
-            options.add("Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
-                    "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?");
-        }
+        // Special elf dialogue
+        Choice elfLine = Choice.interactChoice(
+                "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
+                        "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?",
+                siren
+        );
+        elfLine.addRequirement(new RaceRequirement("Elf"));
+        choices.add(elfLine);
 
-        // Add remaining options
-        options.add("Do you know what has happened to the world balance?");
-        options.add("I have no choice but to slay you!");
-        options.add("I was just passing by");
-
-        return options;
-    }
-
-    public String handleSirenDialogue(int choice, Player player){
-        NPC siren = npcs.get("siren");
-
-        // Special dialogue
-        if (player.isElf() && choice == 1) {
-            return "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
-                    "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?";
-
-        // Dialogue options if not elf
-        } else if ((player.isElf() && choice == 2) || (!player.isElf() && choice == 1)) {
-            return "I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been\n" +
-                    "taken. It must be returned to its nest in its tree.";
+        // General dialogue option
+        Choice generalLine = Choice.interactChoice(
+                "Do you know what has happened to the world balance?",
+                siren
+        );
+        // Only available if player is not Elf or has chosen a different option
+        choices.add(generalLine);
 
         // Attack Siren
-        } else if ((player.isElf() && choice == 3) || (!player.isElf() && choice == 2)) {
-            siren.setDead(true);
-            player.addFlag("killed_siren");
-            player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
-            return "";
+        Choice attackLine = Choice.interactChoice(
+                "I have no choice but to slay you!",
+                siren
+        );
+        choices.add(attackLine);
 
-        } else {
-            return "Farewell";
+        // Leave dialogue
+        Choice leaveLine = Choice.interactChoice(
+                "I was just passing by",
+                siren
+        );
+        choices.add(leaveLine);
+
+        return choices;
+    }
+
+
+    public void handleSirenDialogue(Player player, int choiceIndex) {
+        NPC siren = npcs.get("siren");
+        if (siren == null || siren.isDead()) return;
+
+        List<Choice> choices = getSirenDialogueChoices(player);
+        if (choiceIndex < 0 || choiceIndex >= choices.size()) return;
+
+        Choice selected = choices.get(choiceIndex);
+        String text = selected.getDescription();
+
+        // Display the chosen dialogue
+        System.out.println("You: " + text);
+
+        switch (text) {
+            case "Kin of the water, I see your beauty, my heart your song. Could you guide me on my way? I\n" +
+                         "fear the unbalance will spread, and I wish to stop it. Do you know what has happened?":
+                System.out.println("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
+                break;
+
+            case "Do you know what has happened to the world balance?":
+                System.out.println("Siren: I know you not, stranger. But the world is unsettled by a theft so cruel. One of the tears has been taken. It must be returned to its nest in its tree.");
+                break;
+
+            case "I have no choice but to slay you!":
+                // Make Siren hostile
+                siren.setHostile(true);
+                System.out.println("The Siren becomes hostile!");
+
+                // Start combat via GameController
+                gc.handleCombat(siren);
+
+                // If player won, give the heart
+                if (siren.isDead()) {
+                    player.addFlag("killed_siren");
+                    player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
+                    System.out.println("You have slain the Siren and obtained her Heart!");
+                } else {
+                    System.out.println("You fled from the Siren or were defeated.");
+                }
+                break;
+
+            case "I was just passing by":
+                System.out.println("Siren: Farewell.");
+                break;
         }
     }
+
 
     // WITCH DIALOGUE
     public List<String> getWitchDialogue(Player player){
