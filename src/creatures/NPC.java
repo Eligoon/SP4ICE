@@ -6,7 +6,7 @@ import creatures.attributes.Stats;
 import util.TextUI;
 import java.util.List;
 import java.util.function.Predicate;
-
+import creatures.attributes.AttackStat;
 
 public class NPC extends Creature {
     private String NPC_ID;             // NPC Identifer s.t unique interactions can happen
@@ -15,7 +15,8 @@ public class NPC extends Creature {
     private Item itemHeld;             // Item the NPC is holding
     private boolean isHostile;         // Determines if NPC will attack player
     private boolean isDead;            // Tracks if NPC is dead
-    private String originalLocation;   // Original location for NPC, needed for despawn if needed
+    private AttackStat attackStat;     // Enum stats to help for NPC combat
+    private String originalLocation;   // Original location for NPC, needed for despawn
 
     private boolean despawnsWhenLeaving = false; // For a specific NPC type at a specific location
 
@@ -31,17 +32,35 @@ public class NPC extends Creature {
         this.itemHeld = itemHeld;
         this.questToGive = questToGive;
         this.isDead = false;
+        this.attackStat = AttackStat.STRENGTH; // Defaulting to strength
+
+    }
+
+    private int getAttackStatValue() {
+        switch (attackStat) {
+            case DEXTERITY:
+                return stats.getDexterity();
+            case INTELLIGENCE:
+                return stats.getIntelligence();
+            case STRENGTH:
+            default:
+                return stats.getStrength();
+        }
     }
 
     // --- NPC AI combat for hostile NPCs ---
     public void CPU_Attack(Player player) {
         if (isHostile && !isDead) {
-            int damage = stats.getStrength(); // NPC attacks using its strength
-            ui.displayMsg(getName() + " attacks " + player.getName() + " for " + damage + " damage!");
+            int damage = getAttackStatValue();
+
+            ui.displayMsg(getName() + " attacks " + player.getName()
+                    + " for " + damage + " damage!");
+
             player.takeDamage(damage);
 
             if (player.getCurrentHP() <= 0) {
-                ui.displayMsg(player.getName() + " has been defeated by " + getName() + "!");
+                ui.displayMsg(player.getName()
+                        + " has been defeated by " + getName() + "!");
             }
         }
     }
@@ -92,6 +111,10 @@ public class NPC extends Creature {
 
     public void setDead(boolean dead) {
         isDead = dead;
+    }
+
+    public void setAttackStat(AttackStat attackStat) {
+        this.attackStat = attackStat;
     }
 
     public String getOriginalLocation() {
