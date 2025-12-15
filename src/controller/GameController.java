@@ -123,7 +123,7 @@ public class GameController {
         boolean playerTurn = true;
 
         // Combat continues until either the player or the enemy is dead
-        while (!enemy.isDead() && !player.isDead()) {
+        while (!enemy.getIsDead() && !player.getIsDead()) {
             if (playerTurn) {
                 ui.displayCombatStatus(player, enemy);
 
@@ -208,15 +208,4 @@ public class GameController {
     public List<Choice> getLocationChoices() {
         return currentLocation.getAvailableChoices();
     }
-
-    /* Example of how choice could be processed not full logic
-    List<Choice> available = textUI.getAvailableChoices(allChoices, player);
-
-    Choice picked = textUI.promptChoice(available, "What do you want to do?");
-
-    picked.execute(this);   // <- triggers MOVE, COMBAT, etc.
-
-    // Mark it as taken so it turns gray next time
-    picked.setTaken(true);
-     */
 }
