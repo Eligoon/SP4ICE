@@ -24,6 +24,8 @@ public class GameController {
     TextUI ui = new TextUI();
     //Story object containing all locations and text for them
     Story emeraldTear = new Story();
+    // Player object (this is you!)
+    private Player player;
 
     //--- Database handling --- used for save/load
     private static DataSaving db = new DataSaving();
@@ -56,7 +58,7 @@ public class GameController {
 
     // Method to show class specific intros
     private void displayClassSpecificIntro(){
-        if(player.isWarror()){
+        if(player.isWarrior()){
             ui.displayMsg("Since the times of renewal, when life became more than suffering, your family line has protected a small\n" +
                     "village near the forests that guards the mountain and the eight great trees. The villagers know the\n" +
                     "importance of the surrounding lands, and their dangers, respecting both.\n" +
@@ -182,8 +184,8 @@ public class GameController {
     }
 
     public void handleUseItem(Item item) {
-        ui.displayMsg("You use this item: " + Health.getItemName);
-        // Using health item logic
+        ui.displayMsg("You use this item: " + item.getItemName());
+        // Using item logic
     }
 
     public void handleEquipArmour(Item armour) {
