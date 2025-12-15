@@ -1,5 +1,7 @@
 package collectibles;
 
+import creatures.Player;
+
 public abstract class Item {
 
 protected String itemName;
@@ -10,6 +12,11 @@ protected int weight;
         this.itemName = itemName;
         this.description = description;
         this.weight = weight;
+    }
+    public abstract void use(Player player);
+
+    public boolean isConsumable() {
+        return false;
     }
 
     // Clone constructor
