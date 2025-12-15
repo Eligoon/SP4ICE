@@ -5,8 +5,10 @@ public class Main {
         // Create the game controller
         GameController gc = new GameController();
 
+        // Asks if you want to load or make a new game if new game -->
         // Initialize the game (welcome message, story, player, starting location)
-        gc.initializeGame();
+        // If you chose to load t will load the previous game from the database
+        gc.handleGameStart();
 
         // Start the main game loop
         gc.startGameLoop();
