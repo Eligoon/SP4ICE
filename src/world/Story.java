@@ -516,14 +516,8 @@ public class Story {
     }
 
     // Generic handler for dialogue choice to go to game controller
-    public void handleDialogue(NPC npc, Player player, int choiceIndex) {
-        if (npc == null || npc.isDead()) return;
-
-        // Get dialogue choices for this NPC
-        List<Choice> choices = getDialogueChoices(npc, player);
-        if (choices.isEmpty() || choiceIndex < 0 || choiceIndex >= choices.size()) return;
-
-        Choice selectedChoice = choices.get(choiceIndex);
+    public void handleDialogue(NPC npc, Player player, Choice selectedChoice) {
+        if (npc == null || npc.isDead() || selectedChoice == null) return;
 
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
