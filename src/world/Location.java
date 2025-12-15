@@ -54,6 +54,15 @@ public class Location {
         creatures.add(creature);
     }
 
+    // Getter for creature
+    public List<Creature> getCreature(Location location) {
+        return creatures;
+    }
+
+    public void removeCreature(Creature creature){
+        creatures.remove(creature);
+    }
+
     // Add item to location
     public void addItem(Item item){
         items.add(item);
