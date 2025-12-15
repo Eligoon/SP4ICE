@@ -749,7 +749,7 @@ public class Story {
 
 
     // WITCH DIALOGUE
-    public List<Choice> getWitchDialogueChoices(Player player, Choice selectedChoice) {
+    public List<Choice> getWitchDialogueChoices(Player player) {
         List<Choice> options = new ArrayList<>();
         NPC witch = npcs.get("witch");
 
@@ -1106,8 +1106,6 @@ public class Story {
             return "";
         }
     }
-
-
 }
 
 
@@ -1117,5 +1115,4 @@ public class Story {
 
 
 
-    }
 
