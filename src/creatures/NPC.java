@@ -37,16 +37,32 @@ public class NPC extends Creature {
     }
 
     private int getAttackStatValue() {
+        int str = stats.getStrength();
+        int dex = stats.getDexterity();
+        int intel = stats.getIntelligence();
+
         switch (attackStat) {
+            case STRDEX:
+                return str + dex;
+
+            case INTSTR:
+                return intel + str;
+
+            case DEXINT:
+                return dex + intel;
+
             case DEXTERITY:
-                return stats.getDexterity();
+                return dex;
+
             case INTELLIGENCE:
-                return stats.getIntelligence();
+                return intel;
+
             case STRENGTH:
             default:
-                return stats.getStrength();
+                return str;
         }
     }
+
 
     // --- NPC AI combat for hostile NPCs ---
     public void CPU_Attack(Player player) {
