@@ -499,10 +499,13 @@ public class Story {
 
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                return getSirenDialogueChoices(player); // reuse existing method
+                return getSirenDialogueChoices(player);
 
             case "merchant":
-                return getMerchantDialogueChoices(player); // reuse existing method
+                return getMerchantDialogueChoices(player);
+
+            case "witch":
+                return getWitchDialogueChoices(player);
 
             default:
                 // Generic dialogue fallback
@@ -511,7 +514,6 @@ public class Story {
                 return options;
         }
     }
-
 
     // Generic handler for dialogue choice to go to game controller
     public void handleDialogue(NPC npc, Player player, int choiceIndex) {
@@ -527,14 +529,21 @@ public class Story {
             case "siren":
                 handleSirenDialogue(player, selectedChoice);
                 break;
+
             case "merchant":
                 handleMerchantDialogue(player, selectedChoice);
                 break;
+
+            case "witch":
+                handleWitchDialogue(player, selectedChoice);
+                break;
+
             default:
                 npc.speak("I have nothing special to say.");
                 break;
         }
     }
+
 
 
 
@@ -700,15 +709,11 @@ public class Story {
     }
 
 
-    public void handleSirenDialogue(Player player, int choiceIndex) {
+    public void handleSirenDialogue(Player player, Choice selectedChoice) {
         NPC siren = npcs.get("siren");
         if (siren == null || siren.isDead()) return;
 
-        List<Choice> choices = getSirenDialogueChoices(player);
-        if (choiceIndex < 0 || choiceIndex >= choices.size()) return;
-
-        Choice selected = choices.get(choiceIndex);
-        String text = selected.getDescription();
+        String text = selectedChoice.getDescription();
 
         // Display the chosen dialogue
         System.out.println("You: " + text);
@@ -748,8 +753,9 @@ public class Story {
     }
 
 
+
     // WITCH DIALOGUE
-    public List<Choice> getWitchDialogueChoices(Player player) {
+    public List<Choice> getWitchDialogueChoices(Player player, Choice selectedChoice) {
         List<Choice> options = new ArrayList<>();
         NPC witch = npcs.get("witch");
 
@@ -796,15 +802,11 @@ public class Story {
     }
 
 
-    public void handleWitchDialogue(Player player, int choiceIndex) {
+    public void handleWitchDialogue(Player player, Choice selectedChoice) {
         NPC witch = npcs.get("witch");
         if (witch == null || witch.isDead()) return;
 
-        List<Choice> choices = getWitchDialogueChoices(player);
-        if (choiceIndex < 0 || choiceIndex >= choices.size()) return;
-
-        Choice selected = choices.get(choiceIndex);
-        String text = selected.getDescription();
+        String text = selectedChoice.getDescription();
 
         // Display player's choice
         System.out.println("You: " + text);
@@ -821,7 +823,7 @@ public class Story {
             // Attack / combat choice
             case "You have met your match. Prepare to die!":
                 // Make Witch hostile
-                witch.setHostile(true); // turn hostile
+                witch.setHostile(true);
                 System.out.println("Witch: So be it! Prepare yourself!");
 
                 // Start combat via GameController
