@@ -145,11 +145,16 @@ public class GameController {
                         ui.displayMsg(enemy.getName() + " has been defeated!");
                         break; // exit combat loop
                     }
-                } else {
-                    Inventory.useItem(player);
-                    ui.displayMsg("You used an item!");
+                } else if (choice == 2) {
+                    List<Item> usableItems = player.getInventory().getUsableItems();
+                    if (usableItems.isEmpty()) {
+                        ui.displayMsg("No usable items in your inventory!");
+                    } else {
+                        // Let player choose which item to use
+                        Item itemToUse = ui.promptChoiceOb(usableItems, "Choose an item to use:");
+                        handleUseItem(itemToUse);
+                    }
                 }
-
             } else {
                 // Enemy turn
                 if (enemy instanceof NPC) {
@@ -185,19 +190,39 @@ public class GameController {
     }
 
     public void handleUseItem(Item item) {
-        ui.displayMsg("You use this item: " + item.getItemName());
-        // Using item logic
+        if (item == null) {
+            ui.displayMsg("No item selected.");
+            return;
+        }
+
+        ui.displayMsg("You use the item: " + item.getItemName());
+        item.use(player); // Calls the item’s use() logic
+        player.getInventory().removeItem(item); // Remove from inventory if consumable
     }
 
-    public void handleEquipArmour(Item armour) {
-        ui.displayMsg("You equip this piece of armor: " + Armor.getItemName);
-        // Equipping armor logic
+
+    public void handleEquipArmour(Item armourItem) {
+        if (!(armourItem instanceof Armor)) {
+            ui.displayMsg("This item is not armor and cannot be equipped.");
+            return;
+        }
+
+        Armor armor = (Armor) armourItem;
+        player.getInventory().equipArmor(armor);
+        ui.displayMsg("You equipped: " + armor.getItemName());
     }
 
-    public void handleEquipWeapon(Item weapon) {
-        ui.displayMsg("You equip this weapon: " + Weapon.getItemName);
-        // Equipping weapon logic
+    public void handleEquipWeapon(Item weaponItem) {
+        if (!(weaponItem instanceof Weapon)) {
+            ui.displayMsg("This item is not a weapon and cannot be equipped.");
+            return;
+        }
+
+        Weapon weapon = (Weapon) weaponItem;
+        player.getInventory().equipWeapon(weapon);
+        ui.displayMsg("You equipped: " + weapon.getItemName());
     }
+
 
 
     //--- Getters ---
