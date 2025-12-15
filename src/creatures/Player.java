@@ -65,7 +65,7 @@ public class Player extends Creature {
         int baseDamage = 0;
 
         // Damage scales with class + equipped weapon
-        switch (characterClass.toLowerCase()) {
+        switch (characterClass.getCharacterClassName().toLowerCase()) {
             case "warrior":
                 baseDamage = stats.getStrength();
                 break;
