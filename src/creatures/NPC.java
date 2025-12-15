@@ -5,7 +5,6 @@ import collectibles.Quest;
 import creatures.attributes.Stats;
 import util.TextUI;
 import java.util.List;
-import java.util.function.Predicate;
 import creatures.attributes.AttackStat;
 
 public class NPC extends Creature {
@@ -97,7 +96,7 @@ public class NPC extends Creature {
 
     // Give quest to player
     public void giveQuest(Player player) {
-        if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
+        if (questToGive != null && !player.addQuest(questToGive.getQuestId())) {
             player.addQuest(questToGive);
             ui.displayMsg(name + " gives you a quest: " + questToGive.getQuestName());
         }
@@ -122,7 +121,7 @@ public class NPC extends Creature {
     }
 
     public boolean isDead() {
-        return isDead;
+        return getCurrentHP() <= 0;
     }
 
     public void setDead(boolean dead) {

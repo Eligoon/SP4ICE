@@ -60,16 +60,6 @@ public class Player extends Creature {
         // TODO Add getter in quest?
     }
 
-    // Method to complete quest for the player
-    public void completeQuest(String questID){ // Marks quest as completed
-        for (Quest quest : questLog) {
-            if (quest.getQuestID().equals(questID)) {
-                completeQuest(this);
-                ui.displayMsg("The quest: " + quest.getQuestName() + "has been completed!");
-                return;
-            }
-        }
-    }
 
     // Flag management
 
@@ -103,7 +93,7 @@ public class Player extends Creature {
 
     // Method to receive / pickup an item
     public void pickUpItem(Item item){
-        Inventory.addItem(item);
+        inventory.addItem(item);
     }
 
     // Getter for inventory

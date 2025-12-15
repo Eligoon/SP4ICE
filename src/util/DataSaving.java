@@ -70,7 +70,8 @@ public class DataSaving {
                     npc_name VARCHAR(100) PRIMARY KEY,
                     location_name VARCHAR(100),
                     is_dead BOOLEAN,
-                    is_hostile BOOLEAN
+                    is_hostile BOOLEAN,
+                    item_name VARCHAR(100)
                 );
                 """;
             stmt.executeUpdate(sqlNPCState);
@@ -235,7 +236,7 @@ public class DataSaving {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
         {
-            for (Creature c : location.getCreatures()) {
+            for (Creature c : location.getCreature()) {
 
                 if (c instanceof NPC npc) {
                     stmt.setString(1, npc.getName());
@@ -292,7 +293,7 @@ public class DataSaving {
     // Returns a Player object, or null if no saved player exists.
     public Player loadPlayer() {
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM player WHERE id = 1"))
+             ResultSet rs = stmt.executeQuery("SELECT id, name, race, class, max_health, current_health, strength, intelligence, dexterity, location FROM player WHERE id = 1"))
         {
             if (rs.next()) {
 
@@ -355,7 +356,7 @@ public class DataSaving {
              ResultSet rs = stmt.executeQuery("SELECT item_name FROM inventory WHERE player_id = 1"))
         {
             // clear existing inventory
-            player.getInventory().clear();
+            player.getInventory().clearInventory();
 
             while (rs.next()) {
                 String itemName = rs.getString("item_name");
@@ -402,7 +403,7 @@ public class DataSaving {
                 boolean npcFound = false;
                 NPC npcToRemove = null;
 
-                for (Creature c : location.getCreatures()) {
+                for (Creature c : location.getCreature()) {
                     if (c instanceof NPC npc && npc.getName().equals(npcName)) {
                         npcFound = true;
 
