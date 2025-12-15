@@ -54,10 +54,6 @@ public class Player extends Creature {
     }
 
 
-    public void interact() { //Interaction placeholder
-        //TODO
-    }
-
     // Combat methods
 
     // Player attacks a target
