@@ -193,7 +193,7 @@ public class GameController {
             return;
         }
 
-        List<String> dialogueOptions = emeraldTear.getDialogue(npc, player);
+        List<String> dialogueOptions = emeraldTear.getDialogueChoices(npc, player);
 
         if (dialogueOptions.isEmpty()) {
             ui.displayMsg(npc.getName() + " has nothing to say.");
