@@ -737,7 +737,7 @@ public class Story {
                     player.pickUpItem(new Item("Heart of the Siren", "Heart of the Siren obtained by killing Siren of The Lake", 2));
                     System.out.println("You have slain the Siren and obtained her Heart!");
                 } else {
-                    System.out.println("You fled from the Siren or were defeated.");
+                    System.out.println("You were defeated.");
                 }
                 break;
 
@@ -749,100 +749,116 @@ public class Story {
 
 
     // WITCH DIALOGUE
-    public List<String> getWitchDialogue(Player player){
-        List<String> options = new ArrayList<>();
-
+    public List<Choice> getWitchDialogueChoices(Player player) {
+        List<Choice> options = new ArrayList<>();
         NPC witch = npcs.get("witch");
 
-        // Error handling
         if (witch == null || witch.isDead()) {
             return options;
         }
 
-        // Check if the witch quest is complete
+        // Quest completed
         if (player.getInventory().hasItem("Heart of the Flower") &&
-            player.getInventory().hasItem("Heart of the Siren") &&
-            player.getInventory().hasItem("Heart of the Bog")) {
-            options.add("Here you go witch, I have your spell ingredients.");
-            options.add("You have met your match. Prepare to die!");
+                player.getInventory().hasItem("Heart of the Siren") &&
+                player.getInventory().hasItem("Heart of the Bog")) {
+            options.add(Choice.interactChoice("Here you go witch, I have your spell ingredients.", witch));
+            options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
             return options;
         }
 
-        // Check if quest has been given before
-        if (player.hasFlag("witch_quest_given")){
-            options.add("I uh, do not have all three of the hearts. I will go now.");
-            options.add("You have met your match. Prepare to die!");
+        // Quest already given but not completed
+        if (player.hasFlag("witch_quest_given")) {
+            options.add(Choice.interactChoice("I uh, do not have all three of the hearts. I will go now.", witch));
+            options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
             return options;
         }
 
         // First meeting
-        if(player.isMage()) { // Special interaction if player is a mage
-            options.add("What are you, a witch,\n" +
-                    "a druid? Some sort of nature priestess?");
+        if (player.isMage()) {
+            // Mage-specific dialogue
+            options.add(Choice.interactChoice(
+                    "What are you, a witch,\na druid? Some sort of nature priestess?", witch
+            ));
+        } else {
+            // Generic greeting only if not a mage
+            options.add(Choice.interactChoice(
+                    "I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?",
+                    witch
+            ));
         }
 
-        // Remaining dialogue options
-        options.add("I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\n" +
-                "know something?");
-        options.add("You have met your match. Prepare to die!");
-        options.add("Ah… wrong way. Sorry for intruding");
+        // Combat / attack choice (available to all)
+        options.add(Choice.interactChoice("You have met your match. Prepare to die!", witch));
+        // Leave choice (available to all)
+        options.add(Choice.interactChoice("Ah… wrong way. Sorry for intruding", witch));
 
         return options;
     }
 
-    public String handleWitchDialogue(int choice, Player player){
+
+    public void handleWitchDialogue(Player player, int choiceIndex) {
         NPC witch = npcs.get("witch");
+        if (witch == null || witch.isDead()) return;
 
-        // If quest is complete
-        if (player.getInventory().hasItem("Heart of the Flower") &&
-                player.getInventory().hasItem("Heart of the Siren") &&
-                player.getInventory().hasItem("Heart of the Bog")){
-            if (choice == 1) {
+        List<Choice> choices = getWitchDialogueChoices(player);
+        if (choiceIndex < 0 || choiceIndex >= choices.size()) return;
+
+        Choice selected = choices.get(choiceIndex);
+        String text = selected.getDescription();
+
+        // Display player's choice
+        System.out.println("You: " + text);
+
+        switch (text) {
+            // Quest completed - hand in items
+            case "Here you go witch, I have your spell ingredients.":
                 player.addFlag("witch_barrier_open");
-                // TODO REMOVE QUEST ITEMS FROM INVENTORY
-                player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch",2));
-                return "I thank you, stranger. As promised." + "\nA key to my barrier, you may now pass, and take this with you as well.\n" +
-                        "It is not every day I get visitors."
+                // TODO: remove quest items from inventory
+                player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch", 2));
+                System.out.println("Witch: I thank you, stranger. As promised. A key to my barrier, you may now pass, and take this with you as well.");
+                break;
 
-            } else if (choice == 2){
-                witch.setHostile(true);
-                player.addFlag("killed_witch");
-                player.addFlag("witch_barrier_open"); // Does barrier also open when she's dead?
-                return "";
-            }
-        }
+            // Attack / combat choice
+            case "You have met your match. Prepare to die!":
+                // Make Witch hostile
+                witch.setHostile(true); // turn hostile
+                System.out.println("Witch: So be it! Prepare yourself!");
 
-        // Check if player already has quest
-        if (player.hasFlag("witch_quest_given")) {
-            if (choice == 1) {
-                return "Well get to it then! I may be an elf, but my time is still precious!";
-            } else if (choice == 2) {
-                witch.setDead(true);
-                player.addFlag("killed_witch");
-                player.addFlag("witch_barrier_open");
-                return "";
-            }
-        }
+                // Start combat via GameController
+                gc.handleCombat(witch);
 
-        // First meeting
-        if (player.isMage() && choice == 1) {
-            player.addFlag("witch_quest_given");
-            return "Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I\n" +
-                    "do not eat children!" + "\nBut yes, I know what has\n" +
-                    "upset the balance, a thief, a common bandit, has stolen the emerald tear from a great tree. He tried\n" +
-                    "to sell it to me, stupid oaf! No he likely now tries to return it to the stag atop the crown of the\n" +
-                    "world, the very peak of the mountain, for some great mythical reward.";
+                // If player won
+                if (witch.isDead()) {
+                    player.addFlag("killed_witch");
+                } else {
+                    System.out.println("You were defeated.");
+                }
+                break;
 
-        // Kill witch
-        } else if ((player.isMage() && choice == 2) || (!player.isMage() && choice == 1)) {
-            witch.setDead(true);
-            player.addFlag("killed_witch");
-            player.addFlag("witch_barrier_open");
-            return "";
-        } else {
-            return "Leaving so soon?";
+            // Quest given but not completed
+            case "I uh, do not have all three of the hearts. I will go now.":
+                System.out.println("Witch: Well get to it then! I may be an elf, but my time is still precious!");
+                break;
+
+            // First meeting - mage
+            case "What are you, a witch,\na druid? Some sort of nature priestess?":
+                player.addFlag("witch_quest_given");
+                System.out.println("Witch: Oh… a fellow mage I see. I am a witch, and before you start throwing accusations, no, I do not eat children! But yes, I know what has upset the balance...");
+                break;
+
+            // Generic greeting for non-mages
+            case "I am sorry for intruding into your home, Miss. But I am seeking what upsets the balance, do you\nknow something?":
+                player.addFlag("witch_quest_given");
+                System.out.println("Witch: Hmph, curious mortal… you seek what disrupts the balance? Listen well...");
+                break;
+
+            // Leaving
+            case "Ah… wrong way. Sorry for intruding":
+                System.out.println("Witch: Leaving so soon?");
+                break;
         }
     }
+
 
     // Implement dialogue for dragon, stag and orcs
 
