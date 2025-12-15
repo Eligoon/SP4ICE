@@ -193,19 +193,32 @@ public class GameController {
             return;
         }
 
-        List<String> dialogueOptions = emeraldTear.getDialogueChoices(npc, player);
+        // Get dialogue choices as Choice objects
+        List<Choice> dialogueOptions = emeraldTear.getDialogueChoices(npc, player);
 
         if (dialogueOptions.isEmpty()) {
             ui.displayMsg(npc.getName() + " has nothing to say.");
             return;
         }
 
+        // Prepare descriptions for displaying to the player
+        ArrayList<String> optionTexts = new ArrayList<>();
+        for (Choice c : dialogueOptions) {
+            optionTexts.add(c.getDescription());
+        }
+
         // Prompt the player to choose a dialogue
-        int choice = Integer.parseInt(ui.promptChoice(new ArrayList<>(dialogueOptions), 1, "Choose your dialogue:").get(0));
+        int choiceIndex = Integer.parseInt(ui.promptChoice(optionTexts, 1, "Choose your dialogue:").get(0)) - 1;
+
+        if (choiceIndex < 0 || choiceIndex >= dialogueOptions.size()) {
+            ui.displayMsg("Invalid choice.");
+            return;
+        }
 
         // Handle effects of chosen dialogue
-        emeraldTear.handleDialogue(npc, player, choice - 1); // convert to 0-based index
+        emeraldTear.handleDialogue(npc, player, choiceIndex);
     }
+
 
 
 
