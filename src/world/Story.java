@@ -492,7 +492,7 @@ public class Story {
     // DIALOGUE OPTIONS
 
     // Generic getter for dialogue choices to go to game controller
-    public List<Choice> getDialogue(NPC npc, Player player) {
+    public List<Choice> getDialogueChoices(NPC npc, Player player) {
         if (npc == null || npc.isDead()) {
             return new ArrayList<>(); // no choices if NPC doesn't exist or is dead
         }
@@ -513,21 +513,29 @@ public class Story {
     }
 
 
-
-
     // Generic handler for dialogue choice to go to game controller
     public void handleDialogue(NPC npc, Player player, int choiceIndex) {
         if (npc == null || npc.isDead()) return;
 
+        // Get dialogue choices for this NPC
+        List<Choice> choices = getDialogueChoices(npc, player);
+        if (choices.isEmpty() || choiceIndex < 0 || choiceIndex >= choices.size()) return;
+
+        Choice selectedChoice = choices.get(choiceIndex);
+
         switch (npc.getNPC_ID().toLowerCase()) {
             case "siren":
-                handleSirenDialogue(player, choiceIndex + 1); // +1 because Story method expects 1-based choice
+                handleSirenDialogue(player, selectedChoice);
+                break;
+            case "merchant":
+                handleMerchantDialogue(player, selectedChoice);
                 break;
             default:
                 npc.speak("I have nothing special to say.");
                 break;
         }
     }
+
 
 
 
