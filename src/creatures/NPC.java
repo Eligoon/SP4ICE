@@ -1,13 +1,16 @@
 package creatures;
 
 import collectibles.Item;
+import collectibles.Quest;
 import creatures.attributes.Stats;
 import util.TextUI;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class NPC extends Creature {
+    private String NPC_ID;             // NPC Identifer s.t unique interactions can happen
     private List<String> dialogue;     // Lines the NPC can say
-    private Object questToGive;        // Placeholder for a Quest class
+    private Quest questToGive;        // Placeholder for a Quest class
     private Item itemHeld;             // Item the NPC is holding
     private boolean isHostile;         // Determines if NPC will attack player
     private boolean isDead;            // Tracks if NPC is dead
@@ -18,9 +21,10 @@ public class NPC extends Creature {
     private TextUI ui = new TextUI();  // TextUI instance for displaying combat messages
 
     // --- Constructor ---
-    public NPC(String name, Stats stats, List<String> dialogue,
-               boolean isHostile, Item itemHeld, Object questToGive) {
+    public NPC(String name, String NPC_ID, Stats stats, List<String> dialogue,
+               boolean isHostile, Item itemHeld, Quest questToGive) {
         super(name, null, stats);
+        this.NPC_ID = NPC_ID;
         this.dialogue = dialogue;
         this.isHostile = isHostile;
         this.itemHeld = itemHeld;
@@ -50,6 +54,28 @@ public class NPC extends Creature {
         this.despawnsWhenLeaving = value;
     }
 
+    // Method to add dialogue, check s tory class
+    public void speak(String text){
+        ui.displayMsg(name + " says: " + text);
+    }
+
+    // Give quest to player
+    public void giveQuest(Player player) {
+        if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
+            player.addQuest(questToGive);
+            ui.displayMsg(name + " gives you a quest: " + questToGive.getQuestName());
+        }
+    }
+
+    // Give reward for turning in quest
+    public void giveReward(Player player, Item reward) {
+        if (reward != null) {
+            player.pickUpItem(reward);
+            System.out.println(name + " gives you " + reward.getItemName());
+        }
+    }
+
+
     // --- Getters and setters ---
     public boolean isHostile() {
         return isHostile;
@@ -74,4 +100,5 @@ public class NPC extends Creature {
     public void setOriginalLocation(String originalLocation) {
         this.originalLocation = originalLocation;
     }
+
 }

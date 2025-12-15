@@ -4,101 +4,115 @@ import collectibles.Armor;
 import collectibles.Item;
 import collectibles.Quest;
 import collectibles.Weapon;
+import creatures.attributes.CharacterClass;
+import creatures.attributes.Class;
 import creatures.attributes.Inventory;
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
+import util.TextUI;
 import world.Location;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /* The Player class represents the main character controlled by the user.
- * It extends Creature and inherits name, race and stats. */
+* It extends Creature and inherits name, race and stats. */
+
 public class Player extends Creature {
-    // Player chooses a class
-    private String characterClass;
-    // The player's inventory holding items
+    // Player choose a class
+    private final CharacterClass characterClass;
+
+    // The players inventory holding items
     private Inventory inventory;
-    // A list of quests the player has accepted
-    private List<Quest> questLog;
-    // The currently equipped weapon
-    private Weapon equippedWeapon;
+
+    //A list of quests the player has accepted
+    private final List<Quest> questLog;
+
+    // Flags to keep track of the story
+    private List<String> flags;
+
+    TextUI ui = new TextUI();
 
     // --- Constructor for new player object ---
-    public Player(String name, Race race, String characterClass, Stats stats) {
+    public Player(String name, Race race, CharacterClass characterClass, Stats stats) {
         super(name, race, stats);
-
         this.characterClass = characterClass;
 
-        // create empty inventory for the player
-        this.inventory = new Inventory();
+        // Create empty inventory for the player
+        this.inventory = new Inventory(10);
+
         // create empty quest log
         this.questLog = new ArrayList<>();
+
+        // Apply race and class bonuses
+        race.applyRacialBonuses(this.stats);
+        characterClass.applyCharacterClassBonuses(this.stats);
+
     }
 
     @Override
-    public void interact() { // Interaction placeholder
+    public void interact() { //Interaction placeholder
         //TODO
     }
 
-    public void addQuest(Quest quest){ // add a quest to the player's quest log
+    public void useItem(Item item) { //called when the player uses an item
+        //TODO
+    }
+    public void equipWeapon(Weapon weapon){ //Equip a weapon from the players inventory
+        //TODO
+    }
+    public void equipArmor(Armor armor){ //Equip armor from the players inventory
+        //TODO
+    }
+    public void addQuest(Quest quest){ //add a quest the players quest log
         questLog.add(quest);
+        ui.displayMsg("New quest acquired: " + quest.getQuestName());
+        // TODO Add getter in quest?
     }
 
+    // Method to complete quest for the player
     public void completeQuest(String questID){ // Marks quest as completed
-        //TODO
-    }
-
-    // Combat methods
-
-    // Player attacks a target
-    public int attack(Creature target) {
-        int baseDamage = 0;
-
-        // Damage scales with class + equipped weapon
-        switch (characterClass.toLowerCase()) {
-            case "warrior":
-                baseDamage = stats.getStrength();
-                break;
-            case "ranger":
-                baseDamage = stats.getDexterity();
-                break;
-            case "mage":
-                baseDamage = stats.getIntelligence();
-                break;
+        for (Quest quest : questLog) {
+            if (quest.getQuestID.equals(questID)) {
+                completeQuest(this);
+                ui.displayMsg("The quest: " + quest.getQuestName() + "has been completed!");
+                return;
+            }
         }
-
-        // Add weapon damage if equipped
-        if (equippedWeapon != null) {
-            baseDamage += equippedWeapon.getDamage();
-        }
-
-        // Apply damage to the target
-        target.takeDamage(baseDamage);
-
-        return baseDamage;
     }
 
-    // Player can heal a fixed amount
-    public void heal(int amount) {
-        int newHP = stats.getCurrentHealth() + amount;
-        stats.setCurrentHealth(Math.min(newHP, stats.getMaxHealth())); // cannot exceed max HP
+    // Method to receive / pickup an item
+    public void pickUpItem(Item item){
+        Inventory.addItem(item);
     }
 
-    // --- Getters ---
-    public String getCharacterClass() {
-        return characterClass;
+    // Booleans to check if a player is a specific class or race - needed for specific interactions
+    public boolean isWarrior(){
+        return characterClass.getCharacterClassName().equals("Warrior");
     }
 
-    public Inventory getInventory() {
-        return inventory;
+    public boolean isMage(){
+        return characterClass.getCharacterClassName().equals("Mage");
     }
 
-    public List<Quest> getQuestLog() {
-        return questLog;
+    public boolean isRanger(){
+        return characterClass.getCharacterClassName().equals("Ranger");
     }
 
-    public Weapon getEquippedWeapon() {
-        return equippedWeapon;
+    public boolean isHuman(){
+        return race.getRaceName().equals("Human");
     }
+
+    public boolean isElf(){
+        return race.getRaceName().equals("Elf");
+    }
+
+    public boolean isDwarf(){
+        return race.getRaceName().equals("Dwarf");
+    }
+
+    public boolean isOrc(){
+        return race.getRaceName().equals("Orc");
+    }
+
 }

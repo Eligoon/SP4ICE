@@ -1,10 +1,13 @@
 package world;
 
+import collectibles.Item;
+import creatures.NPC;
+import creatures.Player;
+import creatures.attributes.Stats;
 import util.TextUI;
 import world.Location;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Story {
     TextUI ui = new TextUI();
@@ -28,12 +31,15 @@ public class Story {
     private Location theCave;
     private Location theCrownOfTheWorld;
 
-    public Story(){
+    private Map<String, NPC> npcs;
+
+    public Story() {
         locations = new HashMap<>();
+        npcs = new HashMap<>();
     }
 
     // Displaying the welcome message
-    public void displayWelcomeMessage(){
+    public void displayWelcomeMessage() {
         ui.displayMsg("In a world of stone, rocks and drought. The few things that lived were shrunken and weak. Their teeth\n" +
                 "brittle, their eyes blinded by the ever-raging sun. They knew nothing but the suffering of burnt skin and the\n" +
                 "heat of being trapped in their own fur or feathers. It was an endless cycle of pain, but no cycle exists where\n" +
@@ -58,8 +64,17 @@ public class Story {
                 "without it, the world is once more in disarray and threatened to go out of balance.");
     }
 
+
     // Create all locations
-    public void loadStory(){
+    public void loadStory() {
+        createLocations();
+        storeLocations();
+        connectLocations();
+        createNPCs();
+        populateCreatures();
+    }
+
+    public void createLocations() {
         Location theClearing = new Location(
                 "The Clearing",
                 "A glistening flower stands dancing in the gentle breeze in the middle of the clearing. It is taller than you are,\n" +
@@ -241,85 +256,263 @@ public class Story {
                         "Well, someone thought about that and placed a spiked trap below the waters.\n" +
                         "It snaps around your leg, but you still manage to move forward."
         );
-
-        // Add locations to the map
-        locations.put("The Clearing", theClearing);
-        locations.put("The Hunting Cabin", huntingCabin);
-        locations.put("The Lake", theLake);
-        locations.put("The Forest Path", theForestPath);
-        locations.put("The Travelling Merchant", theTravellingMerchant);
-        locations.put("The Swamp Path", theSwampPath);
-        locations.put("The Murky Waters", theMurkyWaters);
-        locations.put("The Witch's Hut", theWitchHut);
-        locations.put("The Offering Bog", theOfferingBog);
-        locations.put("The Frozen Bog", theFrozenBog);
-        locations.put("The Mountain Path", theMountainPath);
-        locations.put("The Roots of the Mountain", theRootsOfTheMountain);
-        locations.put("The Freezing Pass", theFreezingPass);
-        locations.put("The Cave", theCave);
-        locations.put("The Crown of the World", theCrownOfTheWorld);
-
-        // Connect locations
-        connectLocations();
     }
+
+
+    public void storeLocations () {
+            // Add locations to the map
+            locations.put("The Clearing", theClearing);
+            locations.put("The Hunting Cabin", huntingCabin);
+            locations.put("The Lake", theLake);
+            locations.put("The Forest Path", theForestPath);
+            locations.put("The Travelling Merchant", theTravellingMerchant);
+            locations.put("The Swamp Path", theSwampPath);
+            locations.put("The Murky Waters", theMurkyWaters);
+            locations.put("The Witch's Hut", theWitchHut);
+            locations.put("The Offering Bog", theOfferingBog);
+            locations.put("The Frozen Bog", theFrozenBog);
+            locations.put("The Mountain Path", theMountainPath);
+            locations.put("The Roots of the Mountain", theRootsOfTheMountain);
+            locations.put("The Freezing Pass", theFreezingPass);
+            locations.put("The Cave", theCave);
+            locations.put("The Crown of the World", theCrownOfTheWorld);
+        }
+
 
     // Connects all the locations based on the world map
-    private void connectLocations(){
-        // The Clearing connected locations
-        theClearing.addConnectedLocation("north", huntingCabin);
-        theClearing.addConnectedLocation("south",theLake);
-        theClearing.addConnectedLocation("east",theForestPath);
+    private void connectLocations () {
+            // The Clearing connected locations
+            theClearing.addConnectedLocation("north", huntingCabin);
+            theClearing.addConnectedLocation("south", theLake);
+            theClearing.addConnectedLocation("east", theForestPath);
 
-        // The Hunting Cabin connected locations
-        huntingCabin.addConnectedLocation("south", theClearing);
+            // The Hunting Cabin connected locations
+            huntingCabin.addConnectedLocation("south", theClearing);
 
-        // The lake connected locations
-        theLake.addConnectedLocation("north", theClearing);
+            // The lake connected locations
+            theLake.addConnectedLocation("north", theClearing);
 
-        // The forest path connected locations
-        theForestPath.addConnectedLocation("north", theMountainPath);
-        theForestPath.addConnectedLocation("south", theTravellingMerchant);
-        theForestPath.addConnectedLocation("east", theSwampPath);
-        theForestPath.addConnectedLocation("west",theClearing);
+            // The forest path connected locations
+            theForestPath.addConnectedLocation("north", theMountainPath);
+            theForestPath.addConnectedLocation("south", theTravellingMerchant);
+            theForestPath.addConnectedLocation("east", theSwampPath);
+            theForestPath.addConnectedLocation("west", theClearing);
 
-        // The offering bog connected locations
-        theOfferingBog.addConnectedLocation("north", theSwampPath);
+            // The offering bog connected locations
+            theOfferingBog.addConnectedLocation("north", theSwampPath);
 
-        // The swamp path connected locations
-        theSwampPath.addConnectedLocation("south",theOfferingBog);
-        theSwampPath.addConnectedLocation("west", theForestPath);
-        theSwampPath.addConnectedLocation("north", theFrozenBog);
-        theSwampPath.addConnectedLocation("east",theMurkyWaters);
+            // The swamp path connected locations
+            theSwampPath.addConnectedLocation("south", theOfferingBog);
+            theSwampPath.addConnectedLocation("west", theForestPath);
+            theSwampPath.addConnectedLocation("north", theFrozenBog);
+            theSwampPath.addConnectedLocation("east", theMurkyWaters);
 
-        // The murky waters connected locations
-        theMurkyWaters.addConnectedLocation("west", theSwampPath);
-        theMurkyWaters.addConnectedLocation("east", theWitchHut);
+            // The murky waters connected locations
+            theMurkyWaters.addConnectedLocation("west", theSwampPath);
+            theMurkyWaters.addConnectedLocation("east", theWitchHut);
 
-        // The witch's hut connected locations
-        theWitchHut.addConnectedLocation("west", theMurkyWaters);
+            // The witch's hut connected locations
+            theWitchHut.addConnectedLocation("west", theMurkyWaters);
 
-        // The frozen bog connected locations
-        theFrozenBog.addConnectedLocation("south", theSwampPath);
-        theFrozenBog.addConnectedLocation("west", theMountainPath);
-        theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
+            // The frozen bog connected locations
+            theFrozenBog.addConnectedLocation("south", theSwampPath);
+            theFrozenBog.addConnectedLocation("west", theMountainPath);
+            theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
 
-        // The roots of the mountain connected locations
-        theRootsOfTheMountain.addConnectedLocation("east",theFreezingPass);
-        theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
+            // The roots of the mountain connected locations
+            theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
+            theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
 
-        //  The freezing pass connected locations
-        theFreezingPass.addConnectedLocation("east", theCave);
-        theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
+            //  The freezing pass connected locations
+            theFreezingPass.addConnectedLocation("east", theCave);
+            theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
 
-        // The cave connected locations
-        theCave.addConnectedLocation("north", theCrownOfTheWorld);
-        theCave.addConnectedLocation("west", theFreezingPass);
+            // The cave connected locations
+            theCave.addConnectedLocation("north", theCrownOfTheWorld);
+            theCave.addConnectedLocation("west", theFreezingPass);
 
-        // The crown of the world connected locations
-        theCrownOfTheWorld.addConnectedLocation("south", theCave);
+            // The crown of the world connected locations
+            theCrownOfTheWorld.addConnectedLocation("south", theCave);
+        }
+
+    public Location getLocation (String locationName){
+            return locations.get(locationName);
+        }
+
+    // NPC CREATION
+
+    private void createNPCs(){
+        // Travelling Merchant
+            NPC merchant = new NPC(
+                    "The Travelling Merchant",
+                    "merchant",
+                    new Stats(0,0,0,0),
+                    Arrays.asList(
+                            "Why hello stranger, care to see my wares?"
+                    ),
+                    false, // Not hostile
+                    null, // Item Held until items are created, has cabin key
+                    null // Dire wolf quest - added later
+                    );
+            npcs.put("merchant", merchant); // Map NPC id to merchant
+
+        // FIGHTABLE NPCs
+
+        // Lake Siren
+            NPC siren = new NPC(
+                    "Lake Siren", // Name
+                    "siren",            // NPC ID
+                    new Stats(10,10,10,10),
+                    Arrays.asList(
+                            "What seek you here, at my lake?"
+                    ),
+                    false, // Only hostile when provoked
+                    null, // Item held, has the heart of the siren - drops if slayed
+                    null // Has no quest
+            );
+            npcs.put("siren", siren); // Map NPC id to siren
+
+            // Witch
+            NPC witch = new NPC(
+                    "Witch of the Witch's hut",
+                    "witch",
+                    new Stats(10,10,10,10), // Base stats
+                    Arrays.asList(
+                            " "
+                    ),
+                    false, // Can be hostile
+                    null, // Has special loot
+                    null // She does have a quest
+            );
+            npcs.put("witch",witch);
+
+            // Ice dragon
+            NPC ice_dragon = new NPC(
+                    "Ice Dragon",
+                    "ice_dragon",
+                    new Stats(200,30,20,50), // Proposed stats
+                    Arrays.asList("" +
+                            "What brings you to my cave?"
+                    ),
+                    false, // Not necessarily hostile
+                    null, // No item
+                    null // No quest
+            );
+            npcs.put("ice_dragon", ice_dragon);
+
+            // Dire wolf
+            NPC dire_wolf = new NPC(
+                    "Dire Wolf",
+                    "dire_wolf",
+                    new Stats(10,10,10,10), // Base stats
+                    List.of(""), // No voice lines
+                    true, // Is hostile
+                    new Item("Head of the Dire Wolf", "Dropped when killing the Dire Wolf", 2), // Drops head of the dire wolf
+                    null // Doesn't give quest
+            );
+            npcs.put("dire_wolf", dire_wolf);
+
+            // Mountain goat
+            NPC mountain_goat = new NPC(
+                    "Mountain Goat",
+                    "mountain_goat",
+                    new Stats(30,5,10,5), // Proposed stats
+                    Arrays.asList(""),
+                    true, // Is hostile towards player
+                    null, // Has minor loot
+                    null
+            );
+            npcs.put("mountain_goat", mountain_goat);
+
+            // Great white stag
+            NPC stag = new NPC(
+                    "Great White Stag",
+                    "white_stag",
+                    new Stats(90,20,15,10),
+                    Arrays.asList(""),
+                    false, // Can be hostile if provoked
+                    null,
+                    null // No quest to give
+            );
+            npcs.put("great_white_stag", stag);
+
+            // Glistening flower
+            NPC flower = new NPC(
+                    "Glistening Flower",
+                    "glistening_flower",
+                    new Stats(40,5,5,5), // Proposed stats
+                    Arrays.asList(""),
+                    true, // Hostile towards player
+                    new Item("Heart of the Flower", "Heart of the flower gained by defeating" +
+                            "the Glistening Flower in The Clearing", 1), // Need to implement Item class
+                    null // Doesn't give quest
+            );
+            npcs.put("glistening_flower", flower);
+
+            NPC orc_1 = new NPC(
+                    "Offering Borg Orc 1",
+                    "offering_orc_1",
+                    new Stats(40,10,10,3), // Proposed stats
+                    Arrays.asList("Who is there?!"),
+                    false, // Only when given the right dialogue
+                    new Item("Heart of the Bog", "Looted by defeating the orcs or looted from the already dead orcs", 1),
+                    null // No quests to give
+            );
+            npcs.put("offering_orc_1",orc_1);
+
+            NPC orc_2 = new NPC(
+                    "Offering Borg Orc 2",
+                    "offering_orc_2",
+                    new Stats(40,10,10,3), // Proposed stats
+                    Arrays.asList(""),
+                    false, // Only when given the right dialogue
+                    null, // Only one orc holds item
+                    null // No quests to give
+            );
+            npcs.put("offering_orc_2",orc_2);
+
+        }
+
+    private void populateCreatures(){
+            theClearing.addCreature(npcs.get("glistening_flower"));
+            theLake.addCreature(npcs.get("siren"));
+            theTravellingMerchant.addCreature(npcs.get("merchant"));
+            theSwampPath.addCreature(npcs.get("dire_wolf"));
+            theWitchHut.addCreature(npcs.get("witch"));
+            theFreezingPass.addCreature(npcs.get("mountain_goat"));
+            theCave.addCreature(npcs.get("ice_dragon"));
+            theCrownOfTheWorld.addCreature(npcs.get("great_white_stag"));
+            theOfferingBog.addCreature(npcs.get("offering_orc_1"));
+            theOfferingBog.addCreature(npcs.get("offering_orc_2"));
+        }
+
+    // DIALOGUE OPTIONS
+
+    // MERCHANT
+    public List<String> getMerchantDialogue (Player player){
+        List<String> options = new ArrayList<>();
+
+        NPC merchant = npcs.get("merchant");
+        if (merchant == null || merchant.isDead()) {
+            return options;
+        }
+
+        // Check flags if player has killed the dire wolf
+        if (player.hasFlag("killed_dire_wolf") && player.getInventory().hasItem("Head of the Dire Wolf")){
+            options.add("“I have brought back proof that I have removed the dire\n" +
+                    "wolf from the path.");
+            return options;
+        }
+
+        // Check if the merchant has already given the player the quest
+        if (player.hasFlag("merchant_quest_given")) {
+            // TODO Implement dialogues and PLAYER methods
+        }
     }
 
-    public Location getLocation(String locationName){
-        return locations.get(locationName);
+
+
+
+
     }
-}
+
