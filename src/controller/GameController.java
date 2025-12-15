@@ -361,7 +361,63 @@ public class GameController {
         ui.displayMsg("You equipped: " + weapon.getItemName());
     }
 
+    public void startGameLoop() {
+        boolean isPlaying = true;
 
+        while (isPlaying) {
+            // 1. Show current location and description
+            ui.displayMsg("You are at: " + currentLocation.getLocationName());
+            ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
+
+            // 2. Show available choices
+            List<Choice> choices = getLocationChoices();
+            if (choices.isEmpty()) {
+                ui.displayMsg("There are no actions available here.");
+            } else {
+                Choice selected = ui.promptChoiceOb(choices, "What do you want to do?");
+
+                // Save current location before executing choice
+                Location oldLocation = currentLocation;
+
+                // Execute the choice
+                selected.execute(this);
+
+                // 3. If the player moved, ask to save or quit
+                if (currentLocation != oldLocation) {
+                    ui.displayMsg("You moved to a new location. Options:");
+                    ui.displayMsg("1. Continue");
+                    ui.displayMsg("2. Save Game");
+                    ui.displayMsg("3. Save and Exit");
+                    ui.displayMsg("4. Exit without saving");
+
+                    int option = ui.promptNumeric("Choose option:");
+
+                    switch (option) {
+                        case 2 -> {
+                            db.savePlayer(player, currentLocation);
+                            db.saveInventory(player);
+                            db.saveGameState(this);
+                            ui.displayMsg("Game saved.");
+                        }
+                        case 3 -> {
+                            db.savePlayer(player, currentLocation);
+                            db.saveInventory(player);
+                            db.saveGameState(this);
+                            ui.displayMsg("Game saved. Exiting now. Goodbye!");
+                            isPlaying = false;
+                        }
+                        case 4 -> {
+                            ui.displayMsg("Exiting game without saving. Goodbye!");
+                            isPlaying = false;
+                        }
+                        default -> {
+                            // Continue automatically
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     //--- Getters ---
     public Location getCurrentLocation() {
