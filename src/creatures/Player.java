@@ -3,6 +3,7 @@ package creatures;
 
 import collectibles.Item;
 import collectibles.Quest;
+import collectibles.Weapon;
 import creatures.attributes.CharacterClass;
 import creatures.attributes.Inventory;
 import creatures.attributes.Race;
@@ -27,6 +28,9 @@ public class Player extends Creature {
 
     // Flags to keep track of the story
     private List<String> flags;
+
+    // The currently equipped weapon
+    private Weapon equippedWeapon;
 
     TextUI ui = new TextUI();
 
@@ -53,6 +57,43 @@ public class Player extends Creature {
     public void interact() { //Interaction placeholder
         //TODO
     }
+
+    // Combat methods
+
+    // Player attacks a target
+    public int attack(Creature target) {
+        int baseDamage = 0;
+
+        // Damage scales with class + equipped weapon
+        switch (characterClass.toLowerCase()) {
+            case "warrior":
+                baseDamage = stats.getStrength();
+                break;
+            case "ranger":
+                baseDamage = stats.getDexterity();
+                break;
+            case "mage":
+                baseDamage = stats.getIntelligence();
+                break;
+        }
+
+        // Add weapon damage if equipped
+        if (equippedWeapon != null) {
+            baseDamage += equippedWeapon.getDamage();
+        }
+
+        // Apply damage to the target
+        target.takeDamage(baseDamage);
+
+        return baseDamage;
+    }
+
+    // Player can heal a fixed amount
+    public void heal(int amount) {
+        int newHP = stats.getCurrentHealth() + amount;
+        stats.setCurrentHealth(Math.min(newHP, stats.getMaxHealth())); // cannot exceed max HP
+    }
+
 
     public void addQuest(Quest quest){ //add a quest the players quest log
         questLog.add(quest);
@@ -104,6 +145,10 @@ public class Player extends Creature {
     // Getter for questlog
     public List<Quest> getQuestLog() {
         return questLog;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
     }
 
     // Booleans to check if a player is a specific class or race - needed for specific interactions
