@@ -184,8 +184,18 @@ public class GameController {
 
 
     public void handleNPCInteraction(Creature creature) {
-        creature.interactWithPlayer(player, emeraldTear, ui);
+        if (!(creature instanceof NPC npc)) return;
+
+        List<Choice> dialogueChoices = emeraldTear.getDialogueChoices(npc, player);
+        if (dialogueChoices.isEmpty()) return;
+
+        Choice chosen = ui.promptChoiceOb(dialogueChoices, "Choose what to say:");
+        int choiceIndex = dialogueChoices.indexOf(chosen) + 1; // 1-based index for Story
+
+        String response = emeraldTear.handleDialogue(npc, choiceIndex, player);
+        if (!response.isEmpty()) ui.displayMsg(response);
     }
+
 
     public void handleUseItem(Item item) {
         if (item == null) {
