@@ -209,7 +209,6 @@ enum ChoiceType {
     USEITEM
     EQUIPARMOUR
     EQUIPWEAPON
-
     AND
     OR
 }
@@ -217,19 +216,29 @@ enum ChoiceType {
 
 'Stats'
 class Stats {
-    - health : int
+    'attributes
+    - maxHealth : int
+    - currentHealth : int
     - strength : int
     - dexterity : int
     - intelligence : int
-    + getHealth() : int
-    + setHealth(value : int) : void
+    'constructor
+    + Stats(maxHealth : int, strength : int, dexterity : int, intelligence : int)
+    'getters / setters
+    + getCurrentHealth() : int
+    + getMaxHealth() : int
     + getStrength() : int
-    + setStrength(value : int) : void
     + getDexterity() : int
-    + setDexterity(value : int) : void
     + getIntelligence() : int
+    + setCurrentHealth(value : int) : void
+    + setMaxHealth(value : int) : void
+    + setStrength(value : int) : void
+    + setDexterity(value : int) : void
     + setIntelligence(value : int) : void
+
     + applyModifier(stat : String, modifier : int) : void
+    + takeDamage(damage : int) : void
+    + heal(amount : int) : void
 }
 
 'Creature'
