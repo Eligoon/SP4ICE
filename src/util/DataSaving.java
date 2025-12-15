@@ -378,11 +378,10 @@ public class DataSaving {
     }
 
 
-
     // LoadNPCs
     public void loadNPCs(Map<String, Location> allLocations, String savedLocation) {
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM npc_state"))
+             ResultSet rs = stmt.executeQuery("SELECT npc_name, location_name, is_dead, is_hostile, item_name FROM npc_state"))
         {
 
             while (rs.next())
