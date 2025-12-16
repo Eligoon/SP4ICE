@@ -672,7 +672,7 @@ public class Story {
             case 0: // Greeting & quest for humans
                 if (player.isHuman()) {
                     player.addFlag("merchant_quest_given");
-                    player.pickUpItem(new Item("Red Potion", "Healing potion. Restore 20 health.", 1));
+                    player.pickUpItem(new Item("Healing Potion", "Healing potion. Restore 30 health.", 1));
                     ui.displayMsg("Merchant: Thank you. I shall be extremely careful. " +
                             "Well here, take this to start with for your kindness.\n" +
                             "*The old man hands you a red potion. " +
