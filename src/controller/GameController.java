@@ -25,14 +25,23 @@ import java.util.Map;
 
 public class GameController {
     // --- Fields / Attributes ---
-    //Tracks the players current location
+    // Tracks the player's current location
     private Location currentLocation;
-    // Text based UI to display messages
-    TextUI ui = new TextUI();
-    //Story object containing all locations and text for them
-    Story emeraldTear = new Story();
+
+    // Text-based UI to display messages
+    private TextUI ui = new TextUI();
+
+    // Story object containing all locations and text
+    private Story emeraldTear;
+
     // Player object (this is you!)
     private Player player;
+
+    // --- Constructor ---
+    public GameController() {
+        // Inject this GameController into Story
+        emeraldTear = new Story(this);
+    }
 
     //--- Database handling --- used for save/load
     private static DataSaving db = new DataSaving();
@@ -50,6 +59,8 @@ public class GameController {
     }
 
     public void handleGameStart() {
+        db.createTables();
+
         boolean hasSave = db.checkForSave();
 
         if (hasSave) {
@@ -347,9 +358,6 @@ public class GameController {
         }
     }
 
-
-
-
     public void handleCombat(Creature enemy) {
         if (enemy == null) return;
 
@@ -417,7 +425,6 @@ public class GameController {
 
         ui.displayMsg("Combat has ended.");
     }
-
 
     public void handleNPCInteraction(Creature creature) {
         if (!(creature instanceof NPC)) return;
