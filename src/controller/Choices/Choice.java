@@ -19,6 +19,7 @@ public class Choice {
     private Creature enemy;                // For combat choices
     private Creature npc;                  // For NPC interaction choices
     private Item item;                     // For item-related choices (use/equip)
+    private String direction;              // Direction for move choices
 
     private List<Requirement> requirements = new ArrayList<>(); // Requirements for the choice
 
@@ -26,10 +27,10 @@ public class Choice {
 
     // Helper methods to create choices
 
-    public static Choice moveChoice(String description, Location location) {
+    public static Choice moveChoice(String description, String direction) {
         Choice c = new Choice();
         c.description = description;
-        c.targetLocation = location;
+        c.direction = direction;
         c.type = ChoiceType.MOVE;
         return c;
     }
@@ -75,7 +76,7 @@ public class Choice {
     public void execute(GameController gc) {
         switch (type) {
             case MOVE:
-                gc.move(targetLocation);
+                gc.move(direction);
                 break;
 
             case COMBAT:
