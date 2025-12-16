@@ -150,4 +150,18 @@ public class Choice {
     public void setTaken(boolean taken) {
         this.taken = taken;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Choice)) return false;
+
+        Choice other = (Choice) obj;
+        return description.equals(other.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode();
+    }
 }
