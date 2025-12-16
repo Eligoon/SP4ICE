@@ -54,10 +54,6 @@ public class Player extends Creature {
 
     }
 
-    @Override
-    public void interact() { //Interaction placeholder
-        //TODO
-    }
 
     // Combat methods
 
@@ -145,7 +141,7 @@ public class Player extends Creature {
 
     // Method to receive / pickup an item
     public void pickUpItem(Item item){
-        Inventory.addItem(item);
+        inventory.addItem(item);
     }
 
     // Getter for inventory

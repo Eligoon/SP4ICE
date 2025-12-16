@@ -113,11 +113,5 @@ public class Location {
                 ui.displayMsg(direction);
             }
         }
-
-
-
-
     }
-
-
 }

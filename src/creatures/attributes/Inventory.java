@@ -20,9 +20,9 @@ public class Inventory {
         this.maxCapacity = maxCapacity;
     }
 
-    public static boolean addItem(Item item){
+    public boolean addItem(Item item){
         if (items.size() >= maxCapacity){
-            ui.displayMsg("Inventory is full! Cannot add: " + item.getName());
+            ui.displayMsg("Inventory is full! Cannot add: " + item.getItemName());
             return false;
         }
         items.add(item);
@@ -40,12 +40,12 @@ public class Inventory {
             ui.displayMsg("Inventory is empty! Hampster could not find anything!");
         }else{
             for ( int i = 0; i< items.size(); i++){
-                ui.displayMsg((i+1) + ". " + items.get(i).getName());
+                ui.displayMsg((i+1) + ". " + items.get(i).getItemName());
             }
         }
         ui.displayMsg("------");
-        ui.displayMsg("Equipped Weapon: " + (equippedWeapon != null ? equippedWeapon.getName() : "None"));
-        ui.displayMsg("Equipped Armor: " + (equippedArmor !=null ? equippedArmor.getName() : "None"));
+        ui.displayMsg("Equipped Weapon: " + (equippedWeapon != null ? equippedWeapon.getItemName() : "None"));
+        ui.displayMsg("Equipped Armor: " + (equippedArmor !=null ? equippedArmor.getItemName() : "None"));
     }
 
     public boolean hasItem(String itemName){
@@ -109,7 +109,7 @@ public class Inventory {
         ArrayList<String> weaponNames = new ArrayList<>();
 
         for (Weapon w : weapons){
-            weaponNames.add(w.getName());
+            weaponNames.add(w.getItemName());
         }
         int choice = ui.promptNumeric("Enter Number:") - 1;
         if (choice < 0 || choice >= weapons.size()){
@@ -117,7 +117,7 @@ public class Inventory {
             return;
         }
         equippedWeapon = weapons.get(choice);
-        ui.displayMsg("Equipped Weapon: " + equippedWeapon.getName());
+        ui.displayMsg("Equipped Weapon: " + equippedWeapon.getItemName());
     }
 
     public void equipArmor(){
@@ -131,7 +131,7 @@ public class Inventory {
         ArrayList<String> armorNames = new ArrayList<>();
 
         for(Armor a : armors){
-            armorNames.add(a.getName());
+            armorNames.add(a.getItemName());
         }
         int choice = ui.promptNumeric("Enter number:") - 1;
         if(choice <0 || choice >=armors.size()){
@@ -139,12 +139,12 @@ public class Inventory {
             return;
         }
         equippedArmor = armors.get(choice);
-        ui.displayMsg("Equipped armor: " + equippedArmor.getName());
+        ui.displayMsg("Equipped armor: " + equippedArmor.getItemName());
     }
 
     //to make this work, we would Need a: public void use(Player player) method
 
-    public static void useItem(Player Player){
+    public void useItem(Player Player){
         if (items.isEmpty()){
             ui.displayMsg("You have no items to use!");
             return;
@@ -154,7 +154,7 @@ public class Inventory {
 
         ArrayList<String> itemNames = new ArrayList<>();
         for(Item i : items){
-            itemNames.add(i.getName());
+            itemNames.add(i.getItemName());
         }
 
         int choice = ui.promptNumeric("Enter number:") -1;
@@ -173,6 +173,4 @@ public class Inventory {
             removeItem(chosenItem);
         }
     }
-
-
 }

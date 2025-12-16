@@ -11,21 +11,21 @@ import java.util.List;
 
 public class Choice {
 
-    private String description;        // Text shown to the player
-    private boolean taken = false;     // Checks if this choice has already been taken
-    private ChoiceType type;           // Type of choice (MOVE, COMBAT, INTERACT, USEITEM, etc.)
+    private String description;            // Text shown to the player
+    private boolean taken = false;         // Checks if this choice has already been taken
+    private ChoiceType type;               // Type of choice (MOVE, COMBAT, INTERACT, USEITEM, etc.)
 
-    private Location targetLocation;   // For movement choices
-    private Creature enemy;            // For combat choices
-    private Creature npc;              // For NPC interaction choices
-    private Item item;                 // For item-related choices (use/equip)
+    private Location targetLocation;       // For movement choices
+    private Creature enemy;                // For combat choices
+    private Creature npc;                  // For NPC interaction choices
+    private Item item;                     // For item-related choices (use/equip)
 
     private List<Requirement> requirements = new ArrayList<>(); // Requirements for the choice
 
-    // Private constructor to prevent direct instantiation
     private Choice() { }
 
-    // Method to create a movement choice
+    // Helper methods to create choices
+
     public static Choice moveChoice(String description, Location location) {
         Choice c = new Choice();
         c.description = description;
@@ -34,7 +34,6 @@ public class Choice {
         return c;
     }
 
-    // Method to create a combat choice
     public static Choice combatChoice(String description, Creature enemy) {
         Choice c = new Choice();
         c.description = description;
@@ -43,7 +42,6 @@ public class Choice {
         return c;
     }
 
-    // Method to create an NPC interaction choice
     public static Choice interactChoice(String description, Creature npc) {
         Choice c = new Choice();
         c.description = description;
@@ -52,7 +50,6 @@ public class Choice {
         return c;
     }
 
-    // Method to create an item-based choice
     public static Choice itemChoice(String description, Item item, ChoiceType type) {
         Choice c = new Choice();
         c.description = description;
@@ -61,22 +58,20 @@ public class Choice {
         return c;
     }
 
-    // Add a requirement to this choice
+    // Requirements
+
     public void addRequirement(Requirement req) {
         requirements.add(req);
     }
 
-    // Check if the choice is available to the player
     public boolean isAvailable(Player player) {
         for (Requirement req : requirements) {
-            if (!req.isMet(player)) {
-                return false;
-            }
+            if (!req.isMet(player)) return false;
         }
         return true;
     }
 
-    // Execute the choice in the game controller
+    // Execute choice in GameController
     public void execute(GameController gc) {
         switch (type) {
             case MOVE:
@@ -84,15 +79,11 @@ public class Choice {
                 break;
 
             case COMBAT:
-                if (enemy != null) {
-                    gc.handleCombat(enemy);
-                }
+                if (enemy != null) gc.handleCombat(enemy);
                 break;
 
             case INTERACT:
-                if (npc != null) {
-                    gc.handleNPCInteraction(npc);
-                }
+                if (npc != null) gc.handleNPCInteraction(npc);
                 break;
 
             case USEITEM:
@@ -110,7 +101,8 @@ public class Choice {
         taken = true;
     }
 
-    // Getters and setters
+    // Getters and setters (preserved structure)
+
     public String getDescription() {
         return description;
     }

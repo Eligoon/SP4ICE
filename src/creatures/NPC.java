@@ -2,10 +2,14 @@ package creatures;
 
 import collectibles.Item;
 import collectibles.Quest;
+import controller.Choices.Choice;
 import creatures.attributes.Stats;
 import util.TextUI;
+
+import java.util.ArrayList;
 import java.util.List;
 import creatures.attributes.AttackStat;
+import world.Story;
 
 public class NPC extends Creature {
     private String NPC_ID;             // NPC Identifer s.t unique interactions can happen
@@ -35,6 +39,7 @@ public class NPC extends Creature {
 
     }
 
+    // Stats for combat
     private int getAttackStatValue() {
         int str = stats.getStrength();
         int dex = stats.getDexterity();
@@ -79,6 +84,44 @@ public class NPC extends Creature {
             }
         }
     }
+
+    @Override
+    public void interactWithPlayer(Player player, Story story, TextUI ui) {
+        // Get dialogue choices as Choice objects
+        List<Choice> dialogueChoices = story.getDialogueChoices(this, player);
+
+        // If no dialogue is available, just return silently
+        if (dialogueChoices.isEmpty()) {
+            return;
+        }
+
+        // Display options and prompt the player
+        Choice selected = ui.promptChoiceOb(dialogueChoices, "Choose your dialogue:");
+
+        // Handle the chosen dialogue directly
+        story.handleDialogue(this, player, selected);
+
+        // Give quest if available
+        if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
+            giveQuest(player);
+        }
+
+        // Give held item if available
+        if (itemHeld != null) {
+            player.pickUpItem(itemHeld);
+            ui.displayMsg(getName() + " gives you " + itemHeld.getItemName());
+            itemHeld = null;
+        }
+
+        // Trigger combat if the NPC is hostile
+        if (isHostile() && !isDead()) {
+            ui.displayMsg(getName() + " seems hostile!");
+            // Call your combat handler here if needed
+            // e.g., combatManager.startCombat(player, this);
+        }
+    }
+
+
 
     // --- Despawn getter/setter ---
     public boolean doesDespawnWhenLeaving() {
@@ -140,4 +183,7 @@ public class NPC extends Creature {
         this.originalLocation = originalLocation;
     }
 
+    public String getNPC_ID() {
+        return NPC_ID;
+    }
 }

@@ -4,10 +4,14 @@ import collectibles.Armor;
 import collectibles.Health;
 import collectibles.Weapon;
 import controller.Choices.Choice;
+import controller.Choices.ChoiceType;
 import creatures.Creature;
 import creatures.NPC;
 import creatures.Player;
+import creatures.attributes.CharacterClass;
 import creatures.attributes.Inventory;
+import creatures.attributes.Race;
+import creatures.attributes.Stats;
 import util.TextUI;
 import world.Location;
 import util.DataSaving;
@@ -15,7 +19,9 @@ import world.Objects;
 import world.Story;
 import collectibles.Item;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameController {
     // --- Fields / Attributes ---
@@ -43,19 +49,157 @@ public class GameController {
         }
     }
 
+    public void handleGameStart() {
+        boolean hasSave = db.checkForSave();
+
+        if (hasSave) {
+            ui.displayMsg("A saved game was found.");
+            ui.displayMsg("Do you want to load the saved game or start a new game?");
+            ui.displayMsg("1. Load saved game");
+            ui.displayMsg("2. Start a new game (overwrite old save)");
+
+            int option = -1;
+            while (option != 1 && option != 2) {
+                option = ui.promptNumeric("Enter choice number:");
+            }
+
+            if (option == 1) {
+                loadGame();  // load existing save
+                return;
+            } else {
+                ui.displayMsg("Starting a new game...");
+                db.deleteSave();  // clear old save
+            }
+        } else {
+            ui.displayMsg("No saved game found. Starting a new game...");
+        }
+
+        // Initialize new game
+        initializeGame();
+    }
+
+    private void loadGame() {
+        // 1. Load the last saved location
+        String savedLocationName = db.loadGameState();
+
+        // 2. Load all story locations
+        emeraldTear.loadStory();
+        Map<String, Location> allLocations = emeraldTear.getLocationsMap();
+
+        // 3. Load player
+        player = db.loadPlayer();
+
+        // 4. Set current location
+        currentLocation = db.loadLocation(savedLocationName, allLocations);
+
+        // 5. Load inventory
+        db.loadInventory(player);
+
+        // 6. Load NPC states
+        db.loadNPCs(allLocations, savedLocationName);
+
+        ui.displayMsg("Game loaded successfully!");
+        ui.displayMsg("You are at: " + currentLocation.getLocationName());
+        ui.displayMsg(currentLocation.getDescription());
+    }
+
+
+     // Saves the current game state, including player, inventory, NPCs, and other game data.
+     // Uses the existing DataSaving class connected to the database (db).
+
+    public void saveGame() {
+        if (player == null || currentLocation == null || db == null) {
+            ui.displayMsg("Unable to save game. Missing data.");
+            return;
+        }
+
+        try {
+            // Save player info and location
+            db.savePlayer(player, currentLocation);
+
+            // Save inventory
+            db.saveInventory(player);
+
+            // Save NPCs in current location
+            db.saveNPCs(currentLocation);
+
+            // Save overall game state
+            db.saveGameState(this);
+
+            ui.displayMsg("Game successfully saved!");
+        } catch (Exception e) {
+            ui.displayMsg("Error saving game: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    public void createPlayer() {
+        // --- Player Name ---
+        String name = ui.promptText("Enter your character's name:");
+
+        // --- Choose Race ---
+        List<Race> races = Race.getAllRaces();
+        ui.displayMsg("Choose your race:");
+        for (int i = 0; i < races.size(); i++) {
+            Race r = races.get(i);
+            ui.displayMsg((i + 1) + ". " + r.getRaceName() + " - " + r.getSpecialAbility());
+        }
+
+        int raceChoice = -1;
+        while (raceChoice < 1 || raceChoice > races.size()) {
+            raceChoice = ui.promptNumeric("Enter choice number:");
+        }
+        Race chosenRace = races.get(raceChoice - 1);
+
+        // --- Choose Class ---
+        List<CharacterClass> classes = CharacterClass.getAllCharacterClasses();
+        ui.displayMsg("Choose your class:");
+        for (int i = 0; i < classes.size(); i++) {
+            CharacterClass c = classes.get(i);
+            ui.displayMsg((i + 1) + ". " + c.getCharacterClassName() + " - Skills: " + String.join(", ", c.getSpecialSkills()));
+        }
+
+        int classChoice = -1;
+        while (classChoice < 1 || classChoice > classes.size()) {
+            classChoice = ui.promptNumeric("Enter choice number:");
+        }
+        CharacterClass chosenClass = classes.get(classChoice - 1);
+
+        // --- Base Stats ---
+        Stats stats = new Stats(100, 10, 10, 10); // Default: HP, STR, DEX, INT
+
+        // Apply racial and class bonuses
+        chosenRace.applyRacialBonuses(stats);
+        chosenClass.applyCharacterClassBonuses(stats);
+
+        // --- Create Player ---
+        this.player = new Player(name, chosenRace, chosenClass, stats);
+
+        // --- Display class-specific intro ---
+        displayClassSpecificIntro();
+    }
+
+
     // ---- Initializing the game ---
     public void initializeGame() {
-        // Displays the welcome message
+        // 1. Display welcome message
         emeraldTear.displayWelcomeMessage();
 
-        // Loads story, with locations and connects all locations together
+        // 2. Load story, including all locations and connections
         emeraldTear.loadStory();
 
-        // Set starting location to be current location
-        currentLocation = emeraldTear.getLocation("The Clearing");
+        // 3. Create the player character
+        createPlayer();
 
-        // TODO Show character specific intro, might need a characterCreator helper class
+        // 4. Display class-specific intro immediately after player creation
+        displayClassSpecificIntro();
+
+        // 5. Set starting location
+        currentLocation = emeraldTear.getLocation("The Clearing");
+        ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
     }
+
 
     // Method to show class specific intros
     private void displayClassSpecificIntro(){
@@ -92,38 +236,128 @@ public class GameController {
     }
 
     // --- Movement logic ---
-    // move: Handles movement from the players current location to another connected location.
     public void move(String direction) {
-        //Look up if there is a connected location in the given direction
+        // 1. Look up if there is a connected location in the given direction
         Location newLocation = currentLocation.getConnectedLocation(direction);
-        //if the direction does not lead anywhere (null) block movement
+
+        // 2. If the direction does not lead anywhere, block movement
         if (newLocation == null) {
             ui.displayMsg("You can't go that way.");
-            return; //stop the method here
+            return;
         }
-        //update the current location to the new valid location.
+
+        // 3. Ask player if they want to save, quit, save+quit, or continue
+        int choice = ui.promptNumeric(
+                "Do you want to save the game, quit, save and quit, or continue? Type a number \n" +
+                        "1. (save) \n2. (quit) \n3. (save & quit) \n4. (continue)"
+        );
+
+        switch (choice) {
+            case 1 -> {
+                saveGame();
+                ui.displayMsg("Game saved!");
+            }
+            case 2 -> {
+                ui.displayMsg("Quitting game...");
+                saveGame();
+                System.exit(0);
+            }
+            case 3 -> {
+                saveGame();
+                ui.displayMsg("Game saved and quitting...");
+                System.exit(0);
+            }
+            case 4, default -> { /* continue to move */ }
+        }
+
+        // 4. Update the current location
         currentLocation = newLocation;
 
-        // Feedback to the player showing movement and new location name
+        // 5. Feedback to the player
         ui.displayMsg("You move " + direction + "...");
         ui.displayMsg("You are now at: " + currentLocation.getLocationName());
-
-        //Print the location's description so the player (Description is located in location.java)
         ui.displayMsg(currentLocation.getDescription());
-        // After movement, check for trap
-        Objects object = new Objects();
-        object.checkForTraps(currentLocation);
+
+        // 6. Check for traps
+        Objects worldObjects = new Objects();
+        worldObjects.checkForTraps(currentLocation, player, emeraldTear);
+
+        // 7. Display choices based on whether there are NPCs
+        List<NPC> npcs = currentLocation.getCreature();
+        if (!npcs.isEmpty()) {
+            // If NPCs exist, show NPC interaction choices first
+            for (NPC npc : npcs) {
+                displayAvailableChoices(npc);
+            }
+        } else {
+            // No NPCs, show normal location-based choices
+            displayAvailableChoices(null);
+        }
     }
+
+
+    // Displays available choices at the current location.
+// If npc is provided, shows NPC interaction choices instead of location choices.
+    public void displayAvailableChoices(NPC npc) {
+        if (currentLocation == null || player == null) return;
+
+        // --- 1. Display location description ---
+        ui.displayMsg(currentLocation.getDescription());
+
+        // --- 2. Get all possible choices ---
+        List<Choice> allChoices = new ArrayList<>();
+
+        if (npc != null) {
+            // --- NPC interaction choices ---
+            allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
+        } else {
+            // --- Normal location choices ---
+            allChoices.addAll(currentLocation.getAvailableChoices());
+        }
+
+        // --- 3. Add move options automatically ---
+        for (String direction : currentLocation.getConnectedLocations().keySet()) {
+            Choice moveChoice = new Choice(
+                    "Move " + direction,
+                    ChoiceType.MOVE,
+                    direction
+            );
+            allChoices.add(moveChoice);
+        }
+
+        // --- 4. Filter choices based on player state ---
+        List<Choice> availableChoices = ui.getAvailableChoices(allChoices, player);
+
+        // --- 5. Check if any actions are available ---
+        if (availableChoices.isEmpty()) {
+            ui.displayMsg("There are no actions available here.");
+            return;
+        }
+
+        // --- 6. Display the available choices ---
+        ui.displayMsg("What would you like to do?");
+        ui.displayChoices(availableChoices);
+
+        // --- 7. Prompt player to choose one ---
+        Choice selected = ui.promptChoiceOb(availableChoices, "Choose your action:");
+
+        // --- 8. Execute the chosen action ---
+        if (selected != null) {
+            selected.execute(this);
+        }
+    }
+
+
 
     public void handleCombat(Creature enemy) {
         if (enemy == null) return;
 
-        ui.displayMsg("You engage in combat with " + enemy.getName() + "!");
+        ui.displayMsg("You engage in combat with the " + enemy.getName() + "!");
 
         boolean playerTurn = true;
 
         // Combat continues until either the player or the enemy is dead
-        while (!enemy.isDead() && !player.isDead()) {
+        while (!enemy.getIsDead() && !player.getIsDead()) {
             if (playerTurn) {
                 ui.displayCombatStatus(player, enemy);
 
@@ -145,11 +379,16 @@ public class GameController {
                         ui.displayMsg(enemy.getName() + " has been defeated!");
                         break; // exit combat loop
                     }
-                } else {
-                    Inventory.useItem(player);
-                    ui.displayMsg("You used an item!");
+                } else if (choice == 2) {
+                    List<Item> usableItems = player.getInventory().getUsableItems();
+                    if (usableItems.isEmpty()) {
+                        ui.displayMsg("No usable items in your inventory!");
+                    } else {
+                        // Let player choose which item to use
+                        Item itemToUse = ui.promptChoiceOb(usableItems, "Choose an item to use:");
+                        handleUseItem(itemToUse);
+                    }
                 }
-
             } else {
                 // Enemy turn
                 if (enemy instanceof NPC) {
@@ -178,27 +417,115 @@ public class GameController {
     }
 
 
+    public void handleNPCInteraction(Creature creature) {
+        if (!(creature instanceof NPC)) return;
 
-    public void handleNPCInteraction(Creature npc) {
-        ui.displayMsg("You interact with " + npc.getName());
-        // dialogue, quest logic, etc.
+        NPC npc = (NPC) creature;
+
+        // Get list of choices from Story
+        List<Choice> dialogueOptions = emeraldTear.getDialogueChoices(npc, player);
+        if (dialogueOptions.isEmpty()) {
+            ui.displayMsg(npc.getName() + " has nothing to say.");
+            return;
+        }
+
+        // Prompt the player to choose a dialogue
+        Choice selected = ui.promptChoiceOb(dialogueOptions, "Choose your dialogue:");
+
+        // Handle the chosen dialogue directly
+        emeraldTear.handleDialogue(npc, player, selected);
+
+        // Trigger combat if NPC is hostile
+        if (npc.isHostile() && !npc.isDead()) {
+            ui.displayMsg(npc.getName() + " attacks!");
+            handleCombat(npc);
+        }
     }
 
     public void handleUseItem(Item item) {
-        ui.displayMsg("You use this item: " + item.getItemName());
-        // Using item logic
+        player.getInventory().useItem(player);
+        }
+
+
+    public void handleEquipArmour(Item armourItem) {
+        if (!(armourItem instanceof Armor)) {
+            ui.displayMsg("This item is not armor and cannot be equipped.");
+            return;
+        }
+
+        Armor armor = (Armor) armourItem;
+        player.getInventory().equipArmor(armor);
+        ui.displayMsg("You equipped: " + armor.getItemName());
     }
 
-    public void handleEquipArmour(Item armour) {
-        ui.displayMsg("You equip this piece of armor: " + Armor.getItemName);
-        // Equipping armor logic
+    public void handleEquipWeapon(Item weaponItem) {
+        if (!(weaponItem instanceof Weapon)) {
+            ui.displayMsg("This item is not a weapon and cannot be equipped.");
+            return;
+        }
+
+        Weapon weapon = (Weapon) weaponItem;
+        player.getInventory().equipWeapon(weapon);
+        ui.displayMsg("You equipped: " + weapon.getItemName());
     }
 
-    public void handleEquipWeapon(Item weapon) {
-        ui.displayMsg("You equip this weapon: " + Weapon.getItemName);
-        // Equipping weapon logic
-    }
+    public void startGameLoop() {
+        boolean isPlaying = true;
 
+        while (isPlaying) {
+            // 1. Show current location and description
+            ui.displayMsg("You are at: " + currentLocation.getLocationName());
+            ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
+
+            // 2. Show available choices
+            List<Choice> choices = getLocationChoices();
+            if (choices.isEmpty()) {
+                ui.displayMsg("There are no actions available here.");
+            } else {
+                Choice selected = ui.promptChoiceOb(choices, "What do you want to do?");
+
+                // Save current location before executing choice
+                Location oldLocation = currentLocation;
+
+                // Execute the choice
+                selected.execute(this);
+
+                // 3. If the player moved, ask to save or quit
+                if (currentLocation != oldLocation) {
+                    ui.displayMsg("You moved to a new location. Options:");
+                    ui.displayMsg("1. Continue");
+                    ui.displayMsg("2. Save Game");
+                    ui.displayMsg("3. Save and Exit");
+                    ui.displayMsg("4. Exit without saving");
+
+                    int option = ui.promptNumeric("Choose option:");
+
+                    switch (option) {
+                        case 2 -> {
+                            db.savePlayer(player, currentLocation);
+                            db.saveInventory(player);
+                            db.saveGameState(this);
+                            ui.displayMsg("Game saved.");
+                        }
+                        case 3 -> {
+                            db.savePlayer(player, currentLocation);
+                            db.saveInventory(player);
+                            db.saveGameState(this);
+                            ui.displayMsg("Game saved. Exiting now. Goodbye!");
+                            isPlaying = false;
+                        }
+                        case 4 -> {
+                            ui.displayMsg("Exiting game without saving. Goodbye!");
+                            isPlaying = false;
+                        }
+                        default -> {
+                            // Continue automatically
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     //--- Getters ---
     public Location getCurrentLocation() {
@@ -209,14 +536,11 @@ public class GameController {
         return currentLocation.getAvailableChoices();
     }
 
-    /* Example of how choice could be processed not full logic
-    List<Choice> available = textUI.getAvailableChoices(allChoices, player);
+    public Player getPlayer() {
+        return player;
+    }
 
-    Choice picked = textUI.promptChoice(available, "What do you want to do?");
-
-    picked.execute(this);   // <- triggers MOVE, COMBAT, etc.
-
-    // Mark it as taken so it turns gray next time
-    picked.setTaken(true);
-     */
+    public TextUI getUi() {
+        return ui;
+    }
 }
