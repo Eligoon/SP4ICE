@@ -529,10 +529,19 @@ public class Story {
 
             case "huntingCabin":
                 return getTheHuntingCabin(player);
+
+
+            case "theRootsOfTheMountain":
+                return getTheRootsOfTheMountain(player);
+
+
+            default:
+                ui.displayMsg("");
+
         }
     }
 
-    public void handleLocatoinDialogue(Location location, Player player, Choice selectedChoice) {
+    public void handleLocationDialogue(Location location, Player player, Choice selectedChoice) {
         if (location == null || selectedChoice == null) return;
 
         List<Choice> choices = getLocationDialogue(location player);
@@ -542,10 +551,12 @@ public class Story {
 
         switch (location.getLocationName().toLowerCase()) {
 
-            case "siren":
+            case "huntingCabin":
                 handleHuntingCabin(player, selectedChoice, choiceIndex);
                 break;
 
+            case "theRootsOfTheMountain":
+                handle
 
             default:
                 ui.displayMsg("");
@@ -556,13 +567,13 @@ public class Story {
 
     public List<Choice> getTheHuntingCabin (Player player) {
         List<Choice> choices = new ArrayList<>();
-        Location HuntingCabin = locations.get("huntingCabin");
+        Location huntingCabin = locations.get("huntingCabin");
 
         if (player.hasFlag("received_cabin_key")) {
             Choice getCabinLoot = Choice.interactChoice(
                     "The magical barrier no longer holds, the symbols and runes no longer glowing." +
                             " You can go now go East towards the mountain from here.",
-                    HuntingCabin
+                    huntingCabin
             );
             choices.add(getCabinLoot);
         }
@@ -573,12 +584,73 @@ public class Story {
         // Display the chosen dialogue
         ui.displayMsg("You: " + selectedChoice.getDescription());
 
-        switch( choiceIndex) {
+        switch(choiceIndex) {
             case 0:
                 ui.displayMsg("The old key fits into the lock of the cabin, with one twist the lock clicks open. " +
                         "Inside the old cabin is a few supplies hidden in neat packed crates and barrels. (Imagine it) " +
                         "Whoever lived or used this place left it in a neat condition, and not in a hurried rush.");
                 break;
+            default:
+                ui.displayMsg("This, is the hunting cabin");
+                break;
+        }
+    }
+
+    public List<Choice> getTheRootsOfTheMountain (Player player) {
+        List<Choice> choices = new ArrayList<>();
+        Location theRootsOfTheMountain = locations.get("theRootsOfTheMountain");
+
+        if (player.isDwarf()) {
+            Choice dwarfGood = Choice.interactChoice(
+                    "This is nothing you have not tried before and you know where to find shelter even on a ledge of a " +
+                            "mountain. As soon as you find one big enough, you settle into the very wall of the mountain and take out " +
+                            "what supplies you have. It is not much, but you soon have yourself shelter from the wind and potential new " +
+                            "snow that may fall tonight.",
+                    theRootsOfTheMountain
+            );
+            choices.add(dwarfGood);
+        }
+
+        Choice hunker = Choice.interactChoice(
+                "Hunker in against the wall of the mountain and try to put up a sort of tent with what supplies you\n" +
+                        "have. ",
+                theRootsOfTheMountain
+            );
+            choices.add(hunker);
+
+        Choice build = Choice.interactChoice(
+                "Try to build some sort of snow shelter with what little time you have left. ",
+                theRootsOfTheMountain
+            );
+            choices.add(build);
+
+        Choice die = Choice.interactChoice(
+                "Just pull through the cold night and wrap yourself in as much material as you can.",
+                theRootsOfTheMountain
+            );
+            choices.add(die);
+
+        return choices;
+    }
+
+    public void handleRootsOfMountain(Player player, Choice selectedChoice, int choiceIndex) {
+        // Display the chosen dialogue
+        ui.displayMsg("You: " + selectedChoice.getDescription());
+
+        switch(choiceIndex) {
+            case 0:
+                ui.displayMsg("You wake up, ready to move further up the mountain, you did not freeze as you feared. You stave " +
+                                "off your hunger with your last ration and pack your things away once more, once more you press " +
+                                "onwards. (you cannot go back).");
+                break;
+
+            case 1:
+                ui.displayMsg(
+                        "Your snow shelter took the worst of the cold, but still your limbs feel weak and stiff. Burning and\n" +
+                                "numbness mix in your digits, still you must press on.(you cannot go back)."
+                );
+                
+
             default:
                 ui.displayMsg("This, is the hunting cabin");
                 break;
