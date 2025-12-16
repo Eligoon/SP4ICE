@@ -346,6 +346,10 @@ public class Story {
         theFrozenBog.addConnectedLocation("west", theMountainPath);
         theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
 
+        // The mountain path connected locations
+        theMountainPath.addConnectedLocation("east", theFrozenBog);
+        theMountainPath.addConnectedLocation("south", theForestPath);
+
         // The roots of the mountain connected locations
         theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
         theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
