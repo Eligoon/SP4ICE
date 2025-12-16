@@ -305,47 +305,48 @@ public class GameController {
     public void displayAvailableChoices(NPC npc) {
         if (currentLocation == null || player == null) return;
 
-        // --- 1. Display location description ---
+        // --- 1. Display location header ONCE ---
+        ui.displayMsg("\n==============================");
+        ui.displayMsg("Location: " + currentLocation.getLocationName());
         ui.displayMsg(currentLocation.getDescription());
 
-        // --- 2. Get all possible choices ---
+        // --- 2. Collect all possible choices ---
         List<Choice> allChoices = new ArrayList<>();
 
+        // NPC dialogue choices (if applicable)
         if (npc != null) {
-            // --- NPC interaction choices ---
             allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
         } else {
-            // --- Normal location choices ---
             allChoices.addAll(emeraldTear.getLocationDialogue(currentLocation, player));
         }
 
-        // --- 3. Add move options automatically ---
-        for (String direction : currentLocation.getConnectedLocation().keySet()) {
-            Choice moveChoice = Choice.moveChoice();
-            allChoices.add(moveChoice);
+        // --- 3. Add movement choices ---
+        for (String direction : currentLocation.getConnectedLocations().keySet()) {
+            allChoices.add(Choice.moveChoice(emeraldTear.getLocationDescription(currentLocation), direction));
         }
 
-        // --- 4. Filter choices based on player state ---
+
+        // --- 4. Filter by player state ---
         List<Choice> availableChoices = ui.getAvailableChoices(allChoices, player);
 
-        // --- 5. Check if any actions are available ---
+        // --- 5. No actions case ---
         if (availableChoices.isEmpty()) {
-            ui.displayMsg("There are no actions available here.");
+            ui.displayMsg("There is nothing you can do here.");
             return;
         }
 
-        // --- 6. Display the available choices ---
-        ui.displayMsg("What would you like to do?");
+        // --- 6. Display and prompt ---
+        ui.displayMsg("\nWhat would you like to do?");
         ui.displayChoices(availableChoices);
 
-        // --- 7. Prompt player to choose one ---
         Choice selected = ui.promptChoiceOb(availableChoices, "Choose your action:");
 
-        // --- 8. Execute the chosen action ---
+        // --- 7. Execute ---
         if (selected != null) {
             selected.execute(this);
         }
     }
+
 
 
 
