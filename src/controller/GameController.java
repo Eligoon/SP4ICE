@@ -316,16 +316,12 @@ public class GameController {
             allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
         } else {
             // --- Normal location choices ---
-            allChoices.addAll(emeraldTear.getLocationDialogue());
+            allChoices.addAll(emeraldTear.getLocationDialogue(currentLocation, player));
         }
 
         // --- 3. Add move options automatically ---
-        for (String direction : currentLocation.getConnectedLocations().keySet()) {
-            Choice moveChoice = new Choice(
-                    "Move " + direction,
-                    ChoiceType.MOVE,
-                    direction
-            );
+        for (String direction : currentLocation.getConnectedLocation().keySet()) {
+            Choice moveChoice = Choice.moveChoice();
             allChoices.add(moveChoice);
         }
 
@@ -531,10 +527,6 @@ public class GameController {
     //--- Getters ---
     public Location getCurrentLocation() {
         return currentLocation;
-    }
-
-    public List<Choice> getLocationChoices() {
-        return currentLocation.getAvailableChoices();
     }
 
     public Player getPlayer() {
