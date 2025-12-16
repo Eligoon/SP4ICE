@@ -608,12 +608,6 @@ public class Story {
 
 
 
-
-
-
-
-
-
     // MERCHANT DIALOGUE
     public List<Choice> getMerchantDialogueChoices(Player player) {
         List<Choice> choices = new ArrayList<>();
