@@ -512,9 +512,8 @@ public class Story {
         theOfferingBog.addCreature(npcs.get("offering_orc_2"));
     }
 
-    // DIALOGUE OPTIONS
+    // DIALOGUE OPTIONS FOR NPC's
 
-    // Generic getter for dialogue choices to go to game controller
     // Generic getter for dialogue choices to go to game controller
     public List<Choice> getDialogueChoices(NPC npc, Player player) {
         if (npc == null || npc.isDead()) {
