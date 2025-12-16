@@ -556,7 +556,8 @@ public class Story {
                 break;
 
             case "theRootsOfTheMountain":
-                handle
+                handleRootsOfMountain(player, selectedChoice, choiceIndex);
+                break;
 
             default:
                 ui.displayMsg("");
@@ -639,17 +640,31 @@ public class Story {
 
         switch(choiceIndex) {
             case 0:
+            case 1:
                 ui.displayMsg("You wake up, ready to move further up the mountain, you did not freeze as you feared. You stave " +
                                 "off your hunger with your last ration and pack your things away once more, once more you press " +
                                 "onwards. (you cannot go back).");
                 break;
 
-            case 1:
+            case 2:
                 ui.displayMsg(
                         "Your snow shelter took the worst of the cold, but still your limbs feel weak and stiff. Burning and\n" +
                                 "numbness mix in your digits, still you must press on.(you cannot go back)."
                 );
-                
+                player.takeDamage(10);
+
+                break;
+
+            case 3:
+                ui.displayMsg(
+                        "You tried to go through the night as warm as possible with what you had, but it was not enough. " +
+                                "You feel sore, cold, stiff, and you are pretty sure you are suffering from mild frost bite. But you still " +
+                                "have a world to save. (you cannot go back)."
+
+                );
+                player.takeDamage(20);
+
+                break;
 
             default:
                 ui.displayMsg("This, is the hunting cabin");
