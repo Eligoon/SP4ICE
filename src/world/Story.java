@@ -328,10 +328,14 @@ public class Story {
         // The offering bog connected locations
         theOfferingBog.addConnectedLocation("north", theSwampPath);
 
-        // The swamp path connected locations
+        // The swamp path connected locations/conditioned on story
         theSwampPath.addConnectedLocation("south", theOfferingBog);
         theSwampPath.addConnectedLocation("west", theForestPath);
-        theSwampPath.addConnectedLocation("north", theFrozenBog);
+
+        if(gc.getPlayer().hasFlag("killed_witch") || gc.getPlayer().hasFlag("witch_barrier_open")) {
+            theSwampPath.addConnectedLocation("north", theFrozenBog);
+        }
+
         theSwampPath.addConnectedLocation("east", theMurkyWaters);
 
         // The murky waters connected locations
@@ -346,8 +350,11 @@ public class Story {
         theFrozenBog.addConnectedLocation("west", theMountainPath);
         theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
 
-        // The mountain path connected locations
-        theMountainPath.addConnectedLocation("east", theFrozenBog);
+        // The mountain path connected locations/conditioned on story
+        if (gc.getPlayer().hasFlag("killed_witch") || gc.getPlayer().hasFlag("witch_barrier_open")) {
+            theMountainPath.addConnectedLocation("east", theFrozenBog);
+        }
+
         theMountainPath.addConnectedLocation("south", theForestPath);
 
         // The roots of the mountain connected locations
