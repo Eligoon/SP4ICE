@@ -253,21 +253,24 @@ public class GameController {
         );
 
         switch (choice) {
-            case 1 -> {
+            case 1:
                 saveGame();
                 ui.displayMsg("Game saved!");
-            }
-            case 2 -> {
+                break;
+            case 2:
                 ui.displayMsg("Quitting game...");
                 saveGame();
                 System.exit(0);
-            }
-            case 3 -> {
+                break;
+            case 3:
                 saveGame();
                 ui.displayMsg("Game saved and quitting...");
                 System.exit(0);
-            }
-            case 4, default -> { /* continue to move */ }
+                break;
+            case 4:
+            default:
+                // Continue
+                break;
         }
 
         // 4. Update the current location
@@ -296,8 +299,9 @@ public class GameController {
     }
 
 
+
     // Displays available choices at the current location.
-// If npc is provided, shows NPC interaction choices instead of location choices.
+    // If npc is provided, shows NPC interaction choices instead of location choices.
     public void displayAvailableChoices(NPC npc) {
         if (currentLocation == null || player == null) return;
 
