@@ -1110,59 +1110,75 @@ public class Story {
     }
 
     // OFFERING BOG ORC DIALOGUE
-    public List<String> getOrcDialogue(Player player) {
-        List<String> options = new ArrayList<>();
-
-        // Deal with just one orc talking for this scenario
+    public List<Choice> getBogOrcDialogueChoices(Player player) {
+        List<Choice> choices = new ArrayList<>();
         NPC orc1 = npcs.get("offering_orc_1");
 
-        // Check if orc is dead
-        if (orc1 == null || orc1.isDead()) {
-            return options;
-        }
+        if (orc1 == null || orc1.isDead()) return choices;
 
-        // Check class / race specific dialogue
-        if (player.isOrc()) {
-            options.add("I am not here for you. Do your thing, let our god know we still praise him. I just need something from the bog when you are done!");
-        }
-        if (player.isWarrior()) {
-            options.add("That is my sister!"); // Added dialogue for if warrior
-        }
+        // 1. Orc warrior special option
         if (player.isOrc() && player.isWarrior()) {
-            options.add("The girl is too skinny! Not enough " +
-                    "fat or muscle to please our god. Let me take her instead, go hunt a big fat boar!"); // If orc and warrior
+            choices.add(Choice.interactChoice(
+                    "The girl is too skinny! Not enough fat or muscle to please our god. Let me take her instead, go hunt a big fat boar!",
+                    orc1
+            ));
         }
-        if (!player.isWarrior()) {
-            options.add("*Hunker down and hope they think it was a critter.*"); // If anything else than warrior
-            options.add("*Crawl away back to the swamp path.*");
+        // 2. Orc option
+        else if (player.isOrc()) {
+            choices.add(Choice.interactChoice(
+                    "I am not here for you. Do your thing, let our god know we still praise him. I just need something from the bog when you are done!",
+                    orc1
+            ));
+        }
+        // 3. Warrior option
+        else if (player.isWarrior()) {
+            choices.add(Choice.interactChoice(
+                    "That is my sister!",
+                    orc1
+            ));
+        }
+        // 4. Non-orc, non-warrior
+        else {
+            choices.add(Choice.interactChoice("*Hunker down and hope they think it was a critter.*", orc1));
         }
 
-        // Remaining options
-        options.add("*Rise and charge at them to save the girl*");
-        options.add("*Mimic the sound of some horrid and big animal to scare them away.*");
+        // 5. Non-orc, non-warrior additional option
+        if (!player.isOrc() && !player.isWarrior()) {
+            choices.add(Choice.interactChoice("*Crawl away back to the swamp path.*", orc1));
+        }
 
-        return options;
+        // 6. Charge at orcs
+        choices.add(Choice.interactChoice("*Rise and charge at them to save the girl*", orc1));
+
+        // 7. Mimic a big animal
+        choices.add(Choice.interactChoice("*Mimic the sound of some horrid and big animal to scare them away.*", orc1));
+
+        return choices;
     }
 
-    public String handleOrcDialogue(int choice, Player player) {
+
+    public void handleBogOrcDialogue(Player player, Choice selectedChoice) {
         NPC orc1 = npcs.get("offering_orc_1");
         NPC orc2 = npcs.get("offering_orc_2");
-        List<String> options = getOrcDialogue(player);
 
-        // Choice 1 option varies by player -
-        if (choice == 1) {
-            // If player is an orc warrior
+        if (orc1 == null || orc1.isDead() || selectedChoice == null) return;
+
+        String desc = selectedChoice.getDescription();
+        ui.displayMsg("You: " + desc);
+
+        // 1. Special player-specific first choices
+        if ((player.isOrc() && player.isWarrior() && desc.contains("too skinny")) ||
+                (player.isOrc() && !player.isWarrior() && desc.contains("Do your thing")) ||
+                (!player.isOrc() && player.isWarrior() && desc.contains("That is my sister!")) ||
+                (!player.isOrc() && !player.isWarrior() && desc.contains("Hunker down"))) {
+
             if (player.isOrc() && player.isWarrior()) {
-                // Orc Warrior - trick them to save sister
                 player.addFlag("saved_sister");
                 player.addFlag("got_heart_of_bog");
                 orc1.setDead(true);
                 orc2.setDead(true);
 
-                String response = "*The orcs eye the girl again and grunt, one of them hits the other on the shoulder and they " +
-                        "laugh before throwing the girl onto the ground before waddling off to find a bigger better offering. " +
-                        "You run over to embrace your sister. Before you do anything more however, you go to a corpse from " +
-                        "the bog, to take its heart.*\n";
+                String response = "*The orcs eye the girl again and grunt, one of them hits the other on the shoulder and they laugh before throwing the girl onto the ground before waddling off to find a bigger better offering. You run over to embrace your sister. Before you do anything more however, you go to a corpse from the bog, to take its heart.*\n";
 
                 if (player.hasFlag("killed_merchant")) {
                     response += "*You tell your sister of the horses the merchant had in the forest. So you send her on her way back to your village.*";
@@ -1171,84 +1187,60 @@ public class Story {
                 } else {
                     response += "*You tell your sister to wait at the hunters cabin. You promise to stay alive.*";
                 }
-                return response;
+                ui.displayMsg(response);
 
             } else if (player.isOrc()) {
-                // For a regular orc we let
                 player.addFlag("girl_died");
                 player.addFlag("got_heart_of_bog");
                 orc1.setDead(true);
                 orc2.setDead(true);
-                return "*The orcs look at you and shrug. They return to throwing the girl into the bog, and soon her " +
-                        "cries are muffled by the still water and mud that sucked her in. The orcs leave you to your own " +
-                        "business. You now have free access to fishing up a heart from one of the bog corpses.*";
+                ui.displayMsg("*The orcs look at you and shrug. They return to throwing the girl into the bog, and soon her cries are muffled by the still water and mud that sucked her in. The orcs leave you to your own business. You now have free access to fishing up a heart from one of the bog corpses.*");
 
             } else if (player.isWarrior()) {
-                // Warrior - attempt to save the sister
                 orc1.setHostile(true);
                 orc2.setHostile(true);
                 player.addFlag("saving_sister");
                 player.addFlag("combat_orcs");
-                return "*You feel your blood rage through your body, like fire spreading like venom. That is your sister! " +
-                        "Before you even think, you are already charging to save her!*";
+                ui.displayMsg("*You feel your blood rage through your body, like fire spreading like venom. That is your sister! Before you even think, you are already charging to save her!*");
 
             } else {
-                // For a non orc non warrior
                 player.addFlag("girl_died");
                 player.addFlag("got_heart_of_bog");
                 orc1.setDead(true);
                 orc2.setDead(true);
-                return "*The two orcs look around and wait for a while. But since you do not move, they do indeed just " +
-                        "think it was the wind or a small critter. They throw the girl into the bog, and slowly let her sink into " +
-                        "its muddy abyss. Then they leave, letting you go about finding a heart from a bog corpse in your own time.*";
+                ui.displayMsg("*The two orcs look around and wait for a while. But since you do not move, they throw the girl into the bog, and slowly let her sink into its muddy abyss. Then they leave, letting you go about finding a heart from a bog corpse in your own time.*");
             }
+            return;
         }
 
-        // Account for special options
-        int adjustedChoice = choice;
-
-        // If player had a special first option, other choices shift down
-        if (player.isOrc() || player.isWarrior()) {
-            adjustedChoice = choice; // Keep as is, choice 1 was used
-        } else {
-            adjustedChoice = choice + 1; //  Choose
-        }
-
-        // Now handle remaining choices
-        if (!player.isWarrior() && choice == 2) {
-            // Hunker down (for non-warriors who aren't orcs)
+        // 2. Hunker down (non-warriors)
+        if (!player.isWarrior() && !player.isOrc() && desc.contains("Hunker")) {
             player.addFlag("girl_died");
             player.addFlag("got_heart_of_bog");
             orc1.setDead(true);
             orc2.setDead(true);
-            return "*The two orcs look around and wait for a while. But since you do not move, they do indeed just " +
-                    "think it was the wind or a small critter. They throw the girl into the bog.*";
+            ui.displayMsg("*The two orcs look around and wait for a while. But since you do not move, they throw the girl into the bog.*");
+            return;
         }
 
-        // Determine charge option position
-        int chargePosition = player.isWarrior() || player.isOrc() ? 2 : 3;
-        if (choice == chargePosition) {
-            // Charge at orcs
+        // 3. Charge at orcs
+        if (desc.contains("Rise and charge")) {
             orc1.setHostile(true);
             orc2.setHostile(true);
             player.addFlag("combat_orcs");
             player.addFlag("saving_girl");
-            return "*You cannot let that stand! You rise and charge at the orcs!*";
+            ui.displayMsg("*You cannot let that stand! You rise and charge at the orcs!*");
+            return;
         }
 
-        // Determine mimic position
-        int mimicPosition = player.isWarrior() || player.isOrc() ? 3 : 4;
-        if (choice == mimicPosition) {
-            // Mimic animal
+        // 4. Mimic a big animal
+        if (desc.contains("Mimic the sound")) {
             player.addFlag("girl_saved");
             player.addFlag("got_heart_of_bog");
             orc1.setDead(true);
             orc2.setDead(true);
 
-            String response = "*Your screeching sounds and horrible mimics of a real animal is enough to convince the two " +
-                    "superstitious orcs that you are something even worse. They quickly abandon the girl on the ground " +
-                    "and run for it. You first go to collect a heart from one of the corpses from the bog.*\n";
-
+            String response = "*Your screeching sounds and horrible mimics of a real animal is enough to convince the two superstitious orcs that you are something even worse. They quickly abandon the girl on the ground and run for it. You first go to collect a heart from one of the corpses from the bog.*\n";
             if (player.hasFlag("killed_merchant")) {
                 response += "*You tell the girl of the horses the merchant had in the forest and send her on her way home.*";
             } else if (player.hasFlag("merchant_quest_complete")) {
@@ -1256,47 +1248,37 @@ public class Story {
             } else {
                 response += "*You tell the little girl to wait at the hunters cabin.*";
             }
-            return response;
+            ui.displayMsg(response);
+            return;
         }
 
-        // Determine flee position (non-warriors only)
-        int fleePosition = player.isWarrior() || player.isOrc() ? 4 : 5;
-        if (!player.isWarrior() && choice == fleePosition) {
-            // Run
+        // 5. Crawl away
+        if (!player.isWarrior() && !player.isOrc() && desc.contains("Crawl away")) {
             player.addFlag("abandoned_girl");
-            return "*You quietly crawl away back to the swamp path. You hear the girl's screams fade behind you.*";
+            ui.displayMsg("*You quietly crawl away back to the swamp path. You hear the girl's screams fade behind you.*");
+            return;
         }
 
-        return "*The orcs stare at you suspiciously...*";
+        ui.displayMsg("*The orcs stare at you suspiciously...*");
     }
 
-    // EPILOGUE
-    public String getEpilogue(Player player){
-        if (player.hasFlag("dragon_will_help")){
-            return "The dragon lets you climb onto its back, it says nothing to you but keeps it promise of safe travel down\n" +
-                    "below. It places you at the clearing in the forest and bids you no farewell before surge of wind knocks you\n" +
-                    "off your feet as it takes off once more towards its cave."; // If dragon helped you down
 
-        } else if (player.hasFlag("dragon_will_help") && player.isWarrior() && player.hasFlag("killed_merchant")) {
+    // EPILOGUE
+    public String getEpilogue(Player player) {
+        if (player.hasFlag("dragon_will_help") && player.isWarrior() && player.hasFlag("killed_merchant")) {
             return "The dragon lets you climb onto its back, it says nothing, but at your request it does take you to your home\n" +
                     "village where your sister took the merchants horses to. It places you down and bids you no farewell before\n" +
                     "surge of wind knocks you off your feet as it takes off once more towards its cave. Your sister and mother\n" +
-                    "come running towards you and jumps into your embrace."; // If dragon helped you down as a warrior and merchant is dead
-
+                    "come running towards you and jumps into your embrace.";
         } else if (player.hasFlag("dragon_will_help") && player.isWarrior() && player.hasFlag("merchant_quest_complete")) {
             return "The dragon lets you climb onto its back, it says nothing, but at your request it does take you to the swamp\n" +
                     "town where your sister and the merchant are. It places you down and bids you no farewell before surge of\n" +
                     "wind knocks you off your feet as it takes off once more towards its cave. Your sister comes running towards\n" +
-                    "you and jumps into your embrace."; // Dragon helped you and you're a warrior and you finished merchant quest
-
-        } else if (player.hasFlag("dragon_will_not_help")) {
-            return "You look down the dizzying tall peak, you flew up here, it took not a moment for a dragon, but for you it will\n" +
-                    "take days, weeks. You have so little food left, but at the very least you can chew snow for water you\n" +
-                    "suppose.\n" +
-                    "It is one step at a time, and by the time you finally do reach the bottom, you are worse for wear. Scratches,\n" +
-                    "frost bite, and disease ravage through your body. Something it will never truly heal from, but at least you\n" +
-                    "are still alive."; // Dragon doesn't help you down
-
+                    "you and jumps into your embrace.";
+        } else if (player.hasFlag("dragon_will_help")) {
+            return "The dragon lets you climb onto its back, it says nothing to you but keeps it promise of safe travel down\n" +
+                    "below. It places you at the clearing in the forest and bids you no farewell before surge of wind knocks you\n" +
+                    "off your feet as it takes off once more towards its cave.";
         } else if (player.hasFlag("dragon_will_not_help") && player.isWarrior()) {
             return "You look down the dizzying tall peak, you flew up here, it took not a moment for a dragon, but for you it will\n" +
                     "take days, weeks. You have so little food left, but at the very least you can chew snow for water you\n" +
@@ -1304,8 +1286,14 @@ public class Story {
                     "It is one step at a time, the thoughts of your sister fill you with determination, and by the time you finally do\n" +
                     "reach the bottom, you are worse for wear. Scratches, frost bite, and disease ravage through your body.\n" +
                     "Something it will never truly heal from, but at least you are still alive. You are not sure why you still live, but\n" +
-                    "likely it is the deep oath to yourself and your mother that kept you going at the hardest of times.\n"; // Dragon didn't help you down as warrior
-
+                    "likely it is the deep oath to yourself and your mother that kept you going at the hardest of times.\n";
+        } else if (player.hasFlag("dragon_will_not_help")) {
+            return "You look down the dizzying tall peak, you flew up here, it took not a moment for a dragon, but for you it will\n" +
+                    "take days, weeks. You have so little food left, but at the very least you can chew snow for water you\n" +
+                    "suppose.\n" +
+                    "It is one step at a time, and by the time you finally do reach the bottom, you are worse for wear. Scratches,\n" +
+                    "frost bite, and disease ravage through your body. Something it will never truly heal from, but at least you\n" +
+                    "are still alive.";
         } else if (player.hasFlag("attacked_stag")) {
             return "You did it, you stand covered in the blood of godhood, you are bathed by the few sunrays that dare make its\n" +
                     "way inside the crack, the dragon staring in disbelief. You, YOU DID IT. You killed the deity like creature that\n" +
@@ -1315,6 +1303,7 @@ public class Story {
             return "";
         }
     }
+
 }
 
 
