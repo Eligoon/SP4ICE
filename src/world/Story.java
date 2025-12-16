@@ -825,7 +825,9 @@ public class Story {
         switch (choiceIndex) {
             case 0: // Quest completed
                 player.addFlag("witch_barrier_open");
-                // TODO: remove quest items from inventory
+                player.getInventory().removeItem("Heart of the Flower");
+                player.getInventory().removeItem("Heart of the Siren");
+                player.getInventory().removeItem("Heart of the Bog");
                 player.pickUpItem(new Item("Special Cape", "Special Cape handed to you by the Witch", 2));
                 ui.displayMsg("Witch: I thank you, stranger. As promised. A key to my barrier, you may now pass, and take this with you as well.");
                 break;
