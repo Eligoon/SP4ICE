@@ -471,24 +471,13 @@ public class GameController {
         boolean isPlaying = true;
 
         while (isPlaying) {
-            // 1. Show current location and description
-            ui.displayMsg("You are at: " + currentLocation.getLocationName());
-            ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
 
-            // 2. Show available choices
-            List<Choice> choices = getLocationChoices();
-            if (choices.isEmpty()) {
-                ui.displayMsg("There are no actions available here.");
-            } else {
-                Choice selected = ui.promptChoiceOb(choices, "What do you want to do?");
+            // Save current location before executing choice
+            Location oldLocation = currentLocation;
 
-                // Save current location before executing choice
-                Location oldLocation = currentLocation;
+                displayAvailableChoices(null);
 
-                // Execute the choice
-                selected.execute(this);
-
-                // 3. If the player moved, ask to save or quit
+                //  If the player moved, ask to save or quit
                 if (currentLocation != oldLocation) {
                     ui.displayMsg("You moved to a new location. Options:");
                     ui.displayMsg("1. Continue");
@@ -521,7 +510,6 @@ public class GameController {
                         }
                     }
                 }
-            }
         }
     }
 
