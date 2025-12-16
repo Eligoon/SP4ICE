@@ -41,8 +41,8 @@ public class ItemRegistry {
     /**
      * Creates a new Item instance based on its name.
      *
-     * @param itemName The name / ID of the item to create
-     * @return A NEW copy of the requested item, or null if not found
+     * parameter: itemName The name / ID of the item to create
+     * returns: A NEW copy of the requested item, or null if not found
      */
     public static Item create(String itemName) {
 
