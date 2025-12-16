@@ -539,8 +539,11 @@ public class Story {
                 }
                 return getDragonDialogueChoices(player);
 
+            case "offering_orc_1":
+            case "offering_orc_2":
+                return getBogOrcDialogueChoices(player);
+
             default:
-                // Generic dialogue fallback
                 List<Choice> options = new ArrayList<>();
                 options.add(Choice.interactChoice(
                         "Hello " + player.getName() + "!",
@@ -550,7 +553,6 @@ public class Story {
         }
     }
 
-    // Generic handler for dialogue choice to go to game controller
     public void handleDialogue(NPC npc, Player player, Choice selectedChoice) {
         if (npc == null || npc.isDead() || selectedChoice == null) return;
 
@@ -574,7 +576,6 @@ public class Story {
                 break;
 
             case "ice_dragon":
-                // Decide which handler to use based on flags
                 if (player.hasFlag("dragon_first_interaction") &&
                         !player.hasFlag("dragon_will_help") &&
                         !player.hasFlag("dragon_will_not_help")) {
@@ -585,11 +586,17 @@ public class Story {
                 }
                 break;
 
+            case "offering_orc_1":
+            case "offering_orc_2":
+                handleBogOrcDialogue(player, selectedChoice);
+                break;
+
             default:
                 npc.speak("I have nothing special to say.");
                 break;
         }
     }
+
 
 
 
@@ -1033,81 +1040,70 @@ public class Story {
 
 
     // WHITE STAG DIALOGUE
-    public List<String> getStagDialogue(Player player) {
-        List<String> options = new ArrayList<>();
-
-        // Error handling
+    public List<Choice> getStagDialogueChoices(Player player) {
         NPC stag = npcs.get("white_stag");
-        if (stag == null || stag.isDead()) {
-            return options;
-        }
+        List<Choice> options = new ArrayList<>();
+        if (stag == null || stag.isDead()) return options;
 
-        // Dialogue options for stag
-        options.add("Please mighty white stag, repair your tear, let the cycle continue as it is now.");
-        options.add("*If I can kill a god, maybe I too will become a god.*"); // Added internal dialogue as an option
+        options.add(Choice.interactChoice("Please mighty white stag, repair your tear, let the cycle continue as it is now.", stag));
+        options.add(Choice.interactChoice("*If I can kill a god, maybe I too will become a god.*", stag));
 
         return options;
     }
 
-    public String handleStagDialogue(int choice, Player player) {
+    public void handleStagDialogue(Player player, Choice selectedChoice, int choiceIndex) {
         NPC stag = npcs.get("white_stag");
+        if (stag == null || stag.isDead() || selectedChoice == null) return;
 
-        // Checking for different flags to change ending
-        if (choice == 1) {
-            // Check what player has done to determine ending
+        String desc = selectedChoice.getDescription();
+        ui.displayMsg("You: " + desc);
+
+        if (desc.contains("Please mighty white stag")) {
+            // Choice 1 — repair the tear or alternative endings
+            String response = "";
+
             if (player.hasFlag("killed_merchant")) {
-                player.addFlag("bad_ending_merchant"); // Killed merchant, tear is not repaired
-                return "Killer of the innocent, you speak of hope but forbid it of others yourself? " +
-                        "No… let the cycle end, let the mortals learn from their mistakes.";
+                player.addFlag("bad_ending_merchant");
+                response = "Killer of the innocent, you speak of hope but forbid it of others yourself? No… let the cycle end, let the mortals learn from their mistakes.";
 
             } else if (player.hasFlag("killed_siren")) {
-                player.addFlag("sacrifice_ending"); // Killed siren, sacrifice yourself to repair tear
-                return "Killer of the unknown, of beauty, of nature. You are scared of fear itself. " +
-                        "I cannot blame you for such, as it is the flaw of mortals. Yet it fills me with sorrow. " +
-                        "I ask of you to lay your own life down, and I will repair the tear, to balance the world, " +
-                        "and balance your choice.";
+                player.addFlag("sacrifice_ending");
+                response = "Killer of the unknown, of beauty, of nature. You are scared of fear itself. I cannot blame you for such, as it is the flaw of mortals. Yet it fills me with sorrow. I ask of you to lay your own life down, and I will repair the tear, to balance the world, and balance your choice.";
 
             } else if (player.hasFlag("killed_offering_orc_1") || player.hasFlag("killed_offering_orc_2")) {
                 player.addFlag("good_ending");
-                return "Worship is a dangerous thing when fear takes the hearts of those who seek favors. " +
-                        "I do not blame you for the loss of life to save another. You brought hope to that girl, " +
-                        "so I will repay the favor in her stead.";  // Killed the orc keeping the girl captive, good ending
-
-            } else if (player.hasFlag("killed_witch")) {
-                player.addFlag("bad_ending_witch");
-                return "Nature takes, and nature gives. Nature is not confined to the mortals' standards of evil and good. " +
-                        "You kill that of which is just taking their own interest at heart and that of nature. " +
-                        "I have nothing to give you that you cannot try and mend yourself."; // Tear is not repaired
-
-            } else if (player.hasFlag("killed_witch") && player.hasFlag("killed_siren")) {
-                player.addFlag("bad_ending_death");
-                return "To take from nature and not return anything, take its guardians and deprive it of healing is just as\n" +
-                        "the scorching sun did ages past. You have shown you are no different, and for that, you have\n" +
-                        "discarded my mercy, my hope, my dream for the mortals."; // Player dies and tear is not repaired
+                response = "Worship is a dangerous thing when fear takes the hearts of those who seek favors. I do not blame you for the loss of life to save another. You brought hope to that girl, so I will repay the favor in her stead.";
 
             } else if (player.hasFlag("killed_witch") && player.hasFlag("killed_siren") && player.hasFlag("killed_merchant")) {
                 player.addFlag("bad_ending_stag_fight");
-                return "Murderer…your heart desires nothing but blood, your soul empty like a gaping hole sucking\n" +
-                        "everything in without embracing it. Greed rules your mind, bloodlust your heart and I have nothing\n" +
-                        "to give you but death, even though that is merciful to you, I shall heal the world by removing your\n" +
-                        "stain upon it."; // Bad ending with boss fight
+                response = "Murderer…your heart desires nothing but blood, your soul empty like a gaping hole sucking everything in without embracing it. Greed rules your mind, bloodlust your heart and I have nothing to give you but death, even though that is merciful to you, I shall heal the world by removing your stain upon it.";
+
+            } else if (player.hasFlag("killed_witch") && player.hasFlag("killed_siren")) {
+                player.addFlag("bad_ending_death");
+                response = "To take from nature and not return anything, take its guardians and deprive it of healing is just as the scorching sun did ages past. You have shown you are no different, and for that, you have discarded my mercy, my hope, my dream for the mortals.";
+
+            } else if (player.hasFlag("killed_witch")) {
+                player.addFlag("bad_ending_witch");
+                response = "Nature takes, and nature gives. Nature is not confined to the mortals' standards of evil and good. You kill that of which is just taking their own interest at heart and that of nature. I have nothing to give you that you cannot try and mend yourself.";
+
             } else {
                 player.addFlag("good_ending");
-                return "*The great white stag gently bows its head down to you, despite all you have been through a little bit\n" +
-                        "of fear run through your body yet its warm breath like a summers breeze warms your body. Its milky\n" +
-                        "eyes beholds the cracked gem and then looks carefully at you, even though you feel that it is\n" +
-                        "looking -through- you.*"; // Good ending! Didn't kill anyone unnecessarily, tear gets repaired
+                response = "*The great white stag gently bows its head down to you, despite all you have been through a little bit of fear run through your body yet its warm breath like a summers breeze warms your body. Its milky eyes beholds the cracked gem and then looks carefully at you, even though you feel that it is looking -through- you.*";
             }
-        } else if (choice == 2) {
-            // Attacking the stag
+
+            ui.displayMsg(response);
+
+        } else if (desc.contains("If I can kill a god")) {
+            // Choice 2 — attack the stag (ultra boss fight)
             stag.setHostile(true);
             player.addFlag("attacked_stag");
-            return "*Throw the tear to the ground, if you can kill a god like being, maybe you too will become a god. You\n" +
-                    "charge at the giant stag.*"; // Boss fight
-        }
+            ui.displayMsg("*Throw the tear to the ground, if you can kill a god like being, maybe you too will become a god. You charge at the giant stag.*");
 
-        return "";
+        } else {
+            ui.displayMsg("*The stag looks at you silently.*");
+        }
     }
+
 
     // OFFERING BOG ORC DIALOGUE
     public List<Choice> getBogOrcDialogueChoices(Player player) {
