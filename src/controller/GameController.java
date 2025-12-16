@@ -316,7 +316,7 @@ public class GameController {
             allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
         } else {
             // --- Normal location choices ---
-            allChoices.addAll(currentLocation.getAvailableChoices());
+            allChoices.addAll(emeraldTear.getLocationDialogue());
         }
 
         // --- 3. Add move options automatically ---

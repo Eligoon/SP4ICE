@@ -161,7 +161,7 @@ public class Inventory {
 
     //to make this work, we would Need a: public void use(Player player) method
 
-    public void useItem(Player Player){
+    public void useItem(Player player){
         if (items.isEmpty()){
             ui.displayMsg("You have no items to use!");
             return;
