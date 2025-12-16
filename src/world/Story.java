@@ -12,11 +12,17 @@ import world.Location;
 
 import java.util.*;
 
-public class Story {
-    TextUI ui = new TextUI();
-    // Make map for connecting locations
-    private Map<String, Location> locations;
-    GameController gc = new GameController();
+
+    public class Story {
+        TextUI ui = new TextUI();
+        // Make map for connecting locations
+        private Map<String, Location> locations;
+        private GameController gc;
+
+        public Story(GameController gc) {
+            this.gc = gc;
+        }
+
 
     // Make each Location accessable individually
     private Location theClearing;
