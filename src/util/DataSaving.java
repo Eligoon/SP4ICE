@@ -30,7 +30,7 @@ public class DataSaving {
 
     // Creating tables for gameState, player, inventory and NPC if they do not already exist.
     // Should only run the very first time the game is run.
-    private void createTables() {
+    public void createTables() {
         try (Statement stmt = connection.createStatement()) {
 
             String sqlGameState = """
@@ -76,14 +76,12 @@ public class DataSaving {
                 """;
             stmt.executeUpdate(sqlNPCState);
 
-
-            System.out.println("Tables created");
-
         } catch (SQLException e) {
             System.err.println("Error creating tables:");
             e.printStackTrace();
         }
     }
+
 
 
     /**
