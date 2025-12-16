@@ -92,22 +92,6 @@ public class Player extends Creature {
     }
 
 
-    public void addQuest(Quest quest){ //add a quest the players quest log
-        questLog.add(quest);
-        ui.displayMsg("New quest acquired: " + quest.getQuestName());
-        // TODO Add getter in quest?
-    }
-
-    // Method to complete quest for the player
-    public void completeQuest(String questID){ // Marks quest as completed
-        for (Quest quest : questLog) {
-            if (quest.getQuestID().equals(questID)) {
-                completeQuest(this);
-                ui.displayMsg("The quest: " + quest.getQuestName() + "has been completed!");
-                return;
-            }
-        }
-    }
 
     // Flag management
 
