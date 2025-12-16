@@ -517,10 +517,11 @@ public class Story {
     // Generic getter for dialogue choices to go to game controller
     public List<Choice> getDialogueChoices(NPC npc, Player player) {
         if (npc == null || npc.isDead()) {
-            return new ArrayList<>(); // no choices if NPC doesn't exist or is dead
+            return new ArrayList<>();
         }
 
         switch (npc.getNPC_ID().toLowerCase()) {
+
             case "siren":
                 return getSirenDialogueChoices(player);
 
@@ -530,10 +531,21 @@ public class Story {
             case "witch":
                 return getWitchDialogueChoices(player);
 
+            case "ice_dragon":
+                // Follow-up dialogue takes priority if available
+                List<Choice> followUp = getDragonFollowUpChoices(player);
+                if (!followUp.isEmpty()) {
+                    return followUp;
+                }
+                return getDragonDialogueChoices(player);
+
             default:
                 // Generic dialogue fallback
                 List<Choice> options = new ArrayList<>();
-                options.add(Choice.interactChoice("Hello " + player.getName() + "!", npc));
+                options.add(Choice.interactChoice(
+                        "Hello " + player.getName() + "!",
+                        npc
+                ));
                 return options;
         }
     }
@@ -543,9 +555,12 @@ public class Story {
         if (npc == null || npc.isDead() || selectedChoice == null) return;
 
         List<Choice> choices = getDialogueChoices(npc, player);
-        int choiceIndex = choices.indexOf(selectedChoice); // determine the index of the selected choice
+        int choiceIndex = choices.indexOf(selectedChoice);
+
+        if (choiceIndex < 0) return; // Safety check
 
         switch (npc.getNPC_ID().toLowerCase()) {
+
             case "siren":
                 handleSirenDialogue(player, selectedChoice, choiceIndex);
                 break;
@@ -558,11 +573,24 @@ public class Story {
                 handleWitchDialogue(player, selectedChoice, choiceIndex);
                 break;
 
+            case "ice_dragon":
+                // Decide which handler to use based on flags
+                if (player.hasFlag("dragon_first_interaction") &&
+                        !player.hasFlag("dragon_will_help") &&
+                        !player.hasFlag("dragon_will_not_help")) {
+
+                    handleDragonFollowUp(player, selectedChoice, choiceIndex);
+                } else {
+                    handleDragonDialogue(player, selectedChoice, choiceIndex);
+                }
+                break;
+
             default:
                 npc.speak("I have nothing special to say.");
                 break;
         }
     }
+
 
 
 
@@ -867,86 +895,142 @@ public class Story {
 
 
 
-    // Implement dialogue for dragon, stag and orcs
-
     // ICE DRAGON DIALOGUE
-    public List<String> getDragonDialogue(Player player) {
-        List<String> options = new ArrayList<>();
-
+    public List<Choice> getDragonDialogueChoices(Player player) {
+        List<Choice> choices = new ArrayList<>();
         NPC dragon = npcs.get("ice_dragon");
 
-        // Error handling
-        if (dragon == null || dragon.isDead()) {
-            return options;
-        }
+        if (dragon == null || dragon.isDead()) return choices;
 
-        // Dialogue options
-        options.add("Mighty dragon, I have not come to harm\n" +
-                "you, nor to intrude on your territory. I however must go to the peak of the mountain, the crown of\n" +
-                "the world. For a tear of the great white stag has been damaged, and must be repaired and thus\n" +
-                "promptly returned to its nest, or the world shall fall into chaos.");
-        options.add("I will give you all my treasures if you take me to the peak.");
-        options.add("Prepare to fight, dragon!");
+        // Peaceful / story option
+        Choice plea = Choice.interactChoice(
+                "Mighty dragon, I have not come to harm you, nor to intrude on your territory.\n" +
+                        "I must go to the peak of the mountain, the crown of the world. A tear of the great white stag\n" +
+                        "has been damaged and must be returned, or the world shall fall into chaos.",
+                dragon
+        );
+        choices.add(plea);
 
-        return options;
+        // Bribe option
+        Choice bribe = Choice.interactChoice(
+                "I will give you all my treasures if you take me to the peak.",
+                dragon
+        );
+        choices.add(bribe);
+
+        // Attack option
+        Choice attack = Choice.interactChoice(
+                "Prepare to fight, dragon!",
+                dragon
+        );
+        choices.add(attack);
+
+        return choices;
     }
 
 
-    public String handleDragonDialogue(int choice, Player player) {
+
+    public void handleDragonDialogue(Player player, Choice selectedChoice, int choiceIndex) {
         NPC dragon = npcs.get("ice_dragon");
 
-        // First interaction
-        if (choice == 1) {
-            player.addFlag("dragon_first_interaction");
-            return "A little stranger, here to bring balance to the world, why would the great stag even repair the tear? " +
-                    "Why would I take you? What if I am just awaiting the new cycle to come. Hrmm…";
-        } else if (choice == 2) {
-            // Bartering with the dragon
-            player.addFlag("dragon_will_help");
-            player.addFlag("dragon_barter");
-            for (Item i : player.getInventory().getItems()) { // Removes all items from inventory
-                player.getInventory().clearInventory();
-            }
-            return "Oh, how humorous, yet I am not one to say no to such frivolous mortal behavior. " +
-                    "Come, climb on my back as you have paid your toll.";
-        } else if (choice == 3) {
-            // Choosing to fight the dragon
-            dragon.setHostile(true);
-            return "You dare challenge me?! So be it!";
-        }
+        if (dragon == null || dragon.isDead() || selectedChoice == null) return;
 
-        return "";
+        ui.displayMsg("You: " + selectedChoice.getDescription());
+
+        switch (choiceIndex) {
+
+            case 0: // First interaction (peaceful plea)
+                player.addFlag("dragon_first_interaction");
+                ui.displayMsg(
+                        "A little stranger, here to bring balance to the world…\n" +
+                                "Why would the great stag repair the tear? Why should I help you?\n" +
+                                "What if I simply await the next cycle to begin? Hrmm…"
+                );
+                break;
+
+            case 1: // Bribe: give all items
+                player.addFlag("dragon_will_help");
+                player.addFlag("dragon_barter");
+
+                player.getInventory().clearInventory(); // ✔ Correct way
+
+                ui.displayMsg(
+                        "Oh, how humorous. Such frivolous mortal behavior.\n" +
+                                "Very well. You have paid your toll. Come, climb upon my back."
+                );
+                break;
+
+            case 2: // Fight the dragon
+                dragon.setHostile(true);
+                ui.displayMsg("The Ice Dragon roars and prepares for battle!");
+                gc.handleCombat(dragon);
+
+                if (dragon.isDead()) {
+                    player.addFlag("killed_ice_dragon");
+                    ui.displayMsg("The Ice Dragon has been slain!");
+                } else {
+                    ui.displayMsg("You were defeated.");
+                }
+                break;
+
+            default:
+                ui.displayMsg("The dragon watches you silently.");
+                break;
+        }
     }
 
-    // Dragon follow-up dialogue
-    public List<String> getDragonFollowUp(Player player) {
-        List<String> options = new ArrayList<>();
 
-        // In case we have already talked to the dragon before
-        if (!player.hasFlag("dragon_first_interaction")) {
-            return options;
-        }
+    public List<Choice> getDragonFollowUpChoices(Player player) {
+        List<Choice> choices = new ArrayList<>();
+        NPC dragon = npcs.get("ice_dragon");
 
-        // Additional dialogue options
-        options.add("Oh great dragon, I know my quest might be foolish in your wise eyes, but I must give it a\n" +
-                "try none the less, for if I did not try, I would regret it for the rest of my life.");
-        options.add("A new cycle can begin another time, for now is my time where I choose to try and mend\n" +
-                "the cycle that already is.");
+        if (dragon == null || dragon.isDead()) return choices;
+        if (!player.hasFlag("dragon_first_interaction")) return choices;
 
-        return options;
+        choices.add(Choice.interactChoice(
+                "Oh great dragon, I know my quest may seem foolish, but I must try.\n" +
+                        "If I did not, I would regret it for the rest of my life.",
+                dragon
+        ));
+
+        choices.add(Choice.interactChoice(
+                "A new cycle can begin another time. For now, I choose to mend the one that already is.",
+                dragon
+        ));
+
+        return choices;
     }
 
-    public String handleDragonFollowUp(int choice, Player player) {
-        if (choice == 1) {
-            player.addFlag("dragon_will_help"); // Helps you both ways
-            return "Very well, little one. Your determination moves me. Climb upon my back."; // Added dialogue
-        } else if (choice == 2) {
-            player.addFlag("dragon_will_not_help"); // Only helps you up
-            return "Very well. I shall take you to the peak, but you must find your own way down."; // Added dialogue
-        }
+    public void handleDragonFollowUp(Player player, Choice selectedChoice, int choiceIndex) {
 
-        return "";
+        if (selectedChoice == null) return;
+
+        ui.displayMsg("You: " + selectedChoice.getDescription());
+
+        switch (choiceIndex) {
+
+            case 0:
+                player.addFlag("dragon_will_help");
+                ui.displayMsg(
+                        "Very well, little one. Your determination moves even an ancient heart.\n" +
+                                "Climb upon my back."
+                );
+                break;
+
+            case 1:
+                player.addFlag("dragon_will_not_help");
+                ui.displayMsg(
+                        "So be it. I shall take you to the peak — but you must find your own way down."
+                );
+                break;
+
+            default:
+                ui.displayMsg("The dragon exhales cold mist...");
+                break;
+        }
     }
+
+
 
     // WHITE STAG DIALOGUE
     public List<String> getStagDialogue(Player player) {
