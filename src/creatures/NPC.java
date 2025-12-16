@@ -101,10 +101,7 @@ public class NPC extends Creature {
         // Handle the chosen dialogue directly
         story.handleDialogue(this, player, selected);
 
-        // Give quest if available
-        if (questToGive != null && !player.hasQuest(questToGive.getQuestId())) {
-            giveQuest(player);
-        }
+
 
         // Give held item if available
         if (itemHeld != null) {
@@ -122,7 +119,6 @@ public class NPC extends Creature {
     }
 
 
-
     // --- Despawn getter/setter ---
     public boolean doesDespawnWhenLeaving() {
         return despawnsWhenLeaving;
@@ -137,13 +133,6 @@ public class NPC extends Creature {
         ui.displayMsg(name + " says: " + text);
     }
 
-    // Give quest to player
-    public void giveQuest(Player player) {
-        if (questToGive != null && !player.addQuest(questToGive.getQuestId())) {
-            player.addQuest(questToGive);
-            ui.displayMsg(name + " gives you a quest: " + questToGive.getQuestName());
-        }
-    }
 
     // Give reward for turning in quest
     public void giveReward(Player player, Item reward) {
