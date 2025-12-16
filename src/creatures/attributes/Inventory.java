@@ -182,15 +182,12 @@ public class Inventory implements Iterable<Item> {
         }
         Item chosenItem = items.get(choice);
 
-        //call the item's effect on the player
-        chosenItem.user(player);
 
         //if item is consumable!, we remove it!
         if(chosenItem.isConsumable()){
             removeItem(chosenItem);
         }
     }
-    */
 
 
     public void clearInventory(){
