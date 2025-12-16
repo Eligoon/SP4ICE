@@ -1,6 +1,6 @@
 package creatures;
 
-
+import collectibles.Armor;
 import collectibles.Item;
 import collectibles.Quest;
 import collectibles.Weapon;
@@ -9,6 +9,7 @@ import creatures.attributes.Inventory;
 import creatures.attributes.Race;
 import creatures.attributes.Stats;
 import util.TextUI;
+import world.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class Player extends Creature {
 
     }
 
-
+    @Override
     public void interact() { //Interaction placeholder
         //TODO
     }
@@ -101,6 +102,16 @@ public class Player extends Creature {
         // TODO Add getter in quest?
     }
 
+    // Method to complete quest for the player
+    public void completeQuest(String questID){ // Marks quest as completed
+        for (Quest quest : questLog) {
+            if (quest.getQuestID().equals(questID)) {
+                completeQuest(this);
+                ui.displayMsg("The quest: " + quest.getQuestName() + "has been completed!");
+                return;
+            }
+        }
+    }
 
     // Flag management
 
@@ -134,7 +145,7 @@ public class Player extends Creature {
 
     // Method to receive / pickup an item
     public void pickUpItem(Item item){
-        inventory.addItem(item);
+        Inventory.addItem(item);
     }
 
     // Getter for inventory
