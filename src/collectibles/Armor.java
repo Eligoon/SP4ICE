@@ -28,7 +28,7 @@ public class Armor extends Item {
         return defense;
     }
 
-    // ---------- Armor difinetions ----------
+    // ---------- Armor definitions ----------
 
     public static Armor clothRobe() {
         return new Armor(

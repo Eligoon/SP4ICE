@@ -87,7 +87,6 @@ public class Choice {
                 break;
 
             case USEITEM:
-                gc.handleUseItem(item);
                 break;
 
             case EQUIPARMOUR:

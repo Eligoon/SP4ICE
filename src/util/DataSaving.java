@@ -238,7 +238,7 @@ public class DataSaving {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "REPLACE INTO npc_state (npc_name, location_name, is_dead, is_hostile) VALUES (?, ?, ?, ?)"))
         {
-            for (Creature c : location.getCreature()) {
+            for (Creature c : location.getCreature(location)) {
 
                 if (c instanceof NPC npc) {
                     stmt.setString(1, npc.getName());
@@ -404,7 +404,7 @@ public class DataSaving {
                 boolean npcFound = false;
                 NPC npcToRemove = null;
 
-                for (Creature c : location.getCreature()) {
+                for (Creature c : location.getCreature(allLocations.get(savedLocation))) {
                     if (c instanceof NPC npc && npc.getName().equals(npcName)) {
                         npcFound = true;
 

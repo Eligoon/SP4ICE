@@ -956,7 +956,7 @@ public class Story {
 
         switch (choiceIndex) {
 
-            case 0: // First interaction (peaceful plea)
+            case 0: // First interaction
                 player.addFlag("dragon_first_interaction");
                 ui.displayMsg(
                         "A little stranger, here to bring balance to the world…\n" +
@@ -965,11 +965,11 @@ public class Story {
                 );
                 break;
 
-            case 1: // Bribe: give all items
+            case 1: // Give all items
                 player.addFlag("dragon_will_help");
                 player.addFlag("dragon_barter");
 
-                player.getInventory().clearInventory(); // ✔ Correct way
+                player.getInventory().clearInventory();
 
                 ui.displayMsg(
                         "Oh, how humorous. Such frivolous mortal behavior.\n" +
@@ -977,7 +977,7 @@ public class Story {
                 );
                 break;
 
-            case 2: // Fight the dragon
+            case 2: // Fight dragon
                 dragon.setHostile(true);
                 ui.displayMsg("The Ice Dragon roars and prepares for battle!");
                 gc.handleCombat(dragon);
