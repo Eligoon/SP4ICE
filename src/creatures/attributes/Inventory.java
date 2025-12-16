@@ -6,6 +6,7 @@ import creatures.Player;
 import util.TextUI;
 import collectibles.Item;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Inventory {
@@ -29,9 +30,19 @@ public class Inventory {
         return true;
     }
 
-    public void removeItem(Item item){
-        items.remove(item);
+    public boolean removeItem(String itemName) {
+        Iterator<Item> iterator = items.iterator();
+
+        while (iterator.hasNext()) {
+            Item item = iterator.next();
+            if (item.getItemName().equalsIgnoreCase(itemName)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
+
 
     public void displayInventory(){
         ui.displayMsg("=== INVENTORY ===");
