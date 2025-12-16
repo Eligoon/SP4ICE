@@ -137,6 +137,9 @@ public class GameController {
             // Save overall game state
             db.saveGameState(this);
 
+            // Save current location of player
+            db.saveCurrentLocation(currentLocation);
+
             ui.displayMsg("Game successfully saved!");
         } catch (Exception e) {
             ui.displayMsg("Error saving game: " + e.getMessage());
