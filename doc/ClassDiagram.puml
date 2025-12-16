@@ -3,110 +3,196 @@
 'Game controller'
 class GameController {
     - currentLocation : Location
+    'Attributes
     - ui : TextUI
     - emeraldTear : Story
+    - db : DataSaving
+    - url : String
     - player : Player
-    + move(direction:String)
-    + handleCombat(enemy:Creature)
-    + handleNPCInteraction(npc:Creature)
-    + handleUseItem(item:Item)
-    + handleEquipArmour(item:Item)
-    + handleEquipWeapon(item:Item)
+    'Game Flow
     + initializeGame() : void
+    - displayClassSpecificIntro() : void
+    'Movement
+    + move(direction:String) : void
+    + getCurrentLocation() : Location
+    + getLocationChoices() : List<Choice>
+    'Interaction
+    + handleCombat(enemy:Creature) :void
+    + handleNPCInteraction(npc:Creature) : void
+    + handleUseItem(item:Item) : void
+    + handleEquipArmour(item:Item) : void
+    + handleEquipWeapon(item:Item) : void
 }
 
 
 'Text UI '
 class TextUI {
-    - static sc : Scanner
-    + displayMsg(msg : String) : void
-    + displayChoices(choices : List<Choice>) : void
-    + getPlayerInput() : String
-    + displayInventory(inventory : Inventory) : void
-    + displayCombatStatus(player : Player, enemy : Creature) : void
+    - sc : Scanner {static}
+    'Prompts'
     + promptChoice(options : ArrayList<String>, limit : int, msg : String) : ArrayList<String>
-    + displayList(list : ArrayList<String>, msg : String) : void
     + promptNumeric(msg : String) : int
     + promptText(msg : String) : String
     + promptBinary(msg : String) : boolean
-    + getAvailableChoices(all : List<Choice>, player : Player) : List<Choice>
+    + getPlayerInput() : String
     + promptChoiceOb(choices : List<Choice>, msg : String) : Choice
+    'Display'
+    + displayMsg(msg : String) : void
+    + displayList(list : ArrayList<String>, msg : String) : void
+    + displayChoices(choices : List<Choice>) : void
+    + displayInventory(inventory : Inventory) : void
+    + displayCombatStatus(player : Player, enemy : Creature) : void
+    'Helper'
+    +getAvailableChoices(all : List<Choice>, player : Player) : List<Choice>
 }
 
 
-'Saving data '
+'Saving data'
 class DataSaving {
     - connection : Connection
     + connect(url : String) : void
+    - createTables() : void
+    'Save
     + saveGameState(gameController : GameController) : void
     + saveCurrentLocation(location : Location) : void
     + savePlayer(player : Player, location : Location) : void
     + saveInventory(player : Player) : void
     + saveNPCs(location : Location) : void
+    'Load
     + loadGameState() : String
     + loadLocation(locationName : String, allLocations : Map<String, Location>) : Location
     + loadPlayer() : Player
     + loadInventory(player : Player) : void
     + loadNPCs(allLocations : Map<String, Location>, savedLocation : String) : void
-    + deleteSave() : void
+    'Helpers
     + getRaceFromString(raceName : String) : Race
     + getClassFromString(className : String) : CharacterClass
+    'Reset
+    + deleteSave() : void
 }
 
 
 'Story'
 class Story {
-    - storySegments : Map<String, String>
+  ' Attributes
+  - ui : TextUI
+  - locations : Map<String, Location>
+  - npcs : Map<String, NPC>
+  ' Individual locations
+  - theClearing : Location
+  - huntingCabin : Location
+  - theLake : Location
+  - theForestPath : Location
+  - theTravellingMerchant : Location
+  - theSwampPath : Location
+  - theMurkyWaters : Location
+  - theWitchHut : Location
+  - theOfferingBog : Location
+  - theFrozenBog : Location
+  - theMountainPath : Location
+  - theRootsOfTheMountain : Location
+  - theFreezingPass : Location
+  - theCave : Location
+  - theCrownOfTheWorld : Location
+  'Constructor
+  + Story()
+  'Story setup
+  + displayWelcomeMessage() : void
+  + loadStory() : void
+  + createLocations() : void
+  + storeLocations() : void
+  - connectLocations() : void
+  - createNPCs() : void
+  - populateCreatures() : void
+  'Location access
+  + getLocation(locationName : String) : Location
+  'Dialogue systems
+  + getMerchantDialogue(player : Player) : List<String>
+  + handleMerchantDialogue(choice : int, player : Player) : String
+  + getSirenDialogue(player : Player) : List<String>
+  + handleSirenDialogue(choice : int, player : Player) : String
+  + getWitchDialogue(player : Player) : List<String>
+  + handleWitchDialogue(choice : int, player : Player) : String
+  + getDragonDialogue(player : Player) : List<String>
+  + handleDragonDialogue(choice : int, player : Player) : String
+  + getDragonFollowUp(player : Player) : List<String>
+  + handleDragonFollowUp(choice : int, player : Player) : String
+  + getStagDialogue(player : Player) : List<String>
+  + handleStagDialogue(choice : int, player : Player) : String
+  + getOrcDialogue(player : Player) : List<String>
+  + handleOrcDialogue(choice : int, player : Player) : String
+  'Ending
+  + getEpilogue(player : Player) : String
 }
 
+
 'Choice'
- class Choice {
-        - description : String
-        - taken : boolean
-        - type : ChoiceType
-        - targetLocation : Location
-        - enemy : Creature
-        - npc : Creature
-        - item : Item
-        - requirements : List<Requirement>
-
-        + addRequirement(req: Requirement) : void
-        + isAvailable(player: Player) : boolean
-        + execute(gc: GameController) : void
-
-        + getDescription() : String
-        + getType() : ChoiceType
-        + getTargetLocation() : Location
-        + getEnemy() : Creature
-        + getNpc() : Creature
-        + getItem() : Item
-        + getRequirements() : List<Requirement>
-        + isTaken() : boolean
-        + setTaken(taken: boolean) : void
- }
+class Choice {
+  'Attributes
+  - description : String
+  - taken : boolean
+  - type : ChoiceType
+  - targetLocation : Location
+  - enemy : Creature
+  - npc : Creature
+  - item : Item
+  - requirements : List<Requirement>
+  'Constructor
+  - Choice()
+  + {static} moveChoice(description : String, location : Location) : Choice
+  + {static} combatChoice(description : String, enemy : Creature) : Choice
+  + {static} interactChoice(description : String, npc : Creature) : Choice
+  + {static} itemChoice(description : String, item : Item, type : ChoiceType) : Choice
+  'Behavior
+  + addRequirement(req : Requirement) : void
+  + isAvailable(player : Player) : boolean
+  + execute(gc : GameController) : void
+  'Getters / Setters
+  + getDescription() : String
+  + getType() : ChoiceType
+  + getTargetLocation() : Location
+  + getEnemy() : Creature
+  + getNpc() : Creature
+  + getItem() : Item
+  + getRequirements() : List<Requirement
+  + isTaken() : boolean
+  + setTaken(taken : boolean) : void
+}
 
 ' Classes for requirements used in choices
 
+'ClassRequirement
 class ClassRequirement {
-
+- requiredClass : String
++ ClassRequirement (requiredClass : String)
++ isMet(player : player) : boolean
 }
 
+'ItemRequirement
 class ItemRequirement {
-
+- itemName : String
++ ItemRequirement (itemName : String)
++ isMet (player : Player) : boolean
 }
 
+'NpcDeadRequirement
 class NpcDeadRequirement {
-
+- npc : NPC
++ isMet(player : Player) :boolean
 }
 
+'RaceRequirement
 class RaceRequirement {
-
+    - requiredRace : String
+    + RaceRequirement(requiredRace : String)
+    + isMet(player : Player) : boolean
 }
 
+'MultiRequirement
 class MultiRequirement {
-  - requirements : List<Requirement>
-  - operator : ChoiceType
-  + MultiRequirement(List<Requirement> requirements, ChoiceType operator)
+    - requirements : List<Requirement>
+    - operator : ChoiceType
+    + MultiRequirement(requirements : List<Requirement>, operator : ChoiceType)
+    + isMet(player : Player) : boolean
 }
 
 ' Interface for requirements
@@ -123,7 +209,6 @@ enum ChoiceType {
     USEITEM
     EQUIPARMOUR
     EQUIPWEAPON
-
     AND
     OR
 }
@@ -131,125 +216,202 @@ enum ChoiceType {
 
 'Stats'
 class Stats {
-    - health : int
+    'attributes
+    - maxHealth : int
+    - currentHealth : int
     - strength : int
     - dexterity : int
     - intelligence : int
-    + getHealth() : int
-    + setHealth(value : int) : void
+    'constructor
+    + Stats(maxHealth : int, strength : int, dexterity : int, intelligence : int)
+    'getters / setters
+    + getCurrentHealth() : int
+    + getMaxHealth() : int
     + getStrength() : int
-    + setStrength(value : int) : void
     + getDexterity() : int
-    + setDexterity(value : int) : void
     + getIntelligence() : int
+    + setCurrentHealth(value : int) : void
+    + setMaxHealth(value : int) : void
+    + setStrength(value : int) : void
+    + setDexterity(value : int) : void
     + setIntelligence(value : int) : void
+
     + applyModifier(stat : String, modifier : int) : void
+    + takeDamage(damage : int) : void
+    + heal(amount : int) : void
 }
 
 'Creature'
-abstract class Creature {
+class Creature {
+    'attributes
     # name : String
+    # description : String
     # race : Race
     # stats : Stats
-    + {abstract} interact() : void
-    + fight(target : Creature) : void
-    + pickUpItem(item : Item) : void
-    + getName() : String
-    + getRace() : Race
-    + getStats() : Stats
+    # isDead : boolean
+    'constructor
+    + Creature(name : String, race : Race, stats : Stats)
+    'methods
+    + takeDamage(damage : int) : void
+        + isAlive() : boolean
+        + setDead(dead : boolean) : void
+
+        + getName() : String
+        + getRace() : Race
+        + getStats() : Stats
+        + getCurrentHP() : int
+        + getMaxHP() : int
+        + getIsDead() : boolean
 }
 
-enum AttackStat {
-STRENGTH,
-INTELLIGENCE,
-DEXTERITY
-}
-
-'Player'
 class Player {
-    - characterClass : String
+    'attributes
+    - characterClass : CharacterClass
     - inventory : Inventory
     - questLog : List<Quest>
-    - equippedWeapon : Weapon
+    - flags : List<String>
+    - ui : TextUI
+    'constructors
+    + Player(name : String, race : Race, characterClass : CharacterClass, stats : Stats)
+    'methods
     + interact() : void
+    + useItem(item : Item) : void
+    + equipWeapon(weapon : Weapon) : void
+    + equipArmor(armor : Armor) : void
     + addQuest(quest : Quest) : void
     + completeQuest(questID : String) : void
-    + attack(target : Creature) : int
-    + heal(amount : int) : void
-    + getCharacterClass() : String
+    + addFlag(flag : String) : void
+    + hasFlag(flag : String) : boolean
+    + removeFlag(flag : String) : void
+    + getFlags() : List<String>
+    + pickUpItem(item : Item) : void
     + getInventory() : Inventory
     + getQuestLog() : List<Quest>
-    + getEquippedWeapon() : Weapon
+    + isWarrior() : boolean
+    + isMage() : boolean
+    + isRanger() : boolean
+    + isHuman() : boolean
+    + isElf() : boolean
+    + isDwarf() : boolean
+    + isOrc() : boolean
 }
 
-' NPC '
+' NPC
 class NPC {
+    'attributes
+    - NPC_ID : String
     - dialogue : List<String>
-    - questToGive : Object
+    - questToGive : Quest
     - itemHeld : Item
     - isHostile : boolean
     - isDead : boolean
     - originalLocation : String
     - despawnsWhenLeaving : boolean
     - ui : TextUI
-    + CPU_Attack(player: Player) : void
+    'constructor
+    + NPC(name : String, NPC_ID : String, stats : Stats, dialogue : List<String>, isHostile : boolean, itemHeld : Item, questToGive : Quest)
+    'methods
+    + CPU_Attack(player : Player) : void
     + doesDespawnWhenLeaving() : boolean
-    + setDespawnWhenLeaving(value: boolean) : void
+    + setDespawnWhenLeaving(value : boolean) : void
+    + speak(text : String) : void
+    + giveQuest(player : Player) : void
+    + giveReward(player : Player, reward : Item) : void
     + isHostile() : boolean
-    + setHostile(hostile: boolean) : void
+    + setHostile(hostile : boolean) : void
     + isDead() : boolean
-    + setDead(dead: boolean) : void
+    + setDead(dead : boolean) : void
     + getOriginalLocation() : String
-    + setOriginalLocation(location: String) : void
+    + setOriginalLocation(originalLocation : String) : void
 }
 
-' Race '
+
+' Race
 class Race {
+    'attributes
     - raceName : String
     - healthModifier : int
     - strengthModifier : int
     - dexterityModifier : int
     - intelligenceModifier : int
     - specialAbility : String
+    'constructors
+    + Race(raceName : String, healthModifier : int, strengthModifier : int, dexterityModifier : int, intelligenceModifier : int, specialAbility : String)
+    'methods
     + applyRacialBonuses(stats : Stats) : void
     + getRaceName() : String
     + getSpecialAbility() : String
+
+    + createHuman() : Race
+    + createDwarf() : Race
+    + createElf() : Race
+    + createOrc() : Race
+    + getAllRaces() : List<Race>
 }
+
 
 ' CharacterClass '
 class CharacterClass {
+    'attributes
     - characterClassName : String
     - healthModifier : int
     - strengthModifier : int
     - dexterityModifier : int
     - intelligenceModifier : int
     - specialSkills : List<String>
-    + CharacterClass(characterClassName : String, healthModifier : int, strengthModifier : int, dexterityModifier : int, intelligenceModifier : int, specialSkills : List<String>)
+    'constructors
+    + CharacterClass(
+        characterClassName : String,
+        healthModifier : int,
+        strengthModifier : int,
+        dexterityModifier : int,
+        intelligenceModifier : int,
+        specialSkills : List<String>
+      )
+    'methods
+    + applyCharacterClassBonuses(stats : Stats) : void
+
+    + getCharacterClassName() : String
+    + getSpecialSkills() : List<String>
+    'static
     + createWarrior() : CharacterClass
     + createMage() : CharacterClass
     + createRanger() : CharacterClass
     + getAllCharacterClasses() : List<CharacterClass>
-    + applyCharacterClassBonuses(stats : Stats) : void
-    + getCharacterClassName() : String
-    + getSpecialSkills() : List<String>
 }
 
 
 'Location'
 class Location {
+    'attributes
     - locationName : String
     - description : String
     - creatures : List<Creature>
     - items : List<Item>
     - availableChoices : List<Choice>
     - connectedLocations : Map<String, Location>
-    + enter(player : Player) : void
-    + displayDescription() : String
-    + getAvailableChoices() : List<Choice>
+    - ui : TextUI
+    'constructors
+    + Location(
+        locationName : String,
+        description : String,
+        creatures : List<Creature>,
+        items : List<Item>,
+        availableChoices : List<Choice>,
+        connectedLocations : Map<String, Location>
+      )
+    + Location(locationName : String, description : String)
+    'methods
+    + addConnectedLocation(direction : String, location : Location) : void
+    + getConnectedLocation(direction : String) : Location
     + addCreature(creature : Creature) : void
-    + removeCreature(creature : Creature) : void
     + addItem(item : Item) : void
-    + removeItem(item : Item) : void
+    + addChoice(choice : Choice) : void
+    + hasCreatures() : boolean
+    + hasItems() : boolean
+    + getLocationName() : String
+    + getDescription() : String
+    + displayLocation() : void
 }
 
 'helper class to create items'
@@ -372,7 +534,6 @@ Player --> Choice : can make
 ' NPC composition
 NPC "1" --> "0..1" Quest : canGive
 NPC "1" --> "0..1" Item : holds
-NPC --> AttackStat : uses
 
 ' Inventory relationships
 Inventory "1" --> "*" Item : contains
