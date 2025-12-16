@@ -903,7 +903,7 @@ public class Story {
             player.addFlag("dragon_will_help");
             player.addFlag("dragon_barter");
             for (Item i : player.getInventory().getItems()) { // Removes all items from inventory
-                player.getInventory().removeItem(i);
+                player.getInventory().clearInventory();
             }
             return "Oh, how humorous, yet I am not one to say no to such frivolous mortal behavior. " +
                     "Come, climb on my back as you have paid your toll.";
