@@ -515,6 +515,7 @@ public class Story {
     // DIALOGUE OPTIONS
 
     // Generic getter for dialogue choices to go to game controller
+    // Generic getter for dialogue choices to go to game controller
     public List<Choice> getDialogueChoices(NPC npc, Player player) {
         if (npc == null || npc.isDead()) {
             return new ArrayList<>();
@@ -543,6 +544,9 @@ public class Story {
             case "offering_orc_2":
                 return getBogOrcDialogueChoices(player);
 
+            case "white_stag":
+                return getStagDialogueChoices(player);
+
             default:
                 List<Choice> options = new ArrayList<>();
                 options.add(Choice.interactChoice(
@@ -553,6 +557,7 @@ public class Story {
         }
     }
 
+    // Generic handler for dialogue choice to go to game controller
     public void handleDialogue(NPC npc, Player player, Choice selectedChoice) {
         if (npc == null || npc.isDead() || selectedChoice == null) return;
 
@@ -591,11 +596,16 @@ public class Story {
                 handleBogOrcDialogue(player, selectedChoice);
                 break;
 
+            case "white_stag":
+                handleStagDialogue(player, selectedChoice, choiceIndex);
+                break;
+
             default:
                 npc.speak("I have nothing special to say.");
                 break;
         }
     }
+
 
 
 
