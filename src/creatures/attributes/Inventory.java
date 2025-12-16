@@ -173,4 +173,14 @@ public class Inventory {
             removeItem(chosenItem);
         }
     }
+
+    public void clearInventory(){
+        items.clear();
+        equippedWeapon = null;
+        equippedArmor = null;
+
+        ui.displayMsg("Inventory has been cleared!");
+    }
+
+
 }
