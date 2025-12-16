@@ -546,15 +546,18 @@ public class Story {
 
 
             default:
-                ui.displayMsg("");
-
+                List<Choice> options = new ArrayList<>();
+                options.add(Choice.interactChoice(
+                        "Hello " + player.getName() + "!", location
+                ));
+                return options;
         }
     }
 
     public void handleLocationDialogue(Location location, Player player, Choice selectedChoice) {
         if (location == null || selectedChoice == null) return;
 
-        List<Choice> choices = getLocationDialogue(location player);
+        List<Choice> choices = getLocationDialogue(location, player);
         int choiceIndex = choices.indexOf(selectedChoice);
 
         if (choiceIndex < 0) return; // Safety check
