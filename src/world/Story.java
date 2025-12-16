@@ -4,6 +4,7 @@ import collectibles.Item;
 import controller.Choices.Choice;
 import controller.Choices.RaceRequirement;
 import controller.GameController;
+import creatures.Creature;
 import creatures.NPC;
 import creatures.Player;
 import creatures.attributes.Stats;
@@ -11,15 +12,17 @@ import util.TextUI;
 import world.Location;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 
-    public class Story {
+public class Story {
         TextUI ui = new TextUI();
         // Make map for connecting locations
         private Map<String, Location> locations;
         private GameController gc;
 
         public Story(GameController gc) {
+            this();
             this.gc = gc;
         }
 
@@ -85,13 +88,13 @@ import java.util.*;
     }
 
     public void createLocations() {
-        Location theClearing = new Location(
+        this.theClearing = new Location(
                 "The Clearing",
                 "A glistening flower stands dancing in the gentle breeze in the middle of the clearing. It is taller than you are,\n" +
                         "and strangely glowing below the dew that coats it. This is the sense of danger you felt.\n" +
                         "Roots fly up towards you, attempting to grab and strangle you! "
         );
-        Location huntingCabin = new Location(
+        this.huntingCabin = new Location(
                 "The Hunting Cabin",
                 "Through the barricaded window opening of the cabin," +
                         "you can see crates. They may contain something useful. " +
@@ -100,7 +103,7 @@ import java.util.*;
                         "it. You will need a key to enter."
         );
 
-        Location theLake = new Location(
+        this.theLake = new Location(
                 "The Lake",
                 "You follow the scent of water, and after walking for a while, through lush bushes filled with berries and\n" +
                         "flowers, you see the glinting of an unending number of reflections.\n" +
@@ -113,7 +116,7 @@ import java.util.*;
 
         );
 
-        Location theForestPath = new Location(
+        this.theForestPath = new Location(
                 "The Forest Path",
                 "You walk towards the path you spotted in the forest to the east. It does not take you long before you find\n" +
                         "yourself walking easier on a well-trodden road. Despite the frequent use you imagine the road has had, you\n" +
@@ -127,7 +130,7 @@ import java.util.*;
                         "        clearing in the forest to the South."
         );
 
-        Location theTravellingMerchant = new Location(
+        this.theTravellingMerchant = new Location(
                 "The Travelling Merchant",
                 "An older human man sits and rests with a lit pipe in his mouth up against his small caravan cart. Two work\n" +
                         "horses graze nearby on the greens of the forest floor.\n" +
@@ -135,7 +138,7 @@ import java.util.*;
                         "“Why hello stranger, care to see my wares?”\n"
         );
 
-        Location theSwampPath = new Location(
+        this.theSwampPath = new Location(
                 "The Swamp Path",
                 "You walk into the denser and wetter part of the forest, and soon large trees are swapped out for swamp and\n" +
                         "bog. Your steps are slow and the air harder to breathe. The smell attacks your nose and air your eyes. Yet\n" +
@@ -144,7 +147,7 @@ import java.util.*;
                         "dark furred dire wolf. It launches to attack you."
         );
 
-        Location theMurkyWaters = new Location(
+        this.theMurkyWaters = new Location(
                 "The Murky Waters",
                 "You go through the swampy landscape, the murky waters now waist deep, and you swear something just\n" +
                         "moved past your legs down below the surface.\n" +
@@ -153,7 +156,7 @@ import java.util.*;
                         "deadly to go through them.\n"
         );
 
-        Location theWitchHut = new Location(
+        this.theWitchHut = new Location(
                 "The Witch's Hut",
                 "Having waded through only the gods knows what in the murky waters, soaked and a little low on spirit and\n" +
                         "cheer. You reach a little hut on a patch of dry land in these horrid swamplands.\n" +
@@ -166,7 +169,7 @@ import java.util.*;
                         "face radiating beauty and grace. She turns to look at you expectational."
         );
 
-        Location theOfferingBog = new Location(
+        this.theOfferingBog = new Location(
                 "The Offering Bog",
                 "You choose to go to the darker, murkier, more dangerous part of the swamp. As soon as you being moving\n" +
                         "further south, your nose, your eyes they burn with a stench worse than rot and death. Or perhaps that is\n" +
@@ -181,7 +184,7 @@ import java.util.*;
                         "“WHO IS THERE?!” roars one of them. "
         );
 
-        Location theFrozenBog = new Location(
+        this.theFrozenBog = new Location(
                 "The Frozen Bog",
                 "Past the runes and magical symbols that kept you from entering the barrier. You quickly feel the\n" +
                         "temperature drop, you are moving upwards, the bog is becoming more of a frozen wetland. Reeds stand\n" +
@@ -194,7 +197,7 @@ import java.util.*;
                         "is also new, so you are certain you are not far behind them!\n"
         );
 
-        Location theMountainPath = new Location(
+        this.theMountainPath = new Location(
                 "The Mountain Path",
                 "The path from the forest leads all the way to the beginning of the mountain of origin. By first glance this is\n" +
                         "the fastest way up. But once you begin walking up, you are soon met with a wall of solid rock, snow and ice.\n" +
@@ -202,7 +205,7 @@ import java.util.*;
                         "have to find another way up.\n"
         );
 
-        Location theRootsOfTheMountain = new Location(
+        this.theRootsOfTheMountain = new Location(
                 "The Roots of the Mountain",
                 "You start climbing up the roots of the mountain, sharp ledges and rough terrain. But if you are to succeed to\n" +
                         "bringing balance back before it is too late, there is nothing to do but press ahead.\n" +
@@ -212,7 +215,7 @@ import java.util.*;
                         "become dark soon, and cold, very cold. You will need to find shelter."
         );
 
-        Location theFreezingPass = new Location(
+        this.theFreezingPass = new Location(
                 "The Freezing Pass",
                 "You climb and climb and climb until you reach where the mountain path should have taken you. Exhausted\n" +
                         "you sit down for a moment on a rock, overlooking the view.\n" +
@@ -236,7 +239,7 @@ import java.util.*;
                         "it head and huffs hot air out through its nostrils, it swings its horns at you."
         );
 
-        Location theCave = new Location(
+        this.theCave = new Location(
                 "The Cave",
                 "You reach a gigantic cave, it had looked smaller from the distance you saw it in earlier, but now, it is far\n" +
                         "beyond anything you have ever seen. Three houses if not more could be stacked in here on top of each\n" +
@@ -248,7 +251,7 @@ import java.util.*;
                         "and roars."
         );
 
-        Location theCrownOfTheWorld = new Location(
+        this.theCrownOfTheWorld = new Location(
                 "The Crown of the World",
                 "The dragon upon its back flies you to the peak of the mountain of origin, you can barely hang on to its\n" +
                         "slippery icy back spikes as the wind tries to knock you off by the sheer speed of the great dragon.\n" +
@@ -390,136 +393,131 @@ import java.util.*;
 
     // NPC CREATION
     private void createNPCs() {
+        npcs = new HashMap<>(); // Initialize map
+
+        // Helper to add NPCs consistently
+        BiConsumer<String, NPC> addNPC = (id, npc) -> npcs.put(id.trim().toLowerCase(), npc);
+
         // Travelling Merchant
         NPC merchant = new NPC(
                 "The Travelling Merchant",
                 "merchant",
                 new Stats(0, 0, 0, 0),
-                Arrays.asList(
-                        "Why hello stranger, care to see my wares?"
-                ),
-                false, // Not hostile
-                null, // Item Held until items are created, has cabin key
-                null // Dire wolf quest - added later
+                List.of("Why hello stranger, care to see my wares?"),
+                false,
+                null,
+                null
         );
-        npcs.put("merchant", merchant); // Map NPC id to merchant
-
-        // FIGHTABLE NPCs
+        addNPC.accept(merchant.getNPC_ID(), merchant);
 
         // Lake Siren
         NPC siren = new NPC(
-                "Lake Siren", // Name
-                "siren",            // NPC ID
+                "Lake Siren",
+                "siren",
                 new Stats(10, 10, 10, 10),
-                Arrays.asList(
-                        "What seek you here, at my lake?"
-                ),
-                false, // Only hostile when provoked
-                null, // Item held, has the heart of the siren - drops if slayed
-                null // Has no quest
+                List.of("What seek you here, at my lake?"),
+                false,
+                null,
+                null
         );
-        npcs.put("siren", siren); // Map NPC id to siren
+        addNPC.accept(siren.getNPC_ID(), siren);
 
         // Witch
         NPC witch = new NPC(
                 "Witch of the Witch's hut",
                 "witch",
-                new Stats(10, 10, 10, 10), // Base stats
-                Arrays.asList(
-                        " "
-                ),
-                false, // Can be hostile
-                null, // Has special loot
-                null // She does have a quest
+                new Stats(10, 10, 10, 10),
+                List.of(" "),
+                false,
+                null,
+                null
         );
-        npcs.put("witch", witch);
+        addNPC.accept(witch.getNPC_ID(), witch);
 
-        // Ice dragon
+        // Ice Dragon
         NPC ice_dragon = new NPC(
                 "Ice Dragon",
                 "ice_dragon",
-                new Stats(150, 30, 20, 50), // Proposed stats
-                Arrays.asList("" +
-                        "What brings you to my cave?"
-                ),
-                false, // Not necessarily hostile
-                null, // No item
-                null // No quest
+                new Stats(150, 30, 20, 50),
+                List.of("What brings you to my cave?"),
+                false,
+                null,
+                null
         );
-        npcs.put("ice_dragon", ice_dragon);
+        addNPC.accept(ice_dragon.getNPC_ID(), ice_dragon);
 
-        // Dire wolf
+        // Dire Wolf
         NPC dire_wolf = new NPC(
                 "Dire Wolf",
                 "dire_wolf",
-                new Stats(10, 10, 10, 10), // Base stats
-                List.of(""), // No voice lines
-                true, // Is hostile
-                new Item("Head of the Dire Wolf", "Dropped when killing the Dire Wolf", 2), // Drops head of the dire wolf
-                null // Doesn't give quest
+                new Stats(10, 10, 10, 10),
+                List.of(""),
+                true,
+                new Item("Head of the Dire Wolf", "Dropped when killing the Dire Wolf", 2),
+                null
         );
-        npcs.put("dire_wolf", dire_wolf);
+        addNPC.accept(dire_wolf.getNPC_ID(), dire_wolf);
 
-        // Mountain goat
+        // Mountain Goat
         NPC mountain_goat = new NPC(
                 "Mountain Goat",
                 "mountain_goat",
-                new Stats(30, 5, 10, 5), // Proposed stats
-                Arrays.asList(""),
-                true, // Is hostile towards player
-                null, // Has minor loot
+                new Stats(30, 5, 10, 5),
+                List.of(""),
+                true,
+                null,
                 null
         );
-        npcs.put("mountain_goat", mountain_goat);
+        addNPC.accept(mountain_goat.getNPC_ID(), mountain_goat);
 
-        // Great white stag
+        // Great White Stag
         NPC stag = new NPC(
                 "Great White Stag",
-                "white_stag",
+                "white_stag", // Updated ID to match dialogue switch
                 new Stats(200, 20, 15, 10),
-                Arrays.asList(""),
-                false, // Can be hostile if provoked
+                List.of(""),
+                false,
                 null,
-                null // No quest to give
+                null
         );
-        npcs.put("great_white_stag", stag);
+        addNPC.accept(stag.getNPC_ID(), stag);
 
-        // Glistening flower
+        // Glistening Flower
         NPC flower = new NPC(
                 "Glistening Flower",
                 "glistening_flower",
-                new Stats(40, 5, 5, 5), // Proposed stats
-                Arrays.asList(""),
-                true, // Hostile towards player
-                new Item("Heart of the Flower", "Heart of the flower gained by defeating" +
-                        "the Glistening Flower in The Clearing", 1), // Need to implement Item class
-                null // Doesn't give quest
+                new Stats(40, 5, 5, 5),
+                List.of(""),
+                true,
+                new Item("Heart of the Flower", "Heart of the flower gained by defeating the Glistening Flower", 1),
+                null
         );
-        npcs.put("glistening_flower", flower);
+        addNPC.accept(flower.getNPC_ID(), flower);
 
-            NPC orc_1 = new NPC(
-                    "Offering Bog Orc 1",
-                    "offering_orc_1",
-                    new Stats(40,10,10,3), // Proposed stats
-                    Arrays.asList("Who is there?!"),
-                    false, // Only when given the right dialogue
-                    new Item("Heart of the Bog", "Looted by defeating the orcs or looted from the already dead orcs", 1),
-                    null // No quests to give
-            );
-            npcs.put("offering_orc_1",orc_1);
+        // Offering Bog Orcs
+        NPC orc_1 = new NPC(
+                "Offering Bog Orc 1",
+                "offering_orc_1",
+                new Stats(40, 10, 10, 3),
+                List.of("Who is there?!"),
+                false,
+                new Item("Heart of the Bog", "Looted by defeating the orcs or looted from the already dead orcs", 1),
+                null
+        );
+        addNPC.accept(orc_1.getNPC_ID(), orc_1);
 
-            NPC orc_2 = new NPC(
-                    "Offering Bog Orc 2",
-                    "offering_orc_2",
-                    new Stats(40,10,10,3), // Proposed stats
-                    Arrays.asList(""),
-                    false, // Only when given the right dialogue
-                    null, // Only one orc holds item
-                    null // No quests to give
-            );
-            npcs.put("offering_orc_2",orc_2);
-
+        NPC orc_2 = new NPC(
+                "Offering Bog Orc 2",
+                "offering_orc_2",
+                new Stats(40, 10, 10, 3),
+                List.of(""),
+                false,
+                null,
+                null
+        );
+        addNPC.accept(orc_2.getNPC_ID(), orc_2);
     }
+
 
     private void populateCreatures() {
         theClearing.addCreature(npcs.get("glistening_flower"));
@@ -529,10 +527,12 @@ import java.util.*;
         theWitchHut.addCreature(npcs.get("witch"));
         theFreezingPass.addCreature(npcs.get("mountain_goat"));
         theCave.addCreature(npcs.get("ice_dragon"));
-        theCrownOfTheWorld.addCreature(npcs.get("great_white_stag"));
+        theCrownOfTheWorld.addCreature(npcs.get("white_stag"));
         theOfferingBog.addCreature(npcs.get("offering_orc_1"));
         theOfferingBog.addCreature(npcs.get("offering_orc_2"));
     }
+
+
 
     // DIALOGUE OPTIONS FOR LOCATIONS
 
@@ -702,6 +702,9 @@ import java.util.*;
 
         switch (npc.getNPC_ID().toLowerCase()) {
 
+            case "glistening_flower":
+                return getFlowerDialogueChoices(player);
+
             case "siren":
                 return getSirenDialogueChoices(player);
 
@@ -744,8 +747,12 @@ import java.util.*;
         int choiceIndex = choices.indexOf(selectedChoice);
 
         if (choiceIndex < 0) return; // Safety check
+        String id = npc.getNPC_ID().trim().toLowerCase();
+        switch (id) {
 
-        switch (npc.getNPC_ID().toLowerCase()) {
+            case "glistening_flower":
+                handleFlowerDialogue(player, selectedChoice, choiceIndex);
+                break;
 
             case "siren":
                 handleSirenDialogue(player, selectedChoice, choiceIndex);
@@ -785,6 +792,43 @@ import java.util.*;
         }
     }
 
+
+    // FLOWER DIALOGUE
+
+    public List<Choice> getFlowerDialogueChoices(Player player) {
+        List<Choice> choices = new ArrayList<>();
+        NPC flower = npcs.get("glistening_flower");
+
+        if (flower == null || flower.isDead()) return choices;
+
+        Choice fight = Choice.interactChoice("Attack the flower!",
+                flower
+                );
+        choices.add(fight);
+
+        return choices;
+    }
+
+    public void handleFlowerDialogue(Player player, Choice selectedChoice, int choiceIndex) {
+        NPC flower = npcs.get("glistening_flower");
+        if (flower == null || flower.isDead() || selectedChoice == null) return;
+
+        ui.displayMsg("You: " + selectedChoice.getDescription());
+
+        switch (choiceIndex) {
+
+            case 0:
+                gc.handleCombat(flower);
+
+                if (flower.isDead()) {
+                    player.pickUpItem(new Item("Heart of the Flower", "Heart of the Flower obtained by killing the Glistening Flower", 1));
+                    ui.displayMsg("You have slain the Flower and obtained its Heart!");
+                } else {
+                    ui.displayMsg("You were defeated.");
+                }
+                break;
+        }
+    }
 
 
     // MERCHANT DIALOGUE
@@ -1224,7 +1268,7 @@ import java.util.*;
 
     // WHITE STAG DIALOGUE
     public List<Choice> getStagDialogueChoices(Player player) {
-        NPC stag = npcs.get("white_stag");
+        NPC stag = npcs.get("great_white_stag");
         List<Choice> options = new ArrayList<>();
         if (stag == null || stag.isDead()) return options;
 
@@ -1235,7 +1279,7 @@ import java.util.*;
     }
 
     public void handleStagDialogue(Player player, Choice selectedChoice, int choiceIndex) {
-        NPC stag = npcs.get("white_stag");
+        NPC stag = npcs.get("great_white_stag");
         if (stag == null || stag.isDead() || selectedChoice == null) return;
 
         String desc = selectedChoice.getDescription();

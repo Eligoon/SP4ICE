@@ -92,7 +92,11 @@ public class Choice {
                 break;
 
             case INTERACT:
-                if (npc != null) gc.handleNPCInteraction(npc);
+                if (npc != null) {
+                    gc.handleNPCInteraction(npc);
+                } else if (targetLocation != null) {
+                    gc.handleLocationInteraction(targetLocation);
+                }
                 break;
 
             case USEITEM:

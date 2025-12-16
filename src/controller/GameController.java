@@ -200,11 +200,11 @@ public class GameController {
         // 1. Display welcome message
         emeraldTear.displayWelcomeMessage();
 
-        // 2. Load story, including all locations and connections
-        emeraldTear.loadStory();
-
-        // 3. Create the player character
+        // 2. Create the player character
         createPlayer();
+
+        // 3. Load story, including all locations and connections
+        emeraldTear.loadStory();
 
         // 4. Display class-specific intro immediately after player creation
         displayClassSpecificIntro();
@@ -273,7 +273,6 @@ public class GameController {
                 break;
             case 2:
                 ui.displayMsg("Quitting game...");
-                saveGame();
                 System.exit(0);
                 break;
             case 3:
@@ -299,18 +298,14 @@ public class GameController {
         Objects worldObjects = new Objects();
         worldObjects.checkForTraps(currentLocation, player, emeraldTear);
 
-        // 7. Display choices based on whether there are NPCs
-        List<Creature> npcs = currentLocation.getCreature(newLocation);
-        if (!npcs.isEmpty()) {
-            // If NPCs exist, show NPC interaction choices first
-            for (Creature npc : npcs) {
-                displayAvailableChoices((NPC) npc);
-            }
-        } else {
-            // No NPCs, show normal location-based choices
-            displayAvailableChoices(null);
-        }
+        // 7. Display choices at the new location (pass first NPC if any)
+        List<Creature> npcs = currentLocation.getCreature(currentLocation);
+        NPC npc = null;
+        if (!npcs.isEmpty()) npc = (NPC) npcs.get(0);
+
+        displayAvailableChoices(npc);
     }
+
 
 
 
@@ -319,7 +314,7 @@ public class GameController {
     public void displayAvailableChoices(NPC npc) {
         if (currentLocation == null || player == null) return;
 
-        // --- 1. Display location header ONCE ---
+        // --- 1. Display location header ---
         ui.displayMsg("\n==============================");
         ui.displayMsg("Location: " + currentLocation.getLocationName());
         ui.displayMsg(currentLocation.getDescription());
@@ -327,36 +322,49 @@ public class GameController {
         // --- 2. Collect all possible choices ---
         List<Choice> allChoices = new ArrayList<>();
 
-        // NPC dialogue choices (if applicable)
+        // --- 2a. NPC dialogue choices ---
         if (npc != null) {
-            allChoices.addAll(emeraldTear.getDialogueChoices(npc, player));
-        } else {
-            allChoices.addAll(emeraldTear.getLocationDialogue(currentLocation, player));
+            // Get dialogue choices from Story
+            List<Choice> dialogueChoices = emeraldTear.getDialogueChoices(npc, player);
+            if (!dialogueChoices.isEmpty()) {
+                allChoices.addAll(dialogueChoices);
+            }
         }
 
-        // --- 3. Add movement choices ---
+        // --- 2b. Location-specific choices ---
+        List<Choice> locationChoices = emeraldTear.getLocationDialogue(currentLocation, player);
+        if (locationChoices != null && !locationChoices.isEmpty()) {
+            allChoices.addAll(locationChoices);
+        }
+
+
+        // --- 3. Movement choices ---
         for (String direction : currentLocation.getConnectedLocations().keySet()) {
-            allChoices.add(Choice.moveChoice(emeraldTear.getLocationDescription(currentLocation), direction));
+            allChoices.add(Choice.moveChoice(
+                    emeraldTear.getLocationDescription(currentLocation),
+                    direction
+            ));
         }
 
-
-        // --- 4. Filter by player state ---
+        // --- 4. Filter choices by player state ---
         List<Choice> availableChoices = ui.getAvailableChoices(allChoices, player);
 
-        // --- 5. No actions case ---
+        // --- 5. No available actions ---
         if (availableChoices.isEmpty()) {
             ui.displayMsg("There is nothing you can do here.");
             return;
         }
 
-        // --- 6. Display and prompt ---
+        // --- 6. Display choices to player ---
         ui.displayMsg("\nWhat would you like to do?");
         ui.displayChoices(availableChoices);
 
+        // --- 7. Prompt player to select choice ---
         Choice selected = ui.promptChoiceOb(availableChoices, "Choose your action:");
 
-        // --- 7. Execute ---
+        // --- 8. Execute selected choice ---
         if (selected != null) {
+            // The execute method should call back into GameController, e.g., handleDialogue or move
             selected.execute(this);
         }
     }
@@ -454,6 +462,24 @@ public class GameController {
         }
     }
 
+    public void handleLocationInteraction(Location location) {
+        if (location == null) return;
+
+        // Get list of choices from Story
+        List<Choice> dialogueOptions = emeraldTear.getLocationDialogue(location, player);
+        if (dialogueOptions.isEmpty()) {
+            ui.displayMsg(location.getLocationName() + " The wind blows.");
+            return;
+        }
+
+        // Prompt the player to choose a dialogue
+        Choice selected = ui.promptChoiceOb(dialogueOptions, "Choose your dialogue:");
+
+        // Handle the chosen dialogue directly
+        emeraldTear.handleLocationDialogue(location, player, selected);
+
+    }
+
 
     public void handleEquipArmour(Item armourItem) {
         if (!(armourItem instanceof Armor)) {
@@ -478,50 +504,25 @@ public class GameController {
     }
 
     public void startGameLoop() {
-        boolean isPlaying = true;
+        while (true) {
+            if (currentLocation == null || player == null) {
+                ui.displayMsg("Error: current location or player is not set.");
+                break;
+            }
 
-        while (isPlaying) {
+            // Get first NPC in the current location, if any
+            List<Creature> npcs = currentLocation.getCreature(currentLocation);
+            NPC npc = null;
+            if (!npcs.isEmpty()) {
+                npc = (NPC) npcs.get(0);
+            }
 
-            // Save current location before executing choice
-            Location oldLocation = currentLocation;
-
-                displayAvailableChoices(null);
-
-                //  If the player moved, ask to save or quit
-                if (currentLocation != oldLocation) {
-                    ui.displayMsg("You moved to a new location. Options:");
-                    ui.displayMsg("1. Continue");
-                    ui.displayMsg("2. Save Game");
-                    ui.displayMsg("3. Save and Exit");
-                    ui.displayMsg("4. Exit without saving");
-
-                    int option = ui.promptNumeric("Choose option:");
-
-                    switch (option) {
-                        case 2 -> {
-                            db.savePlayer(player, currentLocation);
-                            db.saveInventory(player);
-                            db.saveGameState(this);
-                            ui.displayMsg("Game saved.");
-                        }
-                        case 3 -> {
-                            db.savePlayer(player, currentLocation);
-                            db.saveInventory(player);
-                            db.saveGameState(this);
-                            ui.displayMsg("Game saved. Exiting now. Goodbye!");
-                            isPlaying = false;
-                        }
-                        case 4 -> {
-                            ui.displayMsg("Exiting game without saving. Goodbye!");
-                            isPlaying = false;
-                        }
-                        default -> {
-                            // Continue automatically
-                        }
-                    }
-                }
+            // Display available choices at current location
+            displayAvailableChoices(npc);
         }
     }
+
+
 
     //--- Getters ---
     public Location getCurrentLocation() {
