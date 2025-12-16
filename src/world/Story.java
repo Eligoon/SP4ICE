@@ -334,10 +334,14 @@ public class Story {
         // The offering bog connected locations
         theOfferingBog.addConnectedLocation("north", theSwampPath);
 
-        // The swamp path connected locations
+        // The swamp path connected locations/conditioned on story
         theSwampPath.addConnectedLocation("south", theOfferingBog);
         theSwampPath.addConnectedLocation("west", theForestPath);
-        theSwampPath.addConnectedLocation("north", theFrozenBog);
+
+        if(gc.getPlayer().hasFlag("killed_witch") || gc.getPlayer().hasFlag("witch_barrier_open")) {
+            theSwampPath.addConnectedLocation("north", theFrozenBog);
+        }
+
         theSwampPath.addConnectedLocation("east", theMurkyWaters);
 
         // The murky waters connected locations
@@ -352,13 +356,19 @@ public class Story {
         theFrozenBog.addConnectedLocation("west", theMountainPath);
         theFrozenBog.addConnectedLocation("north", theRootsOfTheMountain);
 
+        // The mountain path connected locations/conditioned on story
+        if (gc.getPlayer().hasFlag("killed_witch") || gc.getPlayer().hasFlag("witch_barrier_open")) {
+            theMountainPath.addConnectedLocation("east", theFrozenBog);
+        }
+
+        theMountainPath.addConnectedLocation("south", theForestPath);
+
         // The roots of the mountain connected locations
         theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
         theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
 
-        //  The freezing pass connected locations
+        //  The freezing pass connected locations (cannot turn back)
         theFreezingPass.addConnectedLocation("east", theCave);
-        theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
 
         // The cave connected locations
         theCave.addConnectedLocation("north", theCrownOfTheWorld);
@@ -1110,7 +1120,7 @@ public class Story {
 
         switch (choiceIndex) {
 
-            case 0: // First interaction (peaceful plea)
+            case 0: // First interaction
                 player.addFlag("dragon_first_interaction");
                 ui.displayMsg(
                         "A little stranger, here to bring balance to the world…\n" +
@@ -1119,11 +1129,11 @@ public class Story {
                 );
                 break;
 
-            case 1: // Bribe: give all items
+            case 1: // Give all items
                 player.addFlag("dragon_will_help");
                 player.addFlag("dragon_barter");
 
-                player.getInventory().clearInventory(); // ✔ Correct way
+                player.getInventory().clearInventory();
 
                 ui.displayMsg(
                         "Oh, how humorous. Such frivolous mortal behavior.\n" +
@@ -1131,7 +1141,7 @@ public class Story {
                 );
                 break;
 
-            case 2: // Fight the dragon
+            case 2: // Fight dragon
                 dragon.setHostile(true);
                 ui.displayMsg("The Ice Dragon roars and prepares for battle!");
                 gc.handleCombat(dragon);

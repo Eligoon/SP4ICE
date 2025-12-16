@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Inventory {
+public class Inventory implements Iterable<Item> {
     private List<Item> items;
     private int maxCapacity;
     private Weapon equippedWeapon;
@@ -161,7 +161,7 @@ public class Inventory {
 
     //to make this work, we would Need a: public void use(Player player) method
 
-    public void useItem(Player player){
+    public void useItem(Player Player){
         if (items.isEmpty()){
             ui.displayMsg("You have no items to use!");
             return;
@@ -190,6 +190,8 @@ public class Inventory {
             removeItem(chosenItem);
         }
     }
+    */
+
 
     public void clearInventory(){
         items.clear();
@@ -197,6 +199,11 @@ public class Inventory {
         equippedArmor = null;
 
         ui.displayMsg("Inventory has been cleared!");
+    }
+
+
+    public Iterator<Item> iterator(){
+        return items.iterator();
     }
 
 

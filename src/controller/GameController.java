@@ -286,11 +286,11 @@ public class GameController {
         worldObjects.checkForTraps(currentLocation, player, emeraldTear);
 
         // 7. Display choices based on whether there are NPCs
-        List<NPC> npcs = currentLocation.getCreature();
+        List<Creature> npcs = currentLocation.getCreature(newLocation);
         if (!npcs.isEmpty()) {
             // If NPCs exist, show NPC interaction choices first
-            for (NPC npc : npcs) {
-                displayAvailableChoices(npc);
+            for (Creature npc : npcs) {
+                displayAvailableChoices((NPC) npc);
             }
         } else {
             // No NPCs, show normal location-based choices
@@ -384,13 +384,14 @@ public class GameController {
                         break; // exit combat loop
                     }
                 } else if (choice == 2) {
-                    List<Item> usableItems = player.getInventory().getUsableItems();
-                    if (usableItems.isEmpty()) {
-                        ui.displayMsg("No usable items in your inventory!");
-                    } else {
-                        // Let player choose which item to use
-                        Item itemToUse = ui.promptChoiceOb(usableItems, "Choose an item to use:");
-                        handleUseItem(itemToUse);
+                    player.getInventory().displayInventory(); // Show inventory
+                    ArrayList<String> consumableItems = new ArrayList<>();
+
+                    for (Item item : player.getInventory()){
+                        if (item.isConsumable()) {
+                            consumableItems.add(item.getItemName());
+                            ui.displayList(consumableItems, "Pick potion to drink:");
+                        }
                     }
                 }
             } else {
@@ -445,10 +446,6 @@ public class GameController {
             handleCombat(npc);
         }
     }
-
-    public void handleUseItem(Item item) {
-        player.getInventory().useItem(player);
-        }
 
 
     public void handleEquipArmour(Item armourItem) {
