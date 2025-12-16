@@ -189,9 +189,6 @@ public class GameController {
 
         // --- Create Player ---
         this.player = new Player(name, chosenRace, chosenClass, stats);
-
-        // --- Display class-specific intro ---
-        displayClassSpecificIntro();
     }
 
 
@@ -211,7 +208,6 @@ public class GameController {
 
         // 5. Set starting location
         currentLocation = emeraldTear.getLocation("The Clearing");
-        ui.displayMsg(emeraldTear.getLocationDescription(currentLocation));
     }
 
 
@@ -291,22 +287,20 @@ public class GameController {
 
         // 5. Feedback to the player
         ui.displayMsg("You move " + direction + "...");
-        ui.displayMsg("You are now at: " + currentLocation.getLocationName());
-        ui.displayMsg(currentLocation.getDescription());
 
         // 6. Check for traps
         Objects worldObjects = new Objects();
         worldObjects.checkForTraps(currentLocation, player, emeraldTear);
 
+        /*
         // 7. Display choices at the new location (pass first NPC if any)
         List<Creature> npcs = currentLocation.getCreature(currentLocation);
         NPC npc = null;
         if (!npcs.isEmpty()) npc = (NPC) npcs.get(0);
 
         displayAvailableChoices(npc);
+         */
     }
-
-
 
 
     // Displays available choices at the current location.
@@ -341,7 +335,7 @@ public class GameController {
         // --- 3. Movement choices ---
         for (String direction : currentLocation.getConnectedLocations().keySet()) {
             allChoices.add(Choice.moveChoice(
-                    emeraldTear.getLocationDescription(currentLocation),
+                    "Go " + direction,
                     direction
             ));
         }

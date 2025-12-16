@@ -110,13 +110,11 @@ public class TextUI {
     }
 
     public Choice promptChoiceOb(List<Choice> choices, String msg) {
-        displayMsg(msg);
-        displayChoices(choices);
 
         int num;
         while (true) {
             try {
-                displayMsg("Enter choice number:");
+                displayMsg(msg);
                 num = Integer.parseInt(sc.nextLine());
 
                 if (num < 1 || num > choices.size()) {

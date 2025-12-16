@@ -123,11 +123,11 @@ public class Story {
                         "spot no one or any signs of anyone using the road but you. After a while of walking you come to a\n" +
                         "crossroads in the path.\n" +
                         " You can spot the grey and white nuances of the mountain through the trees where one of the path\n" +
-                        "     branches continues to the North.\n" +
-                        "                You can hear the sound of insects and smell the aroma of still standing water where the forest gets wetter\n" +
-                        "        and denser where one of the path branches continues to the East.\n" +
-                        "        You can hear the sound of one or more horses, and see a colourful piece of cloth though a thicket to a small\n" +
-                        "        clearing in the forest to the South."
+                        "branches continues to the North.\n" +
+                        "You can hear the sound of insects and smell the aroma of still standing water where the forest gets wetter\n" +
+                        "and denser where one of the path branches continues to the East.\n" +
+                        "You can hear the sound of one or more horses, and see a colourful piece of cloth though a thicket to a small\n" +
+                        "clearing in the forest to the South."
         );
 
         this.theTravellingMerchant = new Location(
@@ -285,8 +285,6 @@ public class Story {
         }
         return "";
     }
-
-
 
     public void storeLocations() {
         // Add locations to the map
@@ -552,11 +550,7 @@ public class Story {
 
 
             default:
-                List<Choice> options = new ArrayList<>();
-                options.add(Choice.interactChoice(
-                        "Hello " + player.getName() + "!", location
-                ));
-                return options;
+                return new ArrayList<>();
         }
     }
 
