@@ -49,6 +49,11 @@ public class Location {
         return connectedLocations.get(direction);
     }
 
+    // Returns all connected directions
+    public Map<String, Location> getConnectedLocations() {
+        return connectedLocations;
+    }
+
     // Add creature to location
     public void addCreature(Creature creature){
         creatures.add(creature);
