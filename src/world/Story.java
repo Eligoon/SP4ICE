@@ -361,9 +361,8 @@ public class Story {
         theRootsOfTheMountain.addConnectedLocation("east", theFreezingPass);
         theRootsOfTheMountain.addConnectedLocation("south", theFrozenBog);
 
-        //  The freezing pass connected locations
+        //  The freezing pass connected locations (cannot turn back)
         theFreezingPass.addConnectedLocation("east", theCave);
-        theFreezingPass.addConnectedLocation("west", theRootsOfTheMountain);
 
         // The cave connected locations
         theCave.addConnectedLocation("north", theCrownOfTheWorld);
