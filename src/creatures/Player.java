@@ -93,6 +93,7 @@ public class Player extends Creature {
 
 
 
+
     // Flag management
 
     // Add flag to Player flags
