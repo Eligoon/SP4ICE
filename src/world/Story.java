@@ -112,7 +112,13 @@ public class Story {
                 "You walk towards the path you spotted in the forest to the east. It does not take you long before you find\n" +
                         "yourself walking easier on a well-trodden road. Despite the frequent use you imagine the road has had, you\n" +
                         "spot no one or any signs of anyone using the road but you. After a while of walking you come to a\n" +
-                        "crossroads in the path.\n"
+                        "crossroads in the path.\n" +
+                        " You can spot the grey and white nuances of the mountain through the trees where one of the path\n" +
+                        "     branches continues to the North.\n" +
+                        "                You can hear the sound of insects and smell the aroma of still standing water where the forest gets wetter\n" +
+                        "        and denser where one of the path branches continues to the East.\n" +
+                        "        You can hear the sound of one or more horses, and see a colourful piece of cloth though a thicket to a small\n" +
+                        "        clearing in the forest to the South."
         );
 
         Location theTravellingMerchant = new Location(
@@ -256,7 +262,7 @@ public class Story {
     }
 
     public String getTrapMessage(String locationName) {
-        if (locationName.equals("The Murky Waters")) {
+        if (locationName.equalsIgnoreCase("The Murky Waters")) {
             return "You go around the bubbles, those are surely deadly right? " +
                     "Well, someone placed a spiked trap below the waters!";
         }
@@ -512,7 +518,75 @@ public class Story {
         theOfferingBog.addCreature(npcs.get("offering_orc_2"));
     }
 
-    // DIALOGUE OPTIONS FOR NPC's
+    // DIALOGUE OPTIONS FOR LOCATIONS
+
+    public List<Choice> getLocationDialogue(Location location, Player player) {
+        if ( location == null) {
+            return new ArrayList<>();
+        }
+
+        switch(location.getLocationName().toLowerCase()) {
+
+            case "huntingCabin":
+                return getTheHuntingCabin(player);
+        }
+    }
+
+    public void handleLocatoinDialogue(Location location, Player player, Choice selectedChoice) {
+        if (location == null || selectedChoice == null) return;
+
+        List<Choice> choices = getLocationDialogue(location player);
+        int choiceIndex = choices.indexOf(selectedChoice);
+
+        if (choiceIndex < 0) return; // Safety check
+
+        switch (location.getLocationName().toLowerCase()) {
+
+            case "siren":
+                handleHuntingCabin(player, selectedChoice, choiceIndex);
+                break;
+
+
+            default:
+                ui.displayMsg("");
+                break;
+        }
+    }
+
+
+    public List<Choice> getTheHuntingCabin (Player player) {
+        List<Choice> choices = new ArrayList<>();
+        Location HuntingCabin = locations.get("huntingCabin");
+
+        if (player.hasFlag("received_cabin_key")) {
+            Choice getCabinLoot = Choice.interactChoice(
+                    "The magical barrier no longer holds, the symbols and runes no longer glowing." +
+                            " You can go now go East towards the mountain from here.",
+                    HuntingCabin
+            );
+            choices.add(getCabinLoot);
+        }
+        return choices;
+    }
+
+    public void handleHuntingCabin(Player player, Choice selectedChoice, int choiceIndex) {
+        // Display the chosen dialogue
+        ui.displayMsg("You: " + selectedChoice.getDescription());
+
+        switch( choiceIndex) {
+            case 0:
+                ui.displayMsg("The old key fits into the lock of the cabin, with one twist the lock clicks open. " +
+                        "Inside the old cabin is a few supplies hidden in neat packed crates and barrels. (Imagine it) " +
+                        "Whoever lived or used this place left it in a neat condition, and not in a hurried rush.");
+                break;
+            default:
+                ui.displayMsg("This, is the hunting cabin");
+                break;
+        }
+    }
+
+
+    // DIALOGUE OPTIONS FOR NPC'S
 
     // Generic getter for dialogue choices to go to game controller
     public List<Choice> getDialogueChoices(NPC npc, Player player) {
