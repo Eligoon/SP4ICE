@@ -50,6 +50,14 @@ public class Choice {
         return c;
     }
 
+    public static Choice interactChoice(String description, Location location) {
+        Choice c = new Choice();
+        c.description = description;
+        c.targetLocation = location;
+        c.type = ChoiceType.INTERACT;
+        return c;
+    }
+
     public static Choice itemChoice(String description, Item item, ChoiceType type) {
         Choice c = new Choice();
         c.description = description;
